@@ -1,0 +1,333 @@
+{
+  "app": {
+    "name": "Moja Pijaca"
+  },
+  "nav": {
+    "home": "Home",
+    "markets": "Markets",
+    "prices": "Prices"
+  },
+  "header": {
+    "tagline": "Track market prices across Serbia"
+  },
+  "hero": {
+    "stats": {
+      "official": {
+        "title": "Official data",
+        "description": "Sourced directly from the Ministry of Agriculture's STIPS system."
+      },
+      "coverage": {
+        "title": "All locations",
+        "description": "We track markets and procurement points across every city and district in Serbia."
+      },
+      "freshness": {
+        "title": "Fresh prices",
+        "description": "Thousands of prices refreshed every week."
+      }
+    }
+  },
+  "language": {
+    "sr": "Serbian",
+    "en": "English"
+  },
+  "categories": {
+    "eggsPoultry": "Eggs & Poultry",
+    "meat": "Meat",
+    "dairy": "Dairy products",
+    "milk": "Milk",
+    "vegetables": "Vegetables",
+    "fruit": "Fruit",
+    "grains": "Grains"
+  },
+  "filterBar": {
+    "categoryLabel": "Category",
+    "categoryPlaceholder": "Select a category",
+    "cityLabel": "City",
+    "cityPlaceholder": "Select a city",
+    "marketLabel": "Market",
+    "marketAllOption": "All markets in this city",
+    "submit": "Show Prices"
+  },
+  "landing": {
+    "title": "Explore Markets",
+    "subtitle": "Pick a market or use the filters above to see prices."
+  },
+  "weeklyTrends": {
+    "title": "Biggest Price Drops This Week",
+    "subtitle": "Products with the freshest price drops across markets in Serbia."
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "steps": {
+      "search": {
+        "title": "Search by location",
+        "description": "Filter by your exact city and market."
+      },
+      "compare": {
+        "title": "Compare history",
+        "description": "Analyze clear charts tracking prices from the start of the year."
+      },
+      "buy": {
+        "title": "Shop smart",
+        "description": "Find the cheapest options before you leave the house."
+      }
+    }
+  },
+  "weekStatus": {
+    "current": "Prices for period: {{week}}",
+    "official": "Official data as of: {{week}}"
+  },
+  "productCard": {
+    "source": "Source: {{source}}",
+    "avgPrice": "Average price",
+    "avgPriceValue": "{{price}} RSD",
+    "priceUnit": "RSD / {{unit}}",
+    "packaging": "Packaging",
+    "origin": "Origin",
+    "offer": "Offer",
+    "importCountry": "Country of import",
+    "extraPackaging": "Additional packaging",
+    "viewAnalytics": "View analytics for {{product}}",
+    "noTrend": "No trend",
+    "noTrendTitle": "View price trend since the start of the year"
+  },
+  "results": {
+    "loading": "Loading data...",
+    "error": "Failed to load data from Google Sheets.",
+    "empty": "No data to display."
+  },
+  "loader": {
+    "message": "Loading the market database...",
+    "phase1": "Opening the gates and setting up the crates...",
+    "phase2": "Wiping down the counter and adjusting the scales...",
+    "phase3": "Stacking the freshest produce on the stall...",
+    "phase4": "Polishing up the early morning market prices..."
+  },
+  "marketStatus": {
+    "openUntil": "Open • Open until {{time}}",
+    "closed": "Closed",
+    "alwaysOpen": "Open (24h)",
+    "addressLabel": "Address",
+    "closedToday": "closed today",
+    "tooltip": "Address: {{address}} • Working hours: {{hours}}"
+  },
+  "scrollToTop": {
+    "label": "Back to top"
+  },
+  "analytics": {
+    "back": "Back to overview",
+    "backToMarket": "Back to market",
+    "historyTitle": "Price history",
+    "comparisonTitle": "City comparison",
+    "cheapest": "Cheapest",
+    "priciest": "Most expensive",
+    "priceLabel": "Price",
+    "stipsSourceLabel": "STIPS",
+    "jkpSourceLabel": "JKP Beogradske pijace",
+    "noHistory": "No historical data for this product.",
+    "noComparison": "No data available for city comparison."
+  },
+  "footer": {
+    "copyright": "© {{year}} Moja Pijaca. All data is retrieved from the <stipsLink>STIPS</stipsLink> system for informational purposes.",
+    "disclaimerLink": "Disclaimer"
+  },
+  "404": {
+    "title": "This stall is currently empty",
+    "description": "Maybe the page you are looking for is still in a draft state, moved, or the market day has ended. Please check the URL or go back to browse active prices.",
+    "button": "Back to Home"
+  },
+  "disclaimer": {
+    "title": "Disclaimer",
+    "back": "Back to home",
+    "intro": "The data shown on the Moja Pijaca portal is collected through an automated process and is provided for informational purposes only. By using this site, you accept the terms set out below.",
+    "sourceHeading": "Data source",
+    "sourceBody": "All agricultural product price data is retrieved through an automated process from the official STIPS system (Sistem tržišnih informacija poljoprivrede Srbije - the Serbian Agricultural Market Information System), operated by the Ministry of Agriculture, Forestry and Water Management of the Republic of Serbia. Moja Pijaca is not a government authority and is not affiliated with the Ministry - the portal solely processes and displays publicly available data for easier browsing.",
+    "liabilityHeading": "Limitation of liability",
+    "liabilityBody1": "While we make reasonable efforts to keep the displayed data current, we do not guarantee its complete accuracy, completeness, or timeliness. Market prices change in real time and may differ from the most recently recorded values due to seasonal, market, or logistical factors outside our control.",
+    "liabilityBody2": "Moja Pijaca accepts no responsibility for inaccuracies or errors arising from manual data entry by market officials, nor for technical issues in the transfer of data from the source system.",
+    "liabilityBody3": "Information shown on this site is not official and must not be used as the sole basis for legal, financial, or commercial decisions. For official and up-to-date information, please contact the STIPS system or the relevant Ministry directly."
+  },
+  "dataValues": {
+    "trend": {
+      "bez promene": "no price change",
+      "pad": "falling price",
+      "rast": "rising price"
+    },
+    "countries": {
+      "albanija": "Albania",
+      "grčka": "Greece",
+      "turska": "Turkey",
+      "makedonija": "North Macedonia",
+      "italija": "Italy"
+    },
+    "grad": {
+      "Južnobački okrug": "Južnobački okrug",
+      "Severnobački okrug": "Severnobački okrug"
+    },
+    "pijaca": {
+      "Zelena pijaca": "Green Market",
+      "Kvantaška pijaca": "Wholesale Market",
+      "Otkupna mesta / Klanice": "Slaughterhouses / Procurement",
+      "Stočna pijaca": "Livestock Market",
+      "Mlekara": "Dairy Plant",
+      "Maloprodaja": "Retail",
+      "Gazdinstvo": "Farm",
+      "Silos": "Silo",
+      "Pijaca": "Market"
+    },
+    "poreklo": {
+      "Domaće": "Domestic",
+      "Uvoz(Turska)": "Imported (Turkey)",
+      "Uvoz(Ekvador)": "Imported (Ecuador)",
+      "Uvoz(uvoz)": "Imported"
+    },
+    "jedMere": {
+      "kg": "kg",
+      "komad": "piece",
+      "veza": "bunch"
+    },
+    "pakovanje": {
+      "standardno": "standard",
+      "posebno": "special"
+    },
+    "ponuda": {
+      "dobra": "good",
+      "prosečna": "average",
+      "slaba": "poor",
+      "vrlo slaba": "very poor"
+    },
+    "proizvod": {
+      "Ananas (sve sorte)": "Pineapple (all varieties)",
+      "Banana (sve sorte)": "Banana (all varieties)",
+      "Blitva (sve sorte)": "Chard (all varieties)",
+      "Boranija (olovka)": "Green beans (pencil pod)",
+      "Boranija (šarena)": "Green beans (speckled)",
+      "Boranija (žuta)": "Green beans (yellow)",
+      "Borovnica (sve sorte)": "Blueberry (all varieties)",
+      "Breskva (sve sorte)": "Peach (all varieties)",
+      "Brokola (sve sorte)": "Broccoli (all varieties)",
+      "Celer (sve sorte)": "Celery (all varieties)",
+      "Cvekla (sve sorte)": "Beetroot (all varieties)",
+      "Dinja (sve sorte)": "Melon (all varieties)",
+      "Grašak (sve sotre bez mahune)": "Peas (shelled, all varieties)",
+      "Grejpfrut (sve sorte)": "Grapefruit (all varieties)",
+      "Grožđe (belo ostale)": "Grapes (white, other)",
+      "Grožđe (crno ostale)": "Grapes (black, other)",
+      "Jabuka (Ajdared)": "Apple (Idared)",
+      "Jabuka (Delišes ruž.)": "Apple (Red Delicious)",
+      "Jabuka (Delišes zlatni)": "Apple (Golden Delicious)",
+      "Jabuka (Greni Smit)": "Apple (Granny Smith)",
+      "Jabuka (Melrouz)": "Apple (Melrose)",
+      "Jabuka (ostale)": "Apple (other)",
+      "Jagoda (sve sorte)": "Strawberry (all varieties)",
+      "Kajsija (sve sorte)": "Apricot (all varieties)",
+      "Karfiol (sve sorte)": "Cauliflower (all varieties)",
+      "Kelj (sve sorte)": "Kale (all varieties)",
+      "Kivi (sve sorte)": "Kiwi (all varieties)",
+      "Krastavac (salatar)": "Cucumber (salad)",
+      "Krompir (beli)": "Potato (white)",
+      "Krompir (crveni)": "Potato (red)",
+      "Krompir (mladi )": "Potato (new)",
+      "Kruška (Viljamovka)": "Pear (Williams)",
+      "Kruška (ostale)": "Pear (other)",
+      "Kupina (sve sorte)": "Blackberry (all varieties)",
+      "Kupus (mladi)": "Cabbage (young)",
+      "Kupus (sve sorte)": "Cabbage (all varieties)",
+      "Lešnik (očišćen)": "Hazelnut (shelled)",
+      "Limun (sve sorte)": "Lemon (all varieties)",
+      "Lubenica (sve sorte)": "Watermelon (all varieties)",
+      "Luk beli (mladi)": "White onion (young)",
+      "Luk beli (sve sorte)": "White onion (all varieties)",
+      "Luk crni (mladi)": "Yellow onion (young)",
+      "Luk crni (sve sorte)": "Yellow onion (all varieties)",
+      "Malina (sve sorte)": "Raspberry (all varieties)",
+      "Mandarina (sve sorte)": "Mandarin (all varieties)",
+      "Nar (sve sorte)": "Pomegranate (all varieties)",
+      "Nektarina (sve sorte)": "Nectarine (all varieties)",
+      "Orah (očišćen)": "Walnut (shelled)",
+      "Paprika (Babura)": "Bell pepper (Babura)",
+      "Paprika (ljuta)": "Pepper (hot)",
+      "Paprika (ostala)": "Pepper (other)",
+      "Paprika (šilja)": "Pepper (pointed)",
+      "Paradajz (chery)": "Tomato (cherry)",
+      "Paradajz (sve sorte)": "Tomato (all varieties)",
+      "Pasulj (beli gradištanac)": "Beans (white, Gradištanac)",
+      "Pasulj (beli tetovac)": "Beans (white, Tetovac)",
+      "Pasulj (beli)": "Beans (white)",
+      "Pasulj (šareni)": "Beans (speckled)",
+      "Pasulj (žuti)": "Beans (yellow)",
+      "Patlidžan (sve sorte)": "Eggplant (all varieties)",
+      "Paškanat (sve sorte)": "Parsnip (all varieties)",
+      "Peršun (korenaš)": "Parsley (root)",
+      "Peršun (lišćar)": "Parsley (leaf)",
+      "Pečurke (šampinjoni)": "Mushrooms (button)",
+      "Pomorandža (sve sorte)": "Orange (all varieties)",
+      "Praziluk (sve sorte)": "Leek (all varieties)",
+      "Ren (sve sorte)": "Horseradish (all varieties)",
+      "Ribizla (sve sorte)": "Currant (all varieties)",
+      "Rotkvica (sve sorte)": "Radish (all varieties)",
+      "Smokva (suva)": "Fig (dried)",
+      "Smokva (sve sorte)": "Fig (all varieties)",
+      "Spanać (sve sorte)": "Spinach (all varieties)",
+      "Tikvice (sve sorte)": "Zucchini (all varieties)",
+      "Trešnja (sve sorte)": "Cherry (sweet, all varieties)",
+      "Višnja (sve sorte)": "Cherry (sour, all varieties)",
+      "Zelen (sve sorte)": "Soup greens root (all varieties)",
+      "Zelena salata (sve sorte)": "Lettuce (all varieties)",
+      "Zelje (sve sorte)": "Pickling cabbage (all varieties)",
+      "Šargarepa (sve sorte)": "Carrot (all varieties)",
+      "Šljiva (suva)": "Plum (dried)",
+      "Šljiva (sve sorte)": "Plum (all varieties)",
+      "Špargla (sve sorte)": "Asparagus (all varieties)",
+      "Grašak (sve sorte u mahuni)": "Peas (in pod, all varieties)",
+      "Kelj pupčar (sve sorte)": "Brussels sprouts (all varieties)",
+      "Krastavac (Kornišon)": "Cucumber (gherkin)",
+      "Paradajz (zeleni)": "Tomato (green)",
+      "Rotkva (sve sorte)": "Black radish (all varieties)",
+      "Dunja (sve sorte)": "Quince (all varieties)",
+      "Grožđe (crno Kardinal)": "Grapes (black, Cardinal)",
+      "Jabuka (Gloster)": "Apple (Gloster)",
+      "Jabuka (Jonagold)": "Apple (Jonagold)",
+      "Jabuka (Mucu)": "Apple (Mutsu)",
+      "Mušmula (sve sorte)": "Loquat (all varieties)",
+      "Jaja (L)": "Eggs (L)",
+      "Jaja (M)": "Eggs (M)",
+      "Jaja (S)": "Eggs (S)",
+      "Jaja (XL)": "Eggs (XL)",
+      "Piletina (sve rase)": "Chicken (all breeds)",
+      "Bikovi": "Bulls",
+      "Dviske": "Heifers",
+      "Jagnjad": "Lambs",
+      "Jarad": "Kids (goats)",
+      "Junad": "Young cattle",
+      "Koze": "Goats",
+      "Krave za klanje": "Cows (for slaughter)",
+      "Krmače za klanje": "Sows (for slaughter)",
+      "Ovca": "Sheep",
+      "Ovnovi za priplod": "Rams (breeding)",
+      "Prasad": "Piglets",
+      "Priplodne junice": "Heifers (breeding)",
+      "Priplodne nazimice": "Gilts (breeding)",
+      "Telad": "Calves",
+      "Tovljenici": "Fattening cattle",
+      "Beli sir (masni)": "White cheese (full-fat)",
+      "Beli sir (polumasni)": "White cheese (semi-fat)",
+      "Kajmak": "Kajmak (clotted cream)",
+      "Mleko": "Milk",
+      "Kukuruz (novi rod, okrunjen, veštački sušen)": "Corn (new crop, shelled, kiln-dried)",
+      "Kukuruz (okrunjen, prirodno sušen)": "Corn (shelled, naturally dried)",
+      "Kukuruz (okrunjen, veštački sušen)": "Corn (shelled, kiln-dried)",
+      "Kukuruz (u klipu)": "Corn (on the cob)",
+      "Lucerka (seno u balama)": "Alfalfa (baled hay)",
+      "Lucerkino brašno (min 15% proteina)": "Alfalfa meal (min. 15% protein)",
+      "Pšenica": "Wheat",
+      "Pšenica (novi rod)": "Wheat (new crop)",
+      "Sojina sačma (44% proteina)": "Soybean meal (44% protein)",
+      "Sojino zrno": "Soybean (grain)",
+      "Stočni ječam": "Feed barley",
+      "Stočno brašno": "Feed meal",
+      "Suncokret (zrno)": "Sunflower (seed)",
+      "Suncokretova sačma (33% proteina)": "Sunflower meal (33% protein)"
+    }
+  }
+}

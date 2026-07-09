@@ -1,0 +1,28 @@
+# 1. Blokiranje biblioteka (Node modules)
+node_modules/
+**/node_modules/
+
+# 2. Blokiranje lokalnih build foldera
+dist/
+build/
+.claude/
+
+# 3. Blokiranje SVAKOG .env fajla u bilo kom podfolderu
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+
+# 4. Blokiranje Google API ključeva i Service Account fajlova
+service-account.json
+**/service-account.json
+credentials.json
+**/credentials.json
+
+# 5. Blokiranje operativnih sistema i logova
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db

@@ -1,0 +1,179 @@
+{
+  "app": {
+    "name": "Moja Pijaca"
+  },
+  "nav": {
+    "home": "Početna",
+    "markets": "Pijace",
+    "prices": "Cene"
+  },
+  "header": {
+    "tagline": "Pratite cene na pijacama u Srbiji"
+  },
+  "hero": {
+    "stats": {
+      "official": {
+        "title": "Zvanični podaci",
+        "description": "Podaci preuzeti direktno iz STIPS sistema Ministarstva poljoprivrede."
+      },
+      "coverage": {
+        "title": "Ključne lokacije",
+        "description": "Objedinjujemo podatke sa najposećenijih zelenih i kvantaških pijaca u regionalnim centrima zemlje."
+      },
+      "freshness": {
+        "title": "Ažurne cene",
+        "description": "Na hiljade cena se osvežava svake nedelje."
+      }
+    }
+  },
+  "language": {
+    "sr": "Srpski",
+    "en": "Engleski"
+  },
+  "categories": {
+    "eggsPoultry": "Jaja i živinsko meso",
+    "meat": "Meso",
+    "dairy": "Mlečni proizvodi",
+    "milk": "Mleko",
+    "vegetables": "Povrće",
+    "fruit": "Voće",
+    "grains": "Žitarice"
+  },
+  "filterBar": {
+    "categoryLabel": "Kategorija",
+    "categoryPlaceholder": "Izaberite kategoriju",
+    "cityLabel": "Grad",
+    "cityPlaceholder": "Izaberite grad",
+    "marketLabel": "Pijaca",
+    "marketAllOption": "Sve pijace u tom gradu",
+    "submit": "Prikaži cene"
+  },
+  "landing": {
+    "title": "Istražite pijace",
+    "subtitle": "Izaberite pijacu ili koristite filtere iznad da vidite cene."
+  },
+  "weeklyTrends": {
+    "title": "Najveća pojeftinjenja ove nedelje",
+    "subtitle": "Proizvodi sa najsvežijim padom cene na pijacama širom Srbije."
+  },
+  "howItWorks": {
+    "title": "Kako funkcioniše?",
+    "steps": {
+      "search": {
+        "title": "Pretražite lokacije",
+        "description": "Filtrirajte po gradu i pijaci koja vas zanima."
+      },
+      "compare": {
+        "title": "Uporedite istoriju",
+        "description": "Analizirajte jasne grafikone kretanja cena od početka godine."
+      },
+      "buy": {
+        "title": "Kupujte pametno",
+        "description": "Pronađite najpovoljniju ponudu pre nego što izađete iz kuće."
+      }
+    }
+  },
+  "weekStatus": {
+    "current": "Cene za period: {{week}}",
+    "official": "Zvanični podaci od: {{week}}"
+  },
+  "productCard": {
+    "source": "Izvor: {{source}}",
+    "avgPrice": "Prosečna cena",
+    "avgPriceValue": "{{price}} RSD",
+    "priceUnit": "RSD / {{unit}}",
+    "packaging": "Pakovanje",
+    "origin": "Poreklo",
+    "offer": "Ponuda",
+    "importCountry": "Zemlja uvoza",
+    "extraPackaging": "Dodatno pakovanje",
+    "viewAnalytics": "Prikaži analitiku za {{product}}",
+    "noTrend": "Bez trenda",
+    "noTrendTitle": "Pogledaj kretanje cene od početka godine"
+  },
+  "results": {
+    "loading": "Učitavanje podataka...",
+    "error": "Greška pri učitavanju podataka sa Google Sheets-a.",
+    "empty": "Nema podataka za prikaz."
+  },
+  "loader": {
+    "message": "Učitavanje pijačne baze podataka...",
+    "phase1": "Otvaramo kapiju i postavljamo gajbice...",
+    "phase2": "Brišemo kantar i pripremamo vage...",
+    "phase3": "Ređamo najsvežiju robu na čistu tezgu...",
+    "phase4": "Zapisujemo rano jutarnje merenje cena..."
+  },
+  "marketStatus": {
+    "openUntil": "Otvoreno • Radi do {{time}}",
+    "closed": "Zatvoreno",
+    "alwaysOpen": "Otvoreno (00–24h)",
+    "addressLabel": "Adresa",
+    "closedToday": "zatvoreno danas",
+    "tooltip": "Adresa: {{address}} • Radno vreme: {{hours}}"
+  },
+  "scrollToTop": {
+    "label": "Nazad na vrh"
+  },
+  "analytics": {
+    "back": "Nazad na pregled",
+    "backToMarket": "Nazad na pijacu",
+    "historyTitle": "Istorija cena",
+    "comparisonTitle": "Poređenje po gradovima",
+    "cheapest": "Najjeftinije",
+    "priciest": "Najskuplje",
+    "priceLabel": "Cena",
+    "stipsSourceLabel": "STIPS",
+    "jkpSourceLabel": "JKP Beogradske pijace",
+    "noHistory": "Nema istorijskih podataka za ovaj proizvod.",
+    "noComparison": "Nema podataka za poređenje gradova."
+  },
+  "footer": {
+    "copyright": "© {{year}} Moja Pijaca. Svi podaci se preuzimaju sa <stipsLink>STIPS</stipsLink> sistema u informativne svrhe.",
+    "disclaimerLink": "Odricanje od odgovornosti"
+  },
+  "404": {
+    "title": "Ova tezga je trenutno prazna",
+    "description": "Možda je stranica koju tražite u pripremi, premeštena ili je završen pijačni dan. Proverite adresu ili se vratite na pregled aktivnih ponuda.",
+    "button": "Nazad na početnu"
+  },
+  "disclaimer": {
+    "title": "Odricanje od odgovornosti",
+    "back": "Nazad na početnu",
+    "intro": "Podaci prikazani na portalu Moja Pijaca prikupljaju se automatizovanim putem i namenjeni su isključivo u informativne svrhe. Korišćenjem ovog sajta korisnik prihvata uslove navedene u nastavku.",
+    "sourceHeading": "Izvor podataka",
+    "sourceBody": "Svi podaci o cenama poljoprivrednih proizvoda preuzimaju se automatizovanim putem iz zvaničnog sistema STIPS (Sistem tržišnih informacija poljoprivrede Srbije), kojim upravlja Ministarstvo poljoprivrede, šumarstva i vodoprivrede Republike Srbije. Moja Pijaca nije zvaničan državni organ niti je povezana sa Ministarstvom - portal isključivo obrađuje i prikazuje javno dostupne podatke radi lakšeg pregleda.",
+    "liabilityHeading": "Ograničenje odgovornosti",
+    "liabilityBody1": "Iako ulažemo razuman napor da prikazani podaci budu ažurni, ne garantujemo njihovu potpunu tačnost, potpunost ili blagovremenost. Cene na pijacama menjaju se u realnom vremenu i mogu odstupati od poslednjih zabeleženih vrednosti usled sezonskih, tržišnih ili logističkih faktora van naše kontrole.",
+    "liabilityBody2": "Moja Pijaca ne snosi odgovornost za eventualne netačnosti ili greške nastale prilikom ručnog unosa podataka od strane ovlašćenih lica na pijacama, niti za tehničke propuste u prenosu podataka iz izvornog sistema.",
+    "liabilityBody3": "Podaci prikazani na ovom sajtu ne smatraju se zvaničnim i ne mogu se koristiti kao jedini osnov za pravne, finansijske ili komercijalne odluke. Za zvanične i ažurne informacije obratite se direktno sistemu STIPS ili nadležnom Ministarstvu."
+  },
+  "dataValues": {
+    "trend": {
+      "rast": "rast cene",
+      "pad": "pad cene",
+      "bez promene": "bez promene cene"
+    },
+    "countries": {
+      "albanija": "Albanija",
+      "grčka": "Grčka",
+      "turska": "Turska",
+      "makedonija": "Makedonija",
+      "italija": "Italija"
+    },
+    "grad": {
+      "Južnobački okrug": "Južnobački okrug",
+      "Severnobački okrug": "Severnobački okrug"
+    },
+    "pijaca": {
+      "Zelena pijaca": "Zelena pijaca",
+      "Kvantaška pijaca": "Kvantaška pijaca",
+      "Otkupna mesta / Klanice": "Otkupna mesta / Klanice",
+      "Stočna pijaca": "Stočna pijaca",
+      "Mlekara": "Mlekara",
+      "Maloprodaja": "Maloprodaja",
+      "Gazdinstvo": "Gazdinstvo",
+      "Silos": "Silos",
+      "Pijaca": "Pijaca"
+    }
+  }
+}

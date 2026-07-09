@@ -1,0 +1,128 @@
+{
+  "Beograd|Kalenić": {
+    "fullName": "JKP Beogradske pijace - Kalenić",
+    "sourceLabel": "JKP Beogradske pijace",
+    "address": "Maksima Gorkog bb, Beograd",
+    "hours": {
+      "mon": { "open": "06:00", "close": "19:00" },
+      "tue": { "open": "06:00", "close": "19:00" },
+      "wed": { "open": "06:00", "close": "19:00" },
+      "thu": { "open": "06:00", "close": "19:00" },
+      "fri": { "open": "06:00", "close": "19:00" },
+      "sat": { "open": "06:00", "close": "19:00" },
+      "sun": { "open": "06:00", "close": "19:00" }
+    }
+  },
+  "Beograd|Skadarlija": {
+    "fullName": "JKP Beogradske pijace - Skadarlija",
+    "sourceLabel": "JKP Beogradske pijace",
+    "address": "Đorđa Vašingtona bb, Beograd",
+    "hours": {
+      "mon": { "open": "06:00", "close": "19:00" },
+      "tue": { "open": "06:00", "close": "19:00" },
+      "wed": { "open": "06:00", "close": "19:00" },
+      "thu": { "open": "06:00", "close": "19:00" },
+      "fri": { "open": "06:00", "close": "19:00" },
+      "sat": { "open": "06:00", "close": "19:00" },
+      "sun": { "open": "06:00", "close": "19:00" }
+    }
+  },
+  "Beograd|Kvantaška pijaca": {
+    "fullName": "Veletržnica Beograd - Kvantaška pijaca",
+    "sourceLabel": "Veletržnica Beograd",
+    "address": "Balanička 6, Novi Beograd",
+    "hours": {
+      "mon": { "open": "00:00", "close": "24:00" },
+      "tue": { "open": "00:00", "close": "24:00" },
+      "wed": { "open": "00:00", "close": "24:00" },
+      "thu": { "open": "00:00", "close": "24:00" },
+      "fri": { "open": "00:00", "close": "24:00" },
+      "sat": { "open": "00:00", "close": "24:00" },
+      "sun": { "open": "00:00", "close": "24:00" }
+    }
+  },
+  "Novi Sad|Zelena pijaca": {
+    "fullName": "JKP \"Tržnica\" Novi Sad - Zelena pijaca",
+    "sourceLabel": "JKP \"Tržnica\" Novi Sad",
+    "address": "Žike Popovića 4, Novi Sad",
+    "hours": {
+      "mon": { "open": "06:00", "close": "18:00" },
+      "tue": { "open": "06:00", "close": "18:00" },
+      "wed": { "open": "06:00", "close": "18:00" },
+      "thu": { "open": "06:00", "close": "18:00" },
+      "fri": { "open": "06:00", "close": "18:00" },
+      "sat": { "open": "06:00", "close": "18:00" },
+      "sun": { "open": "06:00", "close": "14:00" }
+    }
+  },
+  "Novi Sad|Kvantaška pijaca": {
+    "fullName": "JKP \"Tržnica\" Novi Sad - Kvantaška pijaca",
+    "sourceLabel": "JKP \"Tržnica\" Novi Sad",
+    "address": "Venizelosova 40, Novi Sad",
+    "hours": {
+      "mon": { "open": "00:00", "close": "24:00" },
+      "tue": { "open": "00:00", "close": "24:00" },
+      "wed": { "open": "00:00", "close": "24:00" },
+      "thu": { "open": "00:00", "close": "24:00" },
+      "fri": { "open": "00:00", "close": "24:00" },
+      "sat": { "open": "00:00", "close": "24:00" },
+      "sun": { "open": "00:00", "close": "24:00" }
+    }
+  },
+  "Niš|Zelena pijaca": {
+    "fullName": "JKP \"Tržnica\" Niš - Tvrđava (Zelena pijaca)",
+    "sourceLabel": "JKP \"Tržnica\" Niš",
+    "address": "Đuke Dinić 4, Niš",
+    "hours": {
+      "mon": { "open": "06:00", "close": "17:00" },
+      "tue": { "open": "06:00", "close": "17:00" },
+      "wed": { "open": "06:00", "close": "17:00" },
+      "thu": { "open": "06:00", "close": "17:00" },
+      "fri": { "open": "06:00", "close": "17:00" },
+      "sat": { "open": "06:00", "close": "17:00" },
+      "sun": { "open": "06:00", "close": "17:00" }
+    }
+  },
+  "Niš|Kvantaška pijaca": {
+    "fullName": "JKP \"Tržnica\" Niš - Kvantaška pijaca (Medijana)",
+    "sourceLabel": "JKP \"Tržnica\" Niš",
+    "address": "Bulevar Cara Konstantina, Niš",
+    "hours": {
+      "mon": { "open": "00:00", "close": "24:00" },
+      "tue": { "open": "00:00", "close": "24:00" },
+      "wed": { "open": "00:00", "close": "24:00" },
+      "thu": { "open": "00:00", "close": "24:00" },
+      "fri": { "open": "00:00", "close": "24:00" },
+      "sat": { "open": "00:00", "close": "24:00" },
+      "sun": { "open": "00:00", "close": "24:00" }
+    }
+  },
+  "Leskovac|Zelena pijaca": {
+    "fullName": "JP \"Pijaca\" Leskovac - Zelena pijaca",
+    "sourceLabel": "JP \"Pijaca\" Leskovac",
+    "address": "Kralja Petra Prvog 26/V, Leskovac",
+    "hours": {
+      "mon": { "open": "06:00", "close": "17:00" },
+      "tue": { "open": "06:00", "close": "17:00" },
+      "wed": { "open": "06:00", "close": "17:00" },
+      "thu": { "open": "06:00", "close": "17:00" },
+      "fri": { "open": "06:00", "close": "17:00" },
+      "sat": { "open": "06:00", "close": "17:00" },
+      "sun": { "open": "06:00", "close": "17:00" }
+    }
+  },
+  "Leskovac|Kvantaška pijaca": {
+    "fullName": "JP \"Pijaca\" Leskovac - Kvantaška pijaca (Donji Bunibrod)",
+    "sourceLabel": "JP \"Pijaca\" Leskovac",
+    "address": "Donji Bunibrod, Leskovac",
+    "hours": {
+      "mon": { "open": "00:00", "close": "24:00" },
+      "tue": { "open": "00:00", "close": "24:00" },
+      "wed": { "open": "00:00", "close": "24:00" },
+      "thu": { "open": "00:00", "close": "24:00" },
+      "fri": { "open": "00:00", "close": "24:00" },
+      "sat": { "open": "00:00", "close": "24:00" },
+      "sun": { "open": "00:00", "close": "24:00" }
+    }
+  }
+}
