@@ -1,0 +1,60 @@
+name: Weekly Market Scrape to Sheets
+
+on:
+  schedule:
+    # Every Monday at 05:00 UTC
+    - cron: '0 5 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install STIPS scraper dependencies
+        working-directory: scripts/stips-scraper
+        run: npm ci
+
+      - name: Install JKP scraper dependencies
+        working-directory: scripts/jkp-scraper
+        run: npm ci
+
+      - name: Write Google service account credentials
+        run: echo '${{ secrets.GOOGLE_CREDENTIALS }}' > "$RUNNER_TEMP/service-account.json"
+
+      - name: Determine current year
+        id: date
+        run: echo "year=$(date -u +%Y)" >> "$GITHUB_OUTPUT"
+
+      - name: Run STIPS scraper
+        working-directory: scripts/stips-scraper
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/service-account.json
+          GOOGLE_SHEETS_SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          GOOGLE_SHEETS_SHEET_NAME: Prices
+          STIPS_WEEK: latest
+          STIPS_YEAR: ${{ steps.date.outputs.year }}
+        run: npm start
+
+      - name: Run JKP scraper
+        working-directory: scripts/jkp-scraper
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/service-account.json
+          GOOGLE_SHEETS_SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          JKP_SHEET_NAME: JKP_Prices
+          JKP_DATE: latest
+        run: npm start
+
+      - name: Remove service account credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/service-account.json"
