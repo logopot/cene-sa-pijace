@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Moja Pijaca"
+    "name": "Cene sa pijace"
   },
   "nav": {
     "home": "Početna",
@@ -128,7 +128,7 @@
     "noComparison": "Nema podataka za poređenje gradova."
   },
   "footer": {
-    "copyright": "© {{year}} Moja Pijaca. Svi podaci se preuzimaju sa <stipsLink>STIPS</stipsLink> sistema u informativne svrhe.",
+    "copyright": "© {{year}} Cene sa pijace. Svi podaci se preuzimaju sa <stipsLink>STIPS</stipsLink> sistema u informativne svrhe.",
     "disclaimerLink": "Odricanje od odgovornosti"
   },
   "404": {
@@ -139,12 +139,12 @@
   "disclaimer": {
     "title": "Odricanje od odgovornosti",
     "back": "Nazad na početnu",
-    "intro": "Podaci prikazani na portalu Moja Pijaca prikupljaju se automatizovanim putem i namenjeni su isključivo u informativne svrhe. Korišćenjem ovog sajta korisnik prihvata uslove navedene u nastavku.",
+    "intro": "Podaci prikazani na portalu Cene sa pijace prikupljaju se automatizovanim putem i namenjeni su isključivo u informativne svrhe. Korišćenjem ovog sajta korisnik prihvata uslove navedene u nastavku.",
     "sourceHeading": "Izvor podataka",
-    "sourceBody": "Svi podaci o cenama poljoprivrednih proizvoda preuzimaju se automatizovanim putem iz zvaničnog sistema STIPS (Sistem tržišnih informacija poljoprivrede Srbije), kojim upravlja Ministarstvo poljoprivrede, šumarstva i vodoprivrede Republike Srbije. Moja Pijaca nije zvaničan državni organ niti je povezana sa Ministarstvom - portal isključivo obrađuje i prikazuje javno dostupne podatke radi lakšeg pregleda.",
+    "sourceBody": "Svi podaci o cenama poljoprivrednih proizvoda preuzimaju se automatizovanim putem iz zvaničnog sistema STIPS (Sistem tržišnih informacija poljoprivrede Srbije), kojim upravlja Ministarstvo poljoprivrede, šumarstva i vodoprivrede Republike Srbije. Cene sa pijace nije zvaničan državni organ niti je povezana sa Ministarstvom - portal isključivo obrađuje i prikazuje javno dostupne podatke radi lakšeg pregleda.",
     "liabilityHeading": "Ograničenje odgovornosti",
     "liabilityBody1": "Iako ulažemo razuman napor da prikazani podaci budu ažurni, ne garantujemo njihovu potpunu tačnost, potpunost ili blagovremenost. Cene na pijacama menjaju se u realnom vremenu i mogu odstupati od poslednjih zabeleženih vrednosti usled sezonskih, tržišnih ili logističkih faktora van naše kontrole.",
-    "liabilityBody2": "Moja Pijaca ne snosi odgovornost za eventualne netačnosti ili greške nastale prilikom ručnog unosa podataka od strane ovlašćenih lica na pijacama, niti za tehničke propuste u prenosu podataka iz izvornog sistema.",
+    "liabilityBody2": "Cene sa pijace ne snosi odgovornost za eventualne netačnosti ili greške nastale prilikom ručnog unosa podataka od strane ovlašćenih lica na pijacama, niti za tehničke propuste u prenosu podataka iz izvornog sistema.",
     "liabilityBody3": "Podaci prikazani na ovom sajtu ne smatraju se zvaničnim i ne mogu se koristiti kao jedini osnov za pravne, finansijske ili komercijalne odluke. Za zvanične i ažurne informacije obratite se direktno sistemu STIPS ili nadležnom Ministarstvu."
   },
   "dataValues": {

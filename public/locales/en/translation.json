@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Moja Pijaca"
+    "name": "Cene sa pijace"
   },
   "nav": {
     "home": "Home",
@@ -128,7 +128,7 @@
     "noComparison": "No data available for city comparison."
   },
   "footer": {
-    "copyright": "© {{year}} Moja Pijaca. All data is retrieved from the <stipsLink>STIPS</stipsLink> system for informational purposes.",
+    "copyright": "© {{year}} Cene sa pijace. All data is retrieved from the <stipsLink>STIPS</stipsLink> system for informational purposes.",
     "disclaimerLink": "Disclaimer"
   },
   "404": {
@@ -139,12 +139,12 @@
   "disclaimer": {
     "title": "Disclaimer",
     "back": "Back to home",
-    "intro": "The data shown on the Moja Pijaca portal is collected through an automated process and is provided for informational purposes only. By using this site, you accept the terms set out below.",
+    "intro": "The data shown on the Cene sa pijace portal is collected through an automated process and is provided for informational purposes only. By using this site, you accept the terms set out below.",
     "sourceHeading": "Data source",
-    "sourceBody": "All agricultural product price data is retrieved through an automated process from the official STIPS system (Sistem tržišnih informacija poljoprivrede Srbije - the Serbian Agricultural Market Information System), operated by the Ministry of Agriculture, Forestry and Water Management of the Republic of Serbia. Moja Pijaca is not a government authority and is not affiliated with the Ministry - the portal solely processes and displays publicly available data for easier browsing.",
+    "sourceBody": "All agricultural product price data is retrieved through an automated process from the official STIPS system (Sistem tržišnih informacija poljoprivrede Srbije - the Serbian Agricultural Market Information System), operated by the Ministry of Agriculture, Forestry and Water Management of the Republic of Serbia. Cene sa pijace is not a government authority and is not affiliated with the Ministry - the portal solely processes and displays publicly available data for easier browsing.",
     "liabilityHeading": "Limitation of liability",
     "liabilityBody1": "While we make reasonable efforts to keep the displayed data current, we do not guarantee its complete accuracy, completeness, or timeliness. Market prices change in real time and may differ from the most recently recorded values due to seasonal, market, or logistical factors outside our control.",
-    "liabilityBody2": "Moja Pijaca accepts no responsibility for inaccuracies or errors arising from manual data entry by market officials, nor for technical issues in the transfer of data from the source system.",
+    "liabilityBody2": "Cene sa pijace accepts no responsibility for inaccuracies or errors arising from manual data entry by market officials, nor for technical issues in the transfer of data from the source system.",
     "liabilityBody3": "Information shown on this site is not official and must not be used as the sole basis for legal, financial, or commercial decisions. For official and up-to-date information, please contact the STIPS system or the relevant Ministry directly."
   },
   "dataValues": {

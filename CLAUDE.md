@@ -1,6 +1,6 @@
-# Moja Pijaca - Project Style Guide & Skills
+# Cene sa pijace - Project Style Guide & Skills
 
-This document defines the strict architectural, design, and data formatting rules for the "Moja Pijaca" React application. Refer to these rules during every refactoring and feature implementation.
+This document defines the strict architectural, design, and data formatting rules for the "Cene sa pijace" React application. Refer to these rules during every refactoring and feature implementation.
 
 ## Architecture & Components Rule
 
