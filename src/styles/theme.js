@@ -18,6 +18,9 @@ export const theme = {
     danger: '#c0392b',
     dangerTint: '#fbe4e1',
     jkpBlue: '#2563eb',
+    jkpBlueTint: '#dbeafe',
+    tertiary: '#b45309',
+    tertiaryTint: '#fef3c7',
     chartGuide: '#cbd5e1',
     titleDark: '#0f172a',
     priceAccent: '#16a34a',
@@ -40,7 +43,12 @@ export const theme = {
     pill: '999px',
   },
   spacing: {
+    xs: '8px',
+    sm: '12px',
+    md: '16px',
     lg: '24px',
+    xl: '40px',
+    xxl: '64px',
   },
   font: {
     // 'Plus Jakarta Sans' has no system-font equivalent, so without shipping

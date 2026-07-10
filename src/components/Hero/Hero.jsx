@@ -1,21 +1,21 @@
 import { useTranslation } from 'react-i18next'
 import { Container } from 'react-bootstrap'
-import { LuMapPinned, LuRefreshCw, LuShieldCheck } from 'react-icons/lu'
+import { MdOutlineUpdate, MdOutlineLocationOn, MdOutlineSavings } from 'react-icons/md'
 import {
   StyledHero,
+  Headline,
   Subtitle,
-  StatsRow,
-  StatCard,
-  StatIcon,
-  StatText,
-  StatTitle,
-  StatDescription,
+  ValueGrid,
+  ValueCard,
+  ValueIcon,
+  ValueTitle,
+  ValueDescription,
 } from './Hero.styled.js'
 
-const STATS = [
-  { key: 'official', icon: LuShieldCheck },
-  { key: 'coverage', icon: LuMapPinned },
-  { key: 'freshness', icon: LuRefreshCw },
+const VALUES = [
+  { key: 'freshPrices', icon: MdOutlineUpdate, variant: 'primary' },
+  { key: 'locationSearch', icon: MdOutlineLocationOn, variant: 'secondary' },
+  { key: 'smartSavings', icon: MdOutlineSavings, variant: 'tertiary' },
 ]
 
 function Hero() {
@@ -24,20 +24,19 @@ function Hero() {
   return (
     <StyledHero>
       <Container>
-        <Subtitle>{t('header.tagline')}</Subtitle>
-        <StatsRow>
-          {STATS.map(({ key, icon: Icon }) => (
-            <StatCard key={key}>
-              <StatIcon>
+        <Headline>{t('hero.headline')}</Headline>
+        <Subtitle>{t('hero.subtitle')}</Subtitle>
+        <ValueGrid>
+          {VALUES.map(({ key, icon: Icon, variant }) => (
+            <ValueCard key={key}>
+              <ValueIcon $variant={variant}>
                 <Icon />
-              </StatIcon>
-              <StatText>
-                <StatTitle>{t(`hero.stats.${key}.title`)}</StatTitle>
-                <StatDescription>{t(`hero.stats.${key}.description`)}</StatDescription>
-              </StatText>
-            </StatCard>
+              </ValueIcon>
+              <ValueTitle>{t(`hero.values.${key}.title`)}</ValueTitle>
+              <ValueDescription>{t(`hero.values.${key}.description`)}</ValueDescription>
+            </ValueCard>
           ))}
-        </StatsRow>
+        </ValueGrid>
       </Container>
     </StyledHero>
   )

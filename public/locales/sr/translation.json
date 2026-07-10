@@ -11,18 +11,20 @@
     "tagline": "Pratite cene na pijacama u Srbiji"
   },
   "hero": {
-    "stats": {
-      "official": {
-        "title": "Zvanični podaci",
-        "description": "Podaci preuzeti direktno iz STIPS sistema Ministarstva poljoprivrede."
+    "headline": "Najbolje pijačne cene u Srbiji",
+    "subtitle": "Uporedite cene voća, povrća i drugih namirnica na pijacama širom zemlje i uštedite na svakoj kupovini.",
+    "values": {
+      "freshPrices": {
+        "title": "Sveže cene, svaki dan",
+        "description": "Podaci se ažuriraju svakodnevno direktno iz zvaničnih izvora, tako da uvek vidite najnovije cene."
       },
-      "coverage": {
-        "title": "Ključne lokacije",
-        "description": "Objedinjujemo podatke sa najposećenijih zelenih i kvantaških pijaca u regionalnim centrima zemlje."
+      "locationSearch": {
+        "title": "Pretraga po lokaciji",
+        "description": "Izaberite grad i pijacu koja vam je najbliža i odmah pogledajte ponudu."
       },
-      "freshness": {
-        "title": "Ažurne cene",
-        "description": "Na hiljade cena se osvežava svake nedelje."
+      "smartSavings": {
+        "title": "Uštedite pametno",
+        "description": "Uporedite cene između pijaca i kupujte tamo gde je najpovoljnije."
       }
     }
   },

@@ -11,18 +11,20 @@
     "tagline": "Track market prices across Serbia"
   },
   "hero": {
-    "stats": {
-      "official": {
-        "title": "Official data",
-        "description": "Sourced directly from the Ministry of Agriculture's STIPS system."
+    "headline": "The Best Market Prices in Serbia",
+    "subtitle": "Compare prices for fruit, vegetables, and other goods across markets nationwide and save on every purchase.",
+    "values": {
+      "freshPrices": {
+        "title": "Fresh prices, every day",
+        "description": "Data is updated daily straight from official sources, so you always see the latest prices."
       },
-      "coverage": {
-        "title": "All locations",
-        "description": "We track markets and procurement points across every city and district in Serbia."
+      "locationSearch": {
+        "title": "Search by location",
+        "description": "Pick the city and market closest to you and see prices right away."
       },
-      "freshness": {
-        "title": "Fresh prices",
-        "description": "Thousands of prices refreshed every week."
+      "smartSavings": {
+        "title": "Save smart",
+        "description": "Compare prices across markets and shop where it's cheapest."
       }
     }
   },
