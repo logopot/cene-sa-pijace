@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
+import { AppIconWrapper } from '../../styles/Card.styled.js'
 
 export const StatusSection = styled.div`
   display: flex;
@@ -42,21 +43,9 @@ export const PageHeader = styled.div`
   flex-wrap: wrap;
 `
 
-export const IconWrap = styled.div`
-  flex-shrink: 0;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
+export const IconWrap = styled(AppIconWrapper)`
   background-color: ${({ theme }) => theme.colors.iconBg};
   color: ${({ theme }) => theme.colors.primaryGreen};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  svg {
-    width: 32px;
-    height: 32px;
-  }
 `
 
 export const TitleGroup = styled.div`

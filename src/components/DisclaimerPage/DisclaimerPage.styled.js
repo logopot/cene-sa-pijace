@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { AppIconWrapper } from '../../styles/Card.styled.js'
 
 export const BackButton = styled.button`
   display: inline-flex;
@@ -6,17 +7,17 @@ export const BackButton = styled.button`
   gap: 0.4rem;
   margin: 1.5rem 0 1rem;
   padding: 0.4rem 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  font-weight: 600;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.lg};
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.textSecondary};
+  font-weight: ${({ theme }) => theme.font.weight.semibold};
   cursor: pointer;
 
   &:hover,
   &:focus-visible {
-    border-color: var(--color-primary-green);
-    color: var(--color-primary-green);
+    border-color: ${({ theme }) => theme.colors.primaryGreen};
+    color: ${({ theme }) => theme.colors.primaryGreen};
   }
 
   svg {
@@ -31,43 +32,31 @@ export const PageHeader = styled.div`
   gap: 1rem;
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 2px solid var(--color-primary-green);
+  border-bottom: 2px solid ${({ theme }) => theme.colors.primaryGreen};
 `
 
-export const IconWrap = styled.div`
-  flex-shrink: 0;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background-color: var(--color-icon-bg);
-  color: var(--color-primary-green);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  svg {
-    width: 28px;
-    height: 28px;
-  }
+export const IconWrap = styled(AppIconWrapper)`
+  background-color: ${({ theme }) => theme.colors.iconBg};
+  color: ${({ theme }) => theme.colors.primaryGreen};
 `
 
 export const Title = styled.h1`
   font-size: 1.6rem;
-  font-weight: 700;
+  font-weight: ${({ theme }) => theme.font.weight.bold};
   margin: 0;
-  color: var(--color-text-dark);
+  color: ${({ theme }) => theme.colors.textDark};
 `
 
 export const Intro = styled.p`
   font-size: 1rem;
-  color: var(--color-text-secondary);
+  color: ${({ theme }) => theme.colors.textSecondary};
   margin-bottom: 2rem;
 `
 
 export const SourceNotice = styled.div`
-  background-color: var(--color-icon-bg);
-  border-left: 4px solid var(--color-primary-green);
-  border-radius: 6px;
+  background-color: ${({ theme }) => theme.colors.iconBg};
+  border-left: 4px solid ${({ theme }) => theme.colors.primaryGreen};
+  border-radius: ${({ theme }) => theme.radius.md};
   padding: 1.25rem 1.5rem;
   margin-bottom: 2rem;
 `
@@ -82,14 +71,14 @@ export const Section = styled.section`
 
 export const SectionTitle = styled.h2`
   font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text-dark);
+  font-weight: ${({ theme }) => theme.font.weight.bold};
+  color: ${({ theme }) => theme.colors.textDark};
   margin-bottom: 0.75rem;
 `
 
 export const Paragraph = styled.p`
   font-size: 0.95rem;
-  color: var(--color-text-secondary);
+  color: ${({ theme }) => theme.colors.textSecondary};
   line-height: 1.6;
   margin-bottom: 0.85rem;
 

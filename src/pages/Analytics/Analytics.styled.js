@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { AppIconWrapper } from '../../styles/Card.styled.js'
 
 export const BackButton = styled.button`
   display: inline-flex;
@@ -32,21 +33,9 @@ export const PageHeader = styled.div`
   margin-bottom: 2rem;
 `
 
-export const IconWrap = styled.div`
-  flex-shrink: 0;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
+export const IconWrap = styled(AppIconWrapper)`
   background-color: ${({ theme }) => theme.colors.iconBg};
   color: ${({ theme }) => theme.colors.primaryGreen};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  svg {
-    width: 32px;
-    height: 32px;
-  }
 `
 
 export const ProductTitle = styled.h1`
