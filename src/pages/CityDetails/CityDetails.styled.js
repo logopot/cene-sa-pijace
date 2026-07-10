@@ -79,10 +79,10 @@ export const MarketTileLink = styled(Link)`
 
 export const MarketTileCard = styled(Card)`
   height: 100%;
-  padding: 1.25rem;
+  padding: ${({ theme }) => theme.spacing.lg};
   background: ${({ theme }) => theme.colors.surface};
   border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radius.lg};
+  border-radius: ${({ theme }) => theme.radius.xl};
   display: flex;
   flex-direction: column;
   align-items: flex-start;

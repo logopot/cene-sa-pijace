@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { Card } from "react-bootstrap";
+import { AppIconWrapper } from "../../styles/Card.styled.js";
 
 export const StyledCard = styled(Card)`
   height: 100%;
@@ -54,21 +55,9 @@ export const HeaderRow = styled.div`
   gap: 0.6rem;
 `;
 
-export const IconCircle = styled.div`
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+export const IconCircle = styled(AppIconWrapper)`
   background-color: ${({ theme }) => theme.colors.iconBg};
   color: ${({ theme }) => theme.colors.primaryGreen};
-
-  svg {
-    width: 18px;
-    height: 18px;
-  }
 `;
 
 export const ProductTitle = styled(Card.Title)`
@@ -90,7 +79,7 @@ export const MarketSubtitle = styled(Card.Subtitle)`
   font-weight: ${({ theme }) => theme.font.weight.regular};
   color: ${({ theme }) => theme.colors.textMuted};
   margin-top: 0.3rem;
-  margin-left: calc(36px + 0.6rem);
+  margin-left: calc(48px + 0.6rem);
 `;
 
 export const SourceTag = styled.span`

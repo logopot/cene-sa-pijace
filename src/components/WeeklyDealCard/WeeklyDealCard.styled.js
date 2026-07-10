@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { AppCard, AppIconWrapper } from "../../styles/Card.styled.js";
 
 export const CardLink = styled(Link)`
   display: block;
@@ -14,11 +15,9 @@ export const CardLink = styled(Link)`
   }
 `;
 
-export const StyledCard = styled.div`
+export const StyledCard = styled(AppCard)`
   height: 100%;
-  padding: 1rem;
   background-color: ${({ theme }) => theme.colors.surface};
-  border-radius: ${({ theme }) => theme.radius.xl};
   box-shadow: ${({ theme }) => theme.shadow.sm};
   cursor: pointer;
   transition:
@@ -37,21 +36,9 @@ export const HeaderRow = styled.div`
   gap: 0.6rem;
 `;
 
-export const IconCircle = styled.div`
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+export const IconCircle = styled(AppIconWrapper)`
   background-color: ${({ theme }) => theme.colors.iconBg};
   color: ${({ theme }) => theme.colors.primaryGreen};
-
-  svg {
-    width: 18px;
-    height: 18px;
-  }
 `;
 
 export const ProductTitle = styled.div`

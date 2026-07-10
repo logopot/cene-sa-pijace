@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import { Card } from 'react-bootstrap'
+import { AppIconWrapper } from '../../styles/Card.styled.js'
 
 export const CardLink = styled(Link)`
   display: block;
@@ -19,7 +20,12 @@ export const StyledCard = styled(Card)`
   height: 100%;
   cursor: pointer;
   border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.xl};
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  .card-body {
+    padding: ${({ theme }) => theme.spacing.lg};
+  }
 
   &:hover {
     transform: translateY(-4px);
@@ -28,21 +34,10 @@ export const StyledCard = styled(Card)`
   }
 `
 
-export const IconWrap = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+export const IconWrap = styled(AppIconWrapper)`
   background-color: ${({ theme }) => theme.colors.iconBg};
   color: ${({ theme }) => theme.colors.primaryGreen};
-  display: flex;
-  align-items: center;
-  justify-content: center;
   margin-bottom: 0.75rem;
-
-  svg {
-    width: 24px;
-    height: 24px;
-  }
 `
 
 export const CityName = styled(Card.Title)`

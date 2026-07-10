@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { AppCard, AppIconWrapper } from '../../styles/Card.styled.js'
 
 export const StyledHero = styled.section`
   background-color: ${({ theme }) => theme.colors.iconBg};
@@ -39,10 +40,8 @@ export const ValueGrid = styled.div`
   }
 `
 
-export const ValueCard = styled.div`
-  padding: ${({ theme }) => theme.spacing.lg};
+export const ValueCard = styled(AppCard)`
   background-color: ${({ theme }) => theme.colors.surface};
-  border-radius: ${({ theme }) => theme.radius.xl};
   box-shadow: ${({ theme }) => theme.shadow.sm};
 `
 
@@ -63,21 +62,10 @@ const ICON_VARIANTS = {
   },
 }
 
-export const ValueIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
+export const ValueIcon = styled(AppIconWrapper)`
   margin-bottom: ${({ theme }) => theme.spacing.sm};
-  border-radius: ${({ theme }) => theme.radius.lg};
   background-color: ${(props) => ICON_VARIANTS[props.$variant].bg(props)};
   color: ${(props) => ICON_VARIANTS[props.$variant].fg(props)};
-
-  svg {
-    width: 24px;
-    height: 24px;
-  }
 `
 
 export const ValueTitle = styled.h3`

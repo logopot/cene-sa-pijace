@@ -39,7 +39,8 @@ export const theme = {
   },
   radius: {
     lg: '16px',
-    xl: '20px',
+    md: '12px',
+    xl: '24px',
     pill: '999px',
   },
   spacing: {
