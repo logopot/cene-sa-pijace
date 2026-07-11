@@ -15,8 +15,8 @@
     "subtitle": "Uporedite cene voća, povrća i drugih namirnica na pijacama širom zemlje i uštedite na svakoj kupovini.",
     "values": {
       "freshPrices": {
-        "title": "Sveže cene, svaki dan",
-        "description": "Podaci se ažuriraju svakodnevno direktno iz zvaničnih izvora, tako da uvek vidite najnovije cene."
+        "title": "Sveže cene, svake nedelje",
+        "description": "Podaci se ažuriraju na nedeljnom nivou direktno iz zvaničnih izvora Ministarstva poljoprivrede, kako biste uvek imali pregled aktuelnih cena."
       },
       "locationSearch": {
         "title": "Pretraga po lokaciji",
