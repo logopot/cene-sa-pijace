@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { LuChevronDown } from 'react-icons/lu'
-import { Menu, MenuItem, Trigger, TriggerLabel, Wrapper } from './CustomDropdown.styled.js'
+import { Menu, MenuItem, MenuList, Trigger, TriggerLabel, Wrapper } from './CustomDropdown.styled.js'
 
 function CustomDropdown({ options, value, onChange, placeholder, disabled = false }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -56,18 +56,20 @@ function CustomDropdown({ options, value, onChange, placeholder, disabled = fals
       </Trigger>
 
       {isOpen && (
-        <Menu role="listbox">
-          {options.map((option) => (
-            <MenuItem
-              key={option.value}
-              role="option"
-              aria-selected={option.value === value}
-              $isSelected={option.value === value}
-              onClick={() => handleSelect(option.value)}
-            >
-              {option.label}
-            </MenuItem>
-          ))}
+        <Menu>
+          <MenuList role="listbox">
+            {options.map((option) => (
+              <MenuItem
+                key={option.value}
+                role="option"
+                aria-selected={option.value === value}
+                $isSelected={option.value === value}
+                onClick={() => handleSelect(option.value)}
+              >
+                {option.label}
+              </MenuItem>
+            ))}
+          </MenuList>
         </Menu>
       )}
     </Wrapper>

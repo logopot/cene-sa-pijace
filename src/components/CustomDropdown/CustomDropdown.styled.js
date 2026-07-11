@@ -45,21 +45,30 @@ export const TriggerLabel = styled.span`
   color: ${({ theme, $isPlaceholder }) => ($isPlaceholder ? theme.colors.textMuted : theme.colors.textDark)};
 `
 
-export const Menu = styled.ul`
+// Chrome-only wrapper: owns the border-radius/border/shadow and clips its
+// scrollable child so the child's scrollbar can never bleed past the rounded
+// corners (a plain overflow-y:auto element with its own border-radius won't
+// reliably clip a webkit scrollbar to that radius).
+export const Menu = styled.div`
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
   right: 0;
   z-index: 10;
-  margin: 0;
-  padding: ${({ theme }) => theme.spacing.xs};
-  list-style: none;
-  max-height: 240px;
-  overflow-y: auto;
   border-radius: ${({ theme }) => theme.radius.xl};
   border: 1px solid ${({ theme }) => theme.colors.border};
   background-color: ${({ theme }) => theme.colors.surface};
   box-shadow: ${({ theme }) => theme.shadow.tooltip};
+  overflow: hidden;
+`
+
+export const MenuList = styled.ul`
+  margin: 0;
+  padding: ${({ theme }) => theme.spacing.xs};
+  padding-right: calc(${({ theme }) => theme.spacing.xs} + 6px);
+  list-style: none;
+  max-height: 240px;
+  overflow-y: auto;
 
   &::-webkit-scrollbar {
     width: 6px;
