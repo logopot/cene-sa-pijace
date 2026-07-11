@@ -36,7 +36,7 @@ function CityComparisonChart({ data, cheapest, priciest, highlightGrad }) {
       </Leaderboard>
 
       <ChartWrap>
-        <ResponsiveContainer width="100%" height={320}>
+        <ResponsiveContainer width="100%" height={360}>
           <BarChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: ROTATED_AXIS_MARGIN_BOTTOM }}>
             <CartesianGrid strokeDasharray="3 3" stroke={theme.colors.borderLight} />
             <XAxis dataKey="grad" tick={<RotatedAxisTick fontSize={14} />} height={ROTATED_AXIS_HEIGHT} interval={0} />

@@ -49,7 +49,7 @@ function PriceHistoryChart({ data }) {
 
   return (
     <ChartWrap>
-      <ResponsiveContainer width="100%" height={320}>
+      <ResponsiveContainer width="100%" height={360}>
         <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: ROTATED_AXIS_MARGIN_BOTTOM }}>
           <defs>
             <linearGradient id="stipsGradient" x1="0" y1="0" x2="0" y2="1">
