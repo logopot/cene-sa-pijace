@@ -60,6 +60,19 @@ export const Menu = styled.ul`
   border: 1px solid ${({ theme }) => theme.colors.border};
   background-color: ${({ theme }) => theme.colors.surface};
   box-shadow: ${({ theme }) => theme.shadow.tooltip};
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.colors.primaryGreen};
+    border-radius: 3px;
+  }
 `
 
 export const MenuItem = styled.li`
