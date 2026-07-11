@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Container, Row } from 'react-bootstrap'
+import { LuArrowLeft } from 'react-icons/lu'
 import { ALL_MARKETS } from '../../constants/filters.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getCategoryUrlSlug } from '../../utils/categoryIcons.js'
@@ -13,7 +14,9 @@ import {
   FieldLabel,
   MobileStepHeader,
   StepField,
+  StepHeaderTop,
   StepIndicator,
+  StepInstruction,
   SubmitButton,
 } from './FilterBar.styled.js'
 
@@ -21,6 +24,13 @@ const STEP_CATEGORY = 0
 const STEP_CITY = 1
 const STEP_MARKET = 2
 const TOTAL_STEPS = 3
+
+// Indexed by step number - keep in sync with STEP_CATEGORY/STEP_CITY/STEP_MARKET.
+const STEP_INSTRUCTION_KEYS = [
+  'filterBar.stepInstructionCategory',
+  'filterBar.stepInstructionCity',
+  'filterBar.stepInstructionMarket',
+]
 
 function FilterBar({
   category,
@@ -67,10 +77,14 @@ function FilterBar({
     <Bar>
       <Container>
         <MobileStepHeader>
-          <BackButton type="button" onClick={handleBack} $visible={step > STEP_CATEGORY}>
-            {t('filterBar.back')}
-          </BackButton>
-          <StepIndicator>{t('filterBar.stepIndicator', { current: step + 1, total: TOTAL_STEPS })}</StepIndicator>
+          <StepHeaderTop>
+            <BackButton type="button" onClick={handleBack} $visible={step > STEP_CATEGORY}>
+              <LuArrowLeft size={16} />
+              {t('filterBar.back')}
+            </BackButton>
+            <StepIndicator>{t('filterBar.stepIndicator', { current: step + 1, total: TOTAL_STEPS })}</StepIndicator>
+          </StepHeaderTop>
+          <StepInstruction>{t(STEP_INSTRUCTION_KEYS[step])}</StepInstruction>
         </MobileStepHeader>
 
         <Row className="g-3 align-items-end">

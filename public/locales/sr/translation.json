@@ -50,7 +50,10 @@
     "marketAllOption": "Sve pijace u tom gradu",
     "submit": "Prikaži cene",
     "back": "Nazad",
-    "stepIndicator": "Korak {{current}} od {{total}}"
+    "stepIndicator": "Korak {{current}} od {{total}}",
+    "stepInstructionCategory": "Izaberite kategoriju da nastavite",
+    "stepInstructionCity": "Izaberite grad",
+    "stepInstructionMarket": "Izaberite pijacu"
   },
   "landing": {
     "title": "Istražite pijace",

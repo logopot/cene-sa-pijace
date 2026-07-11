@@ -29,16 +29,23 @@ export const StepField = styled(Col)`
 `;
 
 // Hidden entirely at desktop widths since the stepper (progress text + back
-// navigation) only exists to compensate for mobile showing one field at a time.
+// navigation + instruction line) only exists to compensate for mobile
+// showing one field at a time.
 export const MobileStepHeader = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.25rem;
   margin-bottom: ${({ theme }) => theme.spacing.sm};
 
   @media (min-width: 768px) {
     display: none;
   }
+`;
+
+export const StepHeaderTop = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 export const StepIndicator = styled.span`
@@ -47,19 +54,41 @@ export const StepIndicator = styled.span`
   color: ${({ theme }) => theme.colors.textMuted};
 `;
 
+export const StepInstruction = styled.p`
+  margin: 0;
+  font-size: 0.8rem;
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
 export const BackButton = styled.button`
-  background: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: transparent;
   border: none;
-  padding: 0;
+  border-radius: ${({ theme }) => theme.radius.pill};
+  padding: ${({ theme }) => theme.spacing.xs};
+  margin: 0;
   font-size: 0.85rem;
   font-weight: ${({ theme }) => theme.font.weight.semibold};
   color: ${({ theme }) => theme.colors.primaryGreen};
   cursor: pointer;
   visibility: ${({ $visible }) => ($visible ? "visible" : "hidden")};
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  svg {
+    color: ${({ theme }) => theme.colors.primaryGreen};
+    transition: color 0.2s ease;
+  }
 
   &:hover,
   &:focus {
     color: ${({ theme }) => theme.colors.primaryHover};
+    background-color: ${({ theme }) => theme.colors.primaryTint};
+
+    svg {
+      color: ${({ theme }) => theme.colors.primaryHover};
+    }
   }
 `;
 

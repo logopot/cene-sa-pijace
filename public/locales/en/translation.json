@@ -50,7 +50,10 @@
     "marketAllOption": "All markets in this city",
     "submit": "Show Prices",
     "back": "Back",
-    "stepIndicator": "Step {{current}} of {{total}}"
+    "stepIndicator": "Step {{current}} of {{total}}",
+    "stepInstructionCategory": "Select a category to continue",
+    "stepInstructionCity": "Select a city",
+    "stepInstructionMarket": "Select a market"
   },
   "landing": {
     "title": "Explore Markets",
