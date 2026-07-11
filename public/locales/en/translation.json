@@ -48,7 +48,9 @@
     "cityPlaceholder": "Select a city",
     "marketLabel": "Market",
     "marketAllOption": "All markets in this city",
-    "submit": "Show Prices"
+    "submit": "Show Prices",
+    "back": "Back",
+    "stepIndicator": "Step {{current}} of {{total}}"
   },
   "landing": {
     "title": "Explore Markets",

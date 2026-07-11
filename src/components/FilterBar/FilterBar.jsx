@@ -1,11 +1,25 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Col, Container, Form, Row } from 'react-bootstrap'
+import { Container, Form, Row } from 'react-bootstrap'
 import { ALL_MARKETS } from '../../constants/filters.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getCategoryUrlSlug } from '../../utils/categoryIcons.js'
 import { buildMarketCategoryRoute } from '../../utils/market.js'
-import { Bar, FieldLabel, SubmitButton } from './FilterBar.styled.js'
+import {
+  BackButton,
+  Bar,
+  FieldLabel,
+  MobileStepHeader,
+  StepField,
+  StepIndicator,
+  SubmitButton,
+} from './FilterBar.styled.js'
+
+const STEP_CATEGORY = 0
+const STEP_CITY = 1
+const STEP_MARKET = 2
+const TOTAL_STEPS = 3
 
 function FilterBar({
   category,
@@ -20,6 +34,21 @@ function FilterBar({
 }) {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  // Drives the mobile "one field at a time" stepper only - the desktop layout
+  // ignores it and always shows every field (see StepField's media query).
+  const [step, setStep] = useState(STEP_CATEGORY)
+
+  const handleCategoryChange = (value) => {
+    onCategoryChange(value)
+    setStep(value ? STEP_CITY : STEP_CATEGORY)
+  }
+
+  const handleGradChange = (value) => {
+    onGradChange(value)
+    setStep(value ? STEP_MARKET : STEP_CITY)
+  }
+
+  const handleBack = () => setStep((current) => Math.max(STEP_CATEGORY, current - 1))
 
   const handleSubmit = () => {
     if (!category || !grad) return
@@ -29,11 +58,18 @@ function FilterBar({
   return (
     <Bar>
       <Container>
+        <MobileStepHeader>
+          <BackButton type="button" onClick={handleBack} $visible={step > STEP_CATEGORY}>
+            {t('filterBar.back')}
+          </BackButton>
+          <StepIndicator>{t('filterBar.stepIndicator', { current: step + 1, total: TOTAL_STEPS })}</StepIndicator>
+        </MobileStepHeader>
+
         <Row className="g-3 align-items-end">
-          <Col xs={12} md={3}>
+          <StepField xs={12} md={3} $active={step === STEP_CATEGORY}>
             <Form.Group controlId="filterBarCategory">
               <FieldLabel>{t('filterBar.categoryLabel')}</FieldLabel>
-              <Form.Select value={category} onChange={(e) => onCategoryChange(e.target.value)}>
+              <Form.Select value={category} onChange={(e) => handleCategoryChange(e.target.value)}>
                 <option value="">{t('filterBar.categoryPlaceholder')}</option>
                 {categories.map((cat) => (
                   <option key={cat.name} value={cat.name}>
@@ -42,12 +78,12 @@ function FilterBar({
                 ))}
               </Form.Select>
             </Form.Group>
-          </Col>
+          </StepField>
 
-          <Col xs={12} md={3}>
+          <StepField xs={12} md={3} $active={step === STEP_CITY}>
             <Form.Group controlId="filterBarCity">
               <FieldLabel>{t('filterBar.cityLabel')}</FieldLabel>
-              <Form.Select value={grad} onChange={(e) => onGradChange(e.target.value)} disabled={!category}>
+              <Form.Select value={grad} onChange={(e) => handleGradChange(e.target.value)} disabled={!category}>
                 <option value="">{t('filterBar.cityPlaceholder')}</option>
                 {cities.map((city) => (
                   <option key={city} value={city}>
@@ -56,9 +92,9 @@ function FilterBar({
                 ))}
               </Form.Select>
             </Form.Group>
-          </Col>
+          </StepField>
 
-          <Col xs={12} md={3}>
+          <StepField xs={12} md={3} $active={step === STEP_MARKET}>
             <Form.Group controlId="filterBarMarket">
               <FieldLabel>{t('filterBar.marketLabel')}</FieldLabel>
               <Form.Select value={pijaca} onChange={(e) => onPijacaChange(e.target.value)} disabled={!grad}>
@@ -70,13 +106,13 @@ function FilterBar({
                 ))}
               </Form.Select>
             </Form.Group>
-          </Col>
+          </StepField>
 
-          <Col xs={12} md={3}>
+          <StepField xs={12} md={3} $active={step === STEP_MARKET}>
             <SubmitButton type="button" disabled={!category || !grad} onClick={handleSubmit}>
               {t('filterBar.submit')}
             </SubmitButton>
-          </Col>
+          </StepField>
         </Row>
       </Container>
     </Bar>

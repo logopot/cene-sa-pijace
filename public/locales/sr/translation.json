@@ -48,7 +48,9 @@
     "cityPlaceholder": "Izaberite grad",
     "marketLabel": "Pijaca",
     "marketAllOption": "Sve pijace u tom gradu",
-    "submit": "Prikaži cene"
+    "submit": "Prikaži cene",
+    "back": "Nazad",
+    "stepIndicator": "Korak {{current}} od {{total}}"
   },
   "landing": {
     "title": "Istražite pijace",
