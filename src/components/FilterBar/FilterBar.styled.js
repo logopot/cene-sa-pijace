@@ -64,10 +64,17 @@ export const BackButton = styled.button`
 `;
 
 export const SubmitButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 48px;
+  padding: 0 calc(${({ theme }) => theme.spacing.lg} * 2);
+  border-radius: ${({ theme }) => theme.radius.xl};
   background-color: ${({ theme }) => theme.colors.primaryGreen};
   border-color: ${({ theme }) => theme.colors.primaryGreen};
   font-weight: ${({ theme }) => theme.font.weight.semibold};
-  width: 100%;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 
   &:hover,
   &:focus {

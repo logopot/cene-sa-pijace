@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { theme } from '../../styles/theme.js'
 import {
   ChartWrap,
   EmptyState,
@@ -36,7 +37,7 @@ function CityComparisonChart({ data, cheapest, priciest, highlightGrad }) {
       <ChartWrap>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-light)" />
+            <CartesianGrid strokeDasharray="3 3" stroke={theme.colors.borderLight} />
             <XAxis dataKey="grad" tick={{ fontSize: 14 }} interval={0} />
             <YAxis tick={{ fontSize: 11 }} width={48} />
             <Tooltip formatter={(value) => [Number(value).toFixed(2), t('analytics.priceLabel')]} />
@@ -44,7 +45,7 @@ function CityComparisonChart({ data, cheapest, priciest, highlightGrad }) {
               {data.map((entry) => (
                 <Cell
                   key={entry.grad}
-                  fill={entry.grad === highlightGrad ? 'var(--color-primary-green)' : 'var(--color-border)'}
+                  fill={entry.grad === highlightGrad ? theme.colors.primaryGreen : theme.colors.border}
                 />
               ))}
             </Bar>

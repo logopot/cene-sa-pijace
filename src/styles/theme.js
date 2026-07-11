@@ -1,6 +1,6 @@
-// Canonical design-token source. globalStyle.js's :root custom properties
-// are derived from these same values (not duplicated by hand) so var(--...)
-// consumers and theme.foo consumers never drift apart.
+// Canonical design-token source. Consumed via styled-components' ThemeProvider
+// (props.theme) in .styled.js files, and imported directly as a plain object
+// in non-styled files (e.g. Recharts prop values) that have no theme context.
 export const theme = {
   colors: {
     primaryGreen: '#1f6f43',

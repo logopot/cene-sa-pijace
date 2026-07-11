@@ -1,14 +1,14 @@
 import styled from 'styled-components'
 
 export const ChartWrap = styled.div`
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 8px;
   padding: 1rem;
 `
 
 export const EmptyState = styled.p`
-  color: var(--color-text-muted);
+  color: ${({ theme }) => theme.colors.textMuted};
   font-style: italic;
 `
 
@@ -22,8 +22,8 @@ export const LeaderCard = styled.div`
   flex: 1;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  border: 1px solid var(--color-border);
-  background: ${({ $variant }) => ($variant === 'cheapest' ? 'var(--color-primary-tint)' : 'var(--color-border-light)')};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  background: ${({ $variant, theme }) => ($variant === 'cheapest' ? theme.colors.primaryTint : theme.colors.borderLight)};
 `
 
 export const LeaderLabel = styled.div`
@@ -31,12 +31,12 @@ export const LeaderLabel = styled.div`
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--color-text-muted);
+  color: ${({ theme }) => theme.colors.textMuted};
 `
 
 export const LeaderValue = styled.div`
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--color-text-dark);
+  color: ${({ theme }) => theme.colors.textDark};
   margin-top: 0.15rem;
 `

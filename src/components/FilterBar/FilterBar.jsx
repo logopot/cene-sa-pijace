@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Container, Form, Row } from 'react-bootstrap'
+import { Container, Row } from 'react-bootstrap'
 import { ALL_MARKETS } from '../../constants/filters.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getCategoryUrlSlug } from '../../utils/categoryIcons.js'
 import { buildMarketCategoryRoute } from '../../utils/market.js'
+import CustomDropdown from '../CustomDropdown/CustomDropdown.jsx'
 import {
   BackButton,
   Bar,
@@ -38,6 +39,13 @@ function FilterBar({
   // ignores it and always shows every field (see StepField's media query).
   const [step, setStep] = useState(STEP_CATEGORY)
 
+  const categoryOptions = categories.map((cat) => ({ value: cat.name, label: t(`categories.${cat.slug}`) }))
+  const cityOptions = cities.map((city) => ({ value: city, label: translateDataValue(t, 'grad', city) }))
+  const marketOptions = [
+    { value: ALL_MARKETS, label: t('filterBar.marketAllOption') },
+    ...markets.map((market) => ({ value: market, label: translateDataValue(t, 'pijaca', market) })),
+  ]
+
   const handleCategoryChange = (value) => {
     onCategoryChange(value)
     setStep(value ? STEP_CITY : STEP_CATEGORY)
@@ -67,45 +75,35 @@ function FilterBar({
 
         <Row className="g-3 align-items-end">
           <StepField xs={12} md={3} $active={step === STEP_CATEGORY}>
-            <Form.Group controlId="filterBarCategory">
-              <FieldLabel>{t('filterBar.categoryLabel')}</FieldLabel>
-              <Form.Select value={category} onChange={(e) => handleCategoryChange(e.target.value)}>
-                <option value="">{t('filterBar.categoryPlaceholder')}</option>
-                {categories.map((cat) => (
-                  <option key={cat.name} value={cat.name}>
-                    {t(`categories.${cat.slug}`)}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
+            <FieldLabel>{t('filterBar.categoryLabel')}</FieldLabel>
+            <CustomDropdown
+              options={categoryOptions}
+              value={category}
+              onChange={handleCategoryChange}
+              placeholder={t('filterBar.categoryPlaceholder')}
+            />
           </StepField>
 
           <StepField xs={12} md={3} $active={step === STEP_CITY}>
-            <Form.Group controlId="filterBarCity">
-              <FieldLabel>{t('filterBar.cityLabel')}</FieldLabel>
-              <Form.Select value={grad} onChange={(e) => handleGradChange(e.target.value)} disabled={!category}>
-                <option value="">{t('filterBar.cityPlaceholder')}</option>
-                {cities.map((city) => (
-                  <option key={city} value={city}>
-                    {translateDataValue(t, 'grad', city)}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
+            <FieldLabel>{t('filterBar.cityLabel')}</FieldLabel>
+            <CustomDropdown
+              options={cityOptions}
+              value={grad}
+              onChange={handleGradChange}
+              placeholder={t('filterBar.cityPlaceholder')}
+              disabled={!category}
+            />
           </StepField>
 
           <StepField xs={12} md={3} $active={step === STEP_MARKET}>
-            <Form.Group controlId="filterBarMarket">
-              <FieldLabel>{t('filterBar.marketLabel')}</FieldLabel>
-              <Form.Select value={pijaca} onChange={(e) => onPijacaChange(e.target.value)} disabled={!grad}>
-                <option value={ALL_MARKETS}>{t('filterBar.marketAllOption')}</option>
-                {markets.map((market) => (
-                  <option key={market} value={market}>
-                    {translateDataValue(t, 'pijaca', market)}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
+            <FieldLabel>{t('filterBar.marketLabel')}</FieldLabel>
+            <CustomDropdown
+              options={marketOptions}
+              value={pijaca}
+              onChange={onPijacaChange}
+              placeholder={t('filterBar.marketAllOption')}
+              disabled={!grad}
+            />
           </StepField>
 
           <StepField xs={12} md={3} $active={step === STEP_MARKET}>

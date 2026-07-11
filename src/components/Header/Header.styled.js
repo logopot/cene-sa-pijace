@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Navbar } from 'react-bootstrap'
 
 export const StyledNavbar = styled(Navbar)`
-  background-color: var(--color-primary-green);
+  background-color: ${({ theme }) => theme.colors.primaryGreen};
   padding: 0.75rem 1.5rem;
 `
 
@@ -17,7 +17,7 @@ export const BrandLink = styled(Link)`
 `
 
 export const Brand = styled(Navbar.Brand)`
-  color: var(--color-surface) !important;
+  color: ${({ theme }) => theme.colors.surface} !important;
   font-weight: 700;
   font-size: 1.4rem;
   letter-spacing: 0.02em;
@@ -25,7 +25,7 @@ export const Brand = styled(Navbar.Brand)`
 
 export const Tagline = styled.span`
   display: block;
-  color: var(--color-primary-tint);
+  color: ${({ theme }) => theme.colors.primaryTint};
   font-size: 0.85rem;
   font-weight: 400;
 `

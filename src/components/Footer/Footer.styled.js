@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 export const StyledFooter = styled.footer`
   flex-shrink: 0;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid ${({ theme }) => theme.colors.border};
   padding: 1.25rem 1.5rem;
   margin-top: 2rem;
 `
@@ -17,26 +17,26 @@ export const FooterInner = styled.div`
 `
 
 export const Copyright = styled.span`
-  color: var(--color-text-muted);
+  color: ${({ theme }) => theme.colors.textMuted};
   font-size: 0.85rem;
 `
 
 export const DisclaimerLink = styled(Link)`
-  color: var(--color-text-muted);
+  color: ${({ theme }) => theme.colors.textMuted};
   font-size: 0.85rem;
   text-decoration: underline;
 
   &:hover {
-    color: var(--color-primary-green);
+    color: ${({ theme }) => theme.colors.primaryGreen};
   }
 `
 
 export const StipsLink = styled.a`
-  color: var(--color-text-muted);
+  color: ${({ theme }) => theme.colors.textMuted};
   font-weight: 600;
   text-decoration: underline;
 
   &:hover {
-    color: var(--color-primary-green);
+    color: ${({ theme }) => theme.colors.primaryGreen};
   }
 `

@@ -7,11 +7,11 @@ export const Section = styled.section`
 export const Heading = styled.h2`
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--color-primary-green);
+  color: ${({ theme }) => theme.colors.primaryGreen};
   margin-bottom: 0.25rem;
 `
 
 export const Subtitle = styled.p`
-  color: var(--color-text-muted);
+  color: ${({ theme }) => theme.colors.textMuted};
   margin-bottom: 1.25rem;
 `

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { theme } from '../../styles/theme.js'
 import {
   ChartWrap,
   EmptyState,
@@ -12,8 +13,8 @@ import {
 } from './PriceHistoryChart.styled.js'
 
 const SERIES_META = {
-  stipsPrice: { color: 'var(--color-primary-green)', labelKey: 'analytics.stipsSourceLabel' },
-  jkpPrice: { color: 'var(--color-jkp-blue)', labelKey: 'analytics.jkpSourceLabel' },
+  stipsPrice: { color: theme.colors.primaryGreen, labelKey: 'analytics.stipsSourceLabel' },
+  jkpPrice: { color: theme.colors.jkpBlue, labelKey: 'analytics.jkpSourceLabel' },
 }
 
 function CustomTooltip({ active, payload, label }) {
@@ -51,39 +52,39 @@ function PriceHistoryChart({ data }) {
         <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
           <defs>
             <linearGradient id="stipsGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--color-primary-green)" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="var(--color-primary-green)" stopOpacity={0} />
+              <stop offset="5%" stopColor={theme.colors.primaryGreen} stopOpacity={0.25} />
+              <stop offset="95%" stopColor={theme.colors.primaryGreen} stopOpacity={0} />
             </linearGradient>
             <linearGradient id="jkpGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--color-jkp-blue)" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="var(--color-jkp-blue)" stopOpacity={0} />
+              <stop offset="5%" stopColor={theme.colors.jkpBlue} stopOpacity={0.25} />
+              <stop offset="95%" stopColor={theme.colors.jkpBlue} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid vertical={false} stroke="var(--color-border-light)" strokeDasharray="4 4" />
+          <CartesianGrid vertical={false} stroke={theme.colors.borderLight} strokeDasharray="4 4" />
           <XAxis dataKey="weekLabel" tick={{ fontSize: 11 }} minTickGap={24} />
           <YAxis tick={{ fontSize: 11 }} width={48} />
           <Tooltip
             content={<CustomTooltip />}
-            cursor={{ stroke: 'var(--color-chart-guide)', strokeWidth: 1.5, strokeDasharray: '2 2' }}
+            cursor={{ stroke: theme.colors.chartGuide, strokeWidth: 1.5, strokeDasharray: '2 2' }}
           />
           <Area
             type="monotone"
             dataKey="stipsPrice"
             name={t('analytics.stipsSourceLabel')}
-            stroke="var(--color-primary-green)"
+            stroke={theme.colors.primaryGreen}
             strokeWidth={3.5}
             fill="url(#stipsGradient)"
-            activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--color-primary-green)' }}
+            activeDot={{ r: 6, strokeWidth: 0, fill: theme.colors.primaryGreen }}
             connectNulls
           />
           <Area
             type="monotone"
             dataKey="jkpPrice"
             name={t('analytics.jkpSourceLabel')}
-            stroke="var(--color-jkp-blue)"
+            stroke={theme.colors.jkpBlue}
             strokeWidth={3.5}
             fill="url(#jkpGradient)"
-            activeDot={{ r: 6, strokeWidth: 0, fill: 'var(--color-jkp-blue)' }}
+            activeDot={{ r: 6, strokeWidth: 0, fill: theme.colors.jkpBlue }}
             connectNulls
           />
         </AreaChart>

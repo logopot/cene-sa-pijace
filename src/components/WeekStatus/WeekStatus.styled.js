@@ -7,11 +7,11 @@ export const StatusBadge = styled.div`
   margin-top: 3rem;
   margin-bottom: 1.5rem;
   padding: 0.5rem 1rem;
-  border: 1px solid ${({ $archived }) => ($archived ? 'var(--color-border)' : 'var(--color-primary-tint)')};
-  border-left: 3px solid ${({ $archived }) => ($archived ? 'var(--color-text-secondary)' : 'var(--color-primary-green)')};
+  border: 1px solid ${({ $archived, theme }) => ($archived ? theme.colors.border : theme.colors.primaryTint)};
+  border-left: 3px solid ${({ $archived, theme }) => ($archived ? theme.colors.textSecondary : theme.colors.primaryGreen)};
   border-radius: 4px;
-  background-color: ${({ $archived }) => ($archived ? 'var(--color-border-light)' : 'var(--color-icon-bg)')};
-  color: var(--color-text-secondary);
+  background-color: ${({ $archived, theme }) => ($archived ? theme.colors.borderLight : theme.colors.iconBg)};
+  color: ${({ theme }) => theme.colors.textSecondary};
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -20,6 +20,6 @@ export const StatusBadge = styled.div`
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    color: ${({ $archived }) => ($archived ? 'var(--color-text-muted)' : 'var(--color-primary-green)')};
+    color: ${({ $archived, theme }) => ($archived ? theme.colors.textMuted : theme.colors.primaryGreen)};
   }
 `

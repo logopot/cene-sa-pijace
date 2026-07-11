@@ -1,28 +1,31 @@
 import styled from 'styled-components'
 
-const STATUS_VARIANTS = {
-  OPEN: {
-    bg: 'var(--color-primary-tint)',
-    fg: 'var(--color-primary-green)',
-    border: 'var(--color-primary-green)',
-    dot: 'var(--color-primary-green)',
-  },
-  ALWAYS_OPEN: {
-    bg: 'var(--color-primary-green)',
-    fg: 'var(--color-surface)',
-    border: 'var(--color-primary-green)',
-    dot: 'var(--color-surface)',
-  },
-  CLOSED: {
-    bg: 'var(--color-border-light)',
-    fg: 'var(--color-text-secondary)',
-    border: 'var(--color-border)',
-    dot: 'var(--color-text-muted)',
-  },
+function getStatusVariants(theme) {
+  return {
+    OPEN: {
+      bg: theme.colors.primaryTint,
+      fg: theme.colors.primaryGreen,
+      border: theme.colors.primaryGreen,
+      dot: theme.colors.primaryGreen,
+    },
+    ALWAYS_OPEN: {
+      bg: theme.colors.primaryGreen,
+      fg: theme.colors.surface,
+      border: theme.colors.primaryGreen,
+      dot: theme.colors.surface,
+    },
+    CLOSED: {
+      bg: theme.colors.borderLight,
+      fg: theme.colors.textSecondary,
+      border: theme.colors.border,
+      dot: theme.colors.textMuted,
+    },
+  }
 }
 
-function statusVariant($status) {
-  return STATUS_VARIANTS[$status] ?? STATUS_VARIANTS.CLOSED
+function statusVariant($status, theme) {
+  const variants = getStatusVariants(theme)
+  return variants[$status] ?? variants.CLOSED
 }
 
 export const Badge = styled.span`
@@ -33,9 +36,9 @@ export const Badge = styled.span`
   font-weight: 600;
   border-radius: 999px;
   padding: 0.2rem 0.65rem;
-  border: 1px solid ${({ $status }) => statusVariant($status).border};
-  background-color: ${({ $status }) => statusVariant($status).bg};
-  color: ${({ $status }) => statusVariant($status).fg};
+  border: 1px solid ${({ $status, theme }) => statusVariant($status, theme).border};
+  background-color: ${({ $status, theme }) => statusVariant($status, theme).bg};
+  color: ${({ $status, theme }) => statusVariant($status, theme).fg};
 `
 
 export const Dot = styled.span`
@@ -43,5 +46,5 @@ export const Dot = styled.span`
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
-  background-color: ${({ $status }) => statusVariant($status).dot};
+  background-color: ${({ $status, theme }) => statusVariant($status, theme).dot};
 `

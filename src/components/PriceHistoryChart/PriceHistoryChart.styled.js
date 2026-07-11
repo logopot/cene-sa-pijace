@@ -1,22 +1,22 @@
 import styled from 'styled-components'
 
 export const ChartWrap = styled.div`
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: ${({ theme }) => theme.colors.surface};
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 8px;
   padding: 1rem;
 `
 
 export const EmptyState = styled.p`
-  color: var(--color-text-muted);
+  color: ${({ theme }) => theme.colors.textMuted};
   font-style: italic;
 `
 
 export const TooltipCard = styled.div`
   min-width: 160px;
-  background: var(--color-surface);
+  background: ${({ theme }) => theme.colors.surface};
   border-radius: 12px;
-  box-shadow: var(--shadow-tooltip);
+  box-shadow: ${({ theme }) => theme.shadow.tooltip};
   padding: 0.75rem 1rem;
 `
 
@@ -25,7 +25,7 @@ export const TooltipDate = styled.div`
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--color-text-muted);
+  color: ${({ theme }) => theme.colors.textMuted};
   margin-bottom: 0.5rem;
 `
 
@@ -50,11 +50,11 @@ export const TooltipDot = styled.span`
 export const TooltipSeriesName = styled.span`
   flex: 1;
   font-size: 0.85rem;
-  color: var(--color-text-secondary);
+  color: ${({ theme }) => theme.colors.textSecondary};
 `
 
 export const TooltipValue = styled.span`
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--color-text-dark);
+  color: ${({ theme }) => theme.colors.textDark};
 `
