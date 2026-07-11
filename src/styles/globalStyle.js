@@ -54,13 +54,29 @@ export const GlobalStyle = createGlobalStyle`
     border-color: var(--color-border-light);
   }
 
-  .form-control,
-  .form-select {
+  .form-control {
     border-color: var(--color-border);
 
     &:focus {
       border-color: var(--color-primary-green);
       box-shadow: 0 0 0 0.2rem var(--color-primary-tint);
+    }
+  }
+
+  .form-select {
+    height: 48px;
+    border-radius: ${theme.radius.xl};
+    border: 1px solid ${theme.colors.border};
+    background-color: ${theme.colors.surface};
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: ${theme.colors.primaryGreen};
+    }
+
+    &:focus {
+      border-color: ${theme.colors.primaryGreen};
+      box-shadow: 0 0 0 0.2rem ${theme.colors.primaryTint};
     }
   }
 `
