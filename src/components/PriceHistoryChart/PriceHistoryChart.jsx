@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { theme } from '../../styles/theme.js'
+import { ROTATED_AXIS_HEIGHT, ROTATED_AXIS_MARGIN_BOTTOM, RotatedAxisTick } from '../../utils/chartAxisTick.js'
 import {
   ChartWrap,
   EmptyState,
@@ -49,7 +50,7 @@ function PriceHistoryChart({ data }) {
   return (
     <ChartWrap>
       <ResponsiveContainer width="100%" height={320}>
-        <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
+        <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: ROTATED_AXIS_MARGIN_BOTTOM }}>
           <defs>
             <linearGradient id="stipsGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor={theme.colors.primaryGreen} stopOpacity={0.25} />
@@ -61,7 +62,7 @@ function PriceHistoryChart({ data }) {
             </linearGradient>
           </defs>
           <CartesianGrid vertical={false} stroke={theme.colors.borderLight} strokeDasharray="4 4" />
-          <XAxis dataKey="weekLabel" tick={{ fontSize: 11 }} minTickGap={24} />
+          <XAxis dataKey="weekLabel" tick={<RotatedAxisTick fontSize={11} />} height={ROTATED_AXIS_HEIGHT} minTickGap={24} />
           <YAxis tick={{ fontSize: 11 }} width={48} />
           <Tooltip
             content={<CustomTooltip />}

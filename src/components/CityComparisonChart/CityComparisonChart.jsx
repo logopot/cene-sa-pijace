@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { theme } from '../../styles/theme.js'
+import { ROTATED_AXIS_HEIGHT, ROTATED_AXIS_MARGIN_BOTTOM, RotatedAxisTick } from '../../utils/chartAxisTick.js'
 import {
   ChartWrap,
   EmptyState,
@@ -36,9 +37,9 @@ function CityComparisonChart({ data, cheapest, priciest, highlightGrad }) {
 
       <ChartWrap>
         <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 8 }}>
+          <BarChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: ROTATED_AXIS_MARGIN_BOTTOM }}>
             <CartesianGrid strokeDasharray="3 3" stroke={theme.colors.borderLight} />
-            <XAxis dataKey="grad" tick={{ fontSize: 14 }} interval={0} />
+            <XAxis dataKey="grad" tick={<RotatedAxisTick fontSize={14} />} height={ROTATED_AXIS_HEIGHT} interval={0} />
             <YAxis tick={{ fontSize: 11 }} width={48} />
             <Tooltip formatter={(value) => [Number(value).toFixed(2), t('analytics.priceLabel')]} />
             <Bar dataKey="price" radius={[4, 4, 0, 0]}>
