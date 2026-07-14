@@ -5,6 +5,24 @@ import { initReactI18next } from 'react-i18next'
 
 export const SUPPORTED_LANGUAGES = ['sr', 'en']
 
+// One-time migration for visitors who were auto-detected into English before
+// 'navigator' was removed from the detector's order (see below) - without
+// this, their old cached i18nextLng='en' would look identical to a
+// deliberate post-fix choice and be honored forever. Runs once per browser;
+// wrapped in try/catch since localStorage can throw (e.g. Safari private
+// mode, disabled storage) and this must never block i18n init.
+try {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const MIGRATION_KEY = 'i18n_forced_sr_v1'
+    if (!window.localStorage.getItem(MIGRATION_KEY)) {
+      window.localStorage.setItem('i18nextLng', 'sr')
+      window.localStorage.setItem(MIGRATION_KEY, 'true')
+    }
+  }
+} catch {
+  // Storage inaccessible - fall through to normal detection/fallbackLng.
+}
+
 i18n
   .use(Backend)
   .use(LanguageDetector)
