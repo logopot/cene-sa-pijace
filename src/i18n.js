@@ -22,8 +22,13 @@ i18n
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
+    // Serbian is the site's primary language (promoted only in Serbia);
+    // English exists for foreigners looking up Serbian market prices, so it
+    // must be an explicit user choice (via LanguageSwitcher) rather than
+    // something the browser's OS/navigator language picks automatically -
+    // hence 'navigator' is intentionally excluded from the detection order.
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage'],
       caches: ['localStorage'],
     },
     interpolation: {
