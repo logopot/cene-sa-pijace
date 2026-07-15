@@ -1,19 +1,26 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { Container } from 'react-bootstrap'
+import Logo from '../Logo/Logo.jsx'
 import { getDisclaimerPath } from '../../constants/routeLocales.js'
 import {
   StyledFooter,
-  FooterInner,
+  TopSection,
+  BrandColumn,
+  BrandRow,
+  BrandTitle,
+  Tagline,
+  NavArea,
+  NavColumn,
+  NavHeading,
+  NavList,
+  NavLink,
+  Separator,
+  BottomSection,
   Copyright,
-  DisclaimerLink,
-  StipsLink,
-  FooterRight,
-  FooterSeparator,
   CreditText,
   PortfolioLink,
 } from './Footer.styled.js'
 
-const STIPS_URL = 'https://www.stips.minpolj.gov.rs/'
 const PORTFOLIO_URL = 'https://logopot.rs'
 
 function Footer() {
@@ -24,29 +31,54 @@ function Footer() {
   return (
     <StyledFooter>
       <Container>
-        <FooterInner>
-          <Copyright>
+        <TopSection>
+          <BrandColumn>
+            <BrandRow>
+              <Logo isHeaderVersion={false} size={36} />
+              <BrandTitle>{t('app.name')}</BrandTitle>
+            </BrandRow>
+            <Tagline>{t('footer.tagline')}</Tagline>
+          </BrandColumn>
+
+          <NavArea>
+            <NavColumn>
+              <NavHeading>{t('footer.nav.exploreHeading')}</NavHeading>
+              <NavList>
+                <li>
+                  <NavLink to="/">{t('nav.home')}</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/">{t('nav.markets')}</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/">{t('footer.nav.products')}</NavLink>
+                </li>
+              </NavList>
+            </NavColumn>
+            <NavColumn>
+              <NavHeading>{t('footer.nav.aboutHeading')}</NavHeading>
+              <NavList>
+                <li>
+                  <NavLink to={disclaimerPath}>{t('footer.disclaimerLink')}</NavLink>
+                </li>
+              </NavList>
+            </NavColumn>
+          </NavArea>
+        </TopSection>
+
+        <Separator />
+
+        <BottomSection>
+          <Copyright>{t('footer.copyright', { year })}</Copyright>
+          <CreditText>
             <Trans
-              i18nKey="footer.copyright"
-              values={{ year }}
+              i18nKey="footer.credit"
               components={{
-                stipsLink: <StipsLink href={STIPS_URL} target="_blank" rel="noopener noreferrer" />,
+                portfolioLink: <PortfolioLink href={PORTFOLIO_URL} target="_blank" rel="noopener noreferrer" />,
               }}
             />
-          </Copyright>
-          <FooterRight>
-            <DisclaimerLink to={disclaimerPath}>{t('footer.disclaimerLink')}</DisclaimerLink>
-            <FooterSeparator>•</FooterSeparator>
-            <CreditText>
-              <Trans
-                i18nKey="footer.credit"
-                components={{
-                  portfolioLink: <PortfolioLink href={PORTFOLIO_URL} target="_blank" rel="noopener noreferrer" />,
-                }}
-              />
-            </CreditText>
-          </FooterRight>
-        </FooterInner>
+          </CreditText>
+        </BottomSection>
       </Container>
     </StyledFooter>
   )

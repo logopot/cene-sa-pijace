@@ -138,9 +138,15 @@
     "noComparison": "Nema podataka za poređenje gradova."
   },
   "footer": {
-    "copyright": "© {{year}} Cene sa pijace. Svi podaci se preuzimaju sa <stipsLink>STIPS</stipsLink> sistema u informativne svrhe.",
+    "tagline": "Nezavisni pijačni barometar koji omogućava brz i jasan uvid u kretanje cena poljoprivrednih proizvoda na zelenim pijacama širom Srbije.",
+    "copyright": "© {{year}} Cene sa pijace. Sva prava zadržana.",
     "disclaimerLink": "Odricanje od odgovornosti",
-    "credit": "Dizajn i razvoj: <portfolioLink>Logopot</portfolioLink>"
+    "credit": "Dizajn i razvoj: <portfolioLink>Logopot</portfolioLink>",
+    "nav": {
+      "exploreHeading": "Istražite",
+      "products": "Proizvodi",
+      "aboutHeading": "O projektu"
+    }
   },
   "404": {
     "title": "Ova tezga je trenutno prazna",

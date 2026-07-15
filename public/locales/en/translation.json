@@ -138,9 +138,15 @@
     "noComparison": "No data available for city comparison."
   },
   "footer": {
-    "copyright": "© {{year}} Cene sa pijace. All data is retrieved from the <stipsLink>STIPS</stipsLink> system for informational purposes.",
+    "tagline": "An independent market barometer giving you a fast, clear view of agricultural price trends at green markets across Serbia.",
+    "copyright": "© {{year}} Cene sa pijace. All rights reserved.",
     "disclaimerLink": "Disclaimer",
-    "credit": "Design & development: <portfolioLink>Logopot</portfolioLink>"
+    "credit": "Design & development: <portfolioLink>Logopot</portfolioLink>",
+    "nav": {
+      "exploreHeading": "Explore",
+      "products": "Products",
+      "aboutHeading": "About the project"
+    }
   },
   "404": {
     "title": "This stall is currently empty",
