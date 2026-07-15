@@ -23,7 +23,10 @@ function Logo({ size = 40, isHeaderVersion = true, ...props }) {
         />
         <LogoDot cx="47" cy="57" r="6" $isHeaderVersion={isHeaderVersion} />
       </g>
-      <LogoLeaf d="M62,26 C68,23 76,14 74,6 C66,8 58,18 62,26 Z" />
+      <LogoLeaf
+        d="M62,26 C68,23 76,14 74,6 C66,8 58,18 62,26 Z"
+        transform="translate(-2, 7.5)"
+      />
     </LogoSvg>
   )
 }

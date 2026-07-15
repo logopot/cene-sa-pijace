@@ -18,22 +18,10 @@ export const BrandLink = styled(Link)`
   }
 `
 
-export const BrandText = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
 export const Brand = styled(Navbar.Brand)`
   color: ${({ theme }) => theme.colors.surface} !important;
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   letter-spacing: 0.02em;
-  margin-right: 0;
-`
-
-export const Tagline = styled.span`
-  display: block;
-  color: ${({ theme }) => theme.colors.primaryTint};
-  font-size: 0.85rem;
-  font-weight: 400;
+  margin: 0;
 `
