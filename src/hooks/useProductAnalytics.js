@@ -9,6 +9,15 @@ function average(values) {
   return valid.reduce((sum, value) => sum + value, 0) / valid.length
 }
 
+// CenaDom is normally a precomputed single price (see sheetsService.js), but
+// falls back to the mathematical midpoint of CenaMin/CenaMax so a STIPS
+// price *range* still yields one comparable number instead of dropping out
+// of the comparison entirely.
+function getComparablePrice(row) {
+  if (row.CenaDom !== null && row.CenaDom !== undefined) return row.CenaDom
+  return average([row.CenaMin, row.CenaMax])
+}
+
 // categoryName comes from the URL's :categorySlug segment and always applies
 // (works even for a direct/bookmarked visit with no router state). filters
 // disambiguates products whose names still collide within that category (see
@@ -35,7 +44,7 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
     const row = itemRows[0]
     return {
       kategorija: row?.Kategorija ?? '',
-      proizvod: row?.Proizvod ?? '',
+      proizvod: (row?.Proizvod ?? '').trim(),
       velicina: row?.Velicina ?? '',
       pakovanje: row?.Pakovanje ?? '',
       poreklo: row?.Poreklo ?? '',
@@ -67,26 +76,28 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
       }))
   }, [itemRows, selectedGrad])
 
-  const latestWeekTime = useMemo(() => {
-    const times = itemRows.map((row) => getRowTime(row)).filter((time) => time !== null)
-    return times.length === 0 ? null : Math.max(...times)
-  }, [itemRows])
-
+  // Each city's own latest record for this product, not a single global
+  // latest timestamp - a city whose scraper ran even a day/week earlier than
+  // the overall max would otherwise be silently dropped from the comparison
+  // (see the STIPS/JKP note on useMarketExplorer.js for the same class of bug).
   const cityComparison = useMemo(() => {
-    if (latestWeekTime === null) return []
     const byCity = new Map()
-    itemRows
-      .filter((row) => getRowTime(row) === latestWeekTime)
-      .forEach((row) => {
-        const { grad } = parseMesto(row.Mesto)
-        if (!byCity.has(grad)) byCity.set(grad, [])
-        byCity.get(grad).push(row.CenaDom)
-      })
+    itemRows.forEach((row) => {
+      const time = getRowTime(row)
+      if (time === null) return
+      const { grad } = parseMesto(row.Mesto)
+      const existing = byCity.get(grad)
+      if (!existing || time > existing.time) {
+        byCity.set(grad, { time, rows: [row] })
+      } else if (time === existing.time) {
+        existing.rows.push(row)
+      }
+    })
     return Array.from(byCity.entries())
-      .map(([grad, prices]) => ({ grad, price: average(prices) }))
+      .map(([grad, { rows: cityRows }]) => ({ grad, price: average(cityRows.map(getComparablePrice)) }))
       .filter((entry) => entry.price !== null)
       .sort((a, b) => a.price - b.price)
-  }, [itemRows, latestWeekTime])
+  }, [itemRows])
 
   return {
     identity,
