@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { Link } from "react-router-dom";
 
 export const StyledFooter = styled.footer`
@@ -73,14 +73,27 @@ export const NavList = styled.ul`
   gap: ${({ theme }) => theme.spacing.xs};
 `;
 
-export const NavLink = styled(Link)`
+const linkStyles = css`
   color: ${({ theme }) => theme.colors.textSecondary};
-  font-size: 0.875rem;
   text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: all 0.2s ease-in-out;
 
   &:hover {
     color: ${({ theme }) => theme.colors.primaryGreen};
+    border-bottom: 1px solid ${({ theme }) => theme.colors.primaryGreen};
   }
+`;
+
+export const FooterRouteLink = styled(Link)`
+  ${linkStyles}
+`;
+
+export const FooterExternalLink = styled.a`
+  ${linkStyles}
 `;
 
 export const Separator = styled.hr`
@@ -113,12 +126,3 @@ export const CreditText = styled.span`
   font-size: 0.85rem;
 `;
 
-export const PortfolioLink = styled.a`
-  color: ${({ theme }) => theme.colors.textMuted};
-  font-weight: 600;
-  text-decoration: underline;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.primaryGreen};
-  }
-`;
