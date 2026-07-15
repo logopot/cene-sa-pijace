@@ -49,15 +49,25 @@ export const CardLink = styled(Link)`
   }
 `;
 
-export const HeaderRow = styled.div`
+export const CardHeader = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: ${({ theme }) => theme.spacing.md};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+  width: 100%;
 `;
 
 export const IconCircle = styled(AppIconWrapper)`
   background-color: ${({ theme }) => theme.colors.iconBg};
   color: ${({ theme }) => theme.colors.primaryGreen};
+`;
+
+export const TitleBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.xxs};
+  min-width: 0;
+  text-align: left;
 `;
 
 export const ProductTitle = styled(Card.Title)`
@@ -72,14 +82,12 @@ export const ProductTitle = styled(Card.Title)`
   white-space: nowrap;
 `;
 
-// Indented to line up under ProductTitle's text start (IconCircle width +
-// HeaderRow gap), not under the icon itself.
 export const MarketSubtitle = styled(Card.Subtitle)`
   font-size: 0.875rem;
   font-weight: ${({ theme }) => theme.font.weight.regular};
   color: ${({ theme }) => theme.colors.textMuted};
-  margin-top: 0.3rem;
-  margin-left: calc(48px + 0.6rem);
+  margin: 0;
+  text-align: left;
 `;
 
 export const SourceTag = styled.span`

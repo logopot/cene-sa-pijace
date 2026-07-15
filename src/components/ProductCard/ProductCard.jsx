@@ -15,8 +15,9 @@ import {
 import {
   CardLink,
   StyledCard,
-  HeaderRow,
+  CardHeader,
   IconCircle,
+  TitleBlock,
   ProductTitle,
   MarketSubtitle,
   SourceTag,
@@ -85,16 +86,18 @@ function ProductCard({ row, selection }) {
     >
       <StyledCard>
         <Card.Body>
-          <HeaderRow>
+          <CardHeader>
             <IconCircle>
               {/* eslint-disable-next-line react-hooks/static-components -- Icon is a stable module-level reference, not created during render */}
               <Icon />
             </IconCircle>
-            <ProductTitle>{productName}</ProductTitle>
-          </HeaderRow>
-          <MarketSubtitle>
-            {pijacaLabel}, {gradLabel}
-          </MarketSubtitle>
+            <TitleBlock>
+              <ProductTitle>{productName}</ProductTitle>
+              <MarketSubtitle>
+                {pijacaLabel}, {gradLabel}
+              </MarketSubtitle>
+            </TitleBlock>
+          </CardHeader>
 
           <MetaGrid>
             <MetaBadge>
