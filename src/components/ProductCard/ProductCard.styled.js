@@ -160,6 +160,7 @@ export const PriceValue = styled.div`
   color: ${({ theme }) => theme.colors.titleDark};
   letter-spacing: -0.02em;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 
   @container (max-width: 340px) {
     font-size: 1.2rem;

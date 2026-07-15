@@ -55,12 +55,11 @@ export const theme = {
     xxl: "64px",
   },
   font: {
-    // 'Plus Jakarta Sans' has no system-font equivalent, so without shipping
-    // the actual font file it would silently fall back anyway - keeping Inter
-    // first avoids adding a new external font/CDN dependency (this project
-    // has had recurring TLS-interception friction with outbound network
-    // calls), while still degrading gracefully since Inter mirrors system-ui.
-    family: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+    // Pairing: 'Plus Jakarta Sans' for headings/branding (character, warmth),
+    // 'Inter' for body/data (readability, tabular figures for prices). Both
+    // are loaded via the Google Fonts <link> in index.html.
+    heading: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    body: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     weight: {
       regular: 400,
       medium: 500,

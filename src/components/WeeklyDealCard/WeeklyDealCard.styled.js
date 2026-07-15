@@ -65,4 +65,5 @@ export const PriceValue = styled.span`
   color: ${({ theme }) => theme.colors.titleDark};
   letter-spacing: -0.01em;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 `;

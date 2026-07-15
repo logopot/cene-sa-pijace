@@ -20,6 +20,7 @@ export const BrandLink = styled(Link)`
 
 export const Brand = styled(Navbar.Brand)`
   color: ${({ theme }) => theme.colors.surface} !important;
+  font-family: ${({ theme }) => theme.font.heading};
   font-weight: 700;
   font-size: 1.3rem;
   letter-spacing: 0.02em;
