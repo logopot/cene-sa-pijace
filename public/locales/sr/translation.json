@@ -140,7 +140,8 @@
   },
   "footer": {
     "copyright": "© {{year}} Cene sa pijace. Svi podaci se preuzimaju sa <stipsLink>STIPS</stipsLink> sistema u informativne svrhe.",
-    "disclaimerLink": "Odricanje od odgovornosti"
+    "disclaimerLink": "Odricanje od odgovornosti",
+    "credit": "Dizajn i razvoj: <portfolioLink>Logopot</portfolioLink>"
   },
   "404": {
     "title": "Ova tezga je trenutno prazna",

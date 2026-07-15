@@ -140,7 +140,8 @@
   },
   "footer": {
     "copyright": "© {{year}} Cene sa pijace. All data is retrieved from the <stipsLink>STIPS</stipsLink> system for informational purposes.",
-    "disclaimerLink": "Disclaimer"
+    "disclaimerLink": "Disclaimer",
+    "credit": "Design & development: <portfolioLink>Logopot</portfolioLink>"
   },
   "404": {
     "title": "This stall is currently empty",

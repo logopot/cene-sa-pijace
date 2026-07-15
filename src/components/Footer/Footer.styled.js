@@ -40,3 +40,35 @@ export const StipsLink = styled.a`
     color: ${({ theme }) => theme.colors.primaryGreen};
   }
 `
+
+export const FooterRight = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.xs};
+`
+
+export const FooterSeparator = styled.span`
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-size: 0.85rem;
+  user-select: none;
+
+  @media (max-width: 767px) {
+    display: none;
+  }
+`
+
+export const CreditText = styled.span`
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-size: 0.85rem;
+`
+
+export const PortfolioLink = styled.a`
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-weight: 600;
+  text-decoration: underline;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primaryGreen};
+  }
+`
