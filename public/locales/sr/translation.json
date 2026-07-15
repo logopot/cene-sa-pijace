@@ -119,7 +119,7 @@
     "tooltip": "Adresa: {{address}} • Radno vreme: {{hours}}",
     "cardLabel": "Radno vreme",
     "cardAlwaysOpen": "00–24č",
-    "cardOpenUntil": "radi do {{time}}č",
+    "cardOpenUntil": "do {{time}}č",
     "cardClosed": "ne radi"
   },
   "scrollToTop": {
