@@ -64,6 +64,12 @@ export const NavButton = styled.button`
     outline: 2px solid ${({ theme }) => theme.colors.primaryGreen};
     outline-offset: 2px;
   }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 `
 
 export const Track = styled.div`
