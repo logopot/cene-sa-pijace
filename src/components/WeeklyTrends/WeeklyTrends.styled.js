@@ -79,6 +79,10 @@ export const Track = styled.div`
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.md}
+    ${({ theme }) => theme.spacing.lg} ${({ theme }) => theme.spacing.md};
+  scroll-padding-left: ${({ theme }) => theme.spacing.md};
+  scroll-padding-right: ${({ theme }) => theme.spacing.md};
 
   &::-webkit-scrollbar {
     display: none;
@@ -88,7 +92,9 @@ export const Track = styled.div`
 export const Slide = styled.div`
   flex-shrink: 0;
   scroll-snap-align: start;
-  width: 100%;
+  /* Leaves 48px of the next card peeking in on mobile, signaling the track
+     is swipeable instead of reading as a single full-bleed card. */
+  width: calc(100% - 48px);
 
   @media (min-width: 576px) {
     width: calc((100% - 1.5rem) / 2);
