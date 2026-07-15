@@ -34,20 +34,40 @@ export const StyledCard = styled(Card)`
   }
 `
 
+export const CardHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+  width: 100%;
+`
+
 export const IconWrap = styled(AppIconWrapper)`
   background-color: ${({ theme }) => theme.colors.iconBg};
   color: ${({ theme }) => theme.colors.primaryGreen};
-  margin-bottom: 0.75rem;
+`
+
+export const TitleWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.xxs};
+  min-width: 0;
 `
 
 export const CityName = styled(Card.Title)`
   font-size: 1.1rem;
   font-weight: ${({ theme }) => theme.font.weight.bold};
   color: ${({ theme }) => theme.colors.primaryGreen};
-  margin-bottom: 0.15rem;
+  margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 export const MarketName = styled(Card.Subtitle)`
   font-size: 0.9rem;
   color: ${({ theme }) => theme.colors.textMuted};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
