@@ -116,7 +116,11 @@
     "alwaysOpen": "Open (24h)",
     "addressLabel": "Address",
     "closedToday": "closed today",
-    "tooltip": "Address: {{address}} • Working hours: {{hours}}"
+    "tooltip": "Address: {{address}} • Working hours: {{hours}}",
+    "cardLabel": "Working hours",
+    "cardAlwaysOpen": "open 00–24",
+    "cardOpenUntil": "open until {{time}}",
+    "cardClosed": "closed"
   },
   "scrollToTop": {
     "label": "Back to top"

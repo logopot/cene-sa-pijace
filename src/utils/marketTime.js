@@ -31,6 +31,13 @@ export function formatTodayHours(slot) {
   return `${slot.open}–${slot.close}`
 }
 
+// Strips a redundant ":00" so a closing time reads e.g. "19" instead of
+// "19:00", while keeping minutes when they matter (e.g. "19:30").
+export function formatClosingTime(close) {
+  const [hours, minutes] = close.split(':')
+  return minutes === '00' ? hours : `${hours}:${minutes}`
+}
+
 // Reports today's slot against `now` (defaults to the real current time) -
 // a slot of `{ open: "00:00", close: "24:00" }` means the market never
 // closes that day, distinct from a plain open/close window.

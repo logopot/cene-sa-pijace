@@ -52,6 +52,33 @@ export const MarketName = styled(Card.Subtitle)`
   color: ${({ theme }) => theme.colors.textMuted};
 `
 
-export const StatusRow = styled.div`
-  margin-top: 0.6rem;
+export const WorkingHoursRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  padding-top: ${({ theme }) => theme.spacing.sm};
+  border-top: 1px solid ${({ theme }) => theme.colors.borderLight};
+`
+
+export const WorkingHoursLabel = styled.span`
+  font-size: 0.85rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+`
+
+export const WorkingHoursValue = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+  color: ${({ theme }) => theme.colors.textSecondary};
+`
+
+export const StatusDot = styled.span`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-color: ${({ $isOpen, theme }) => ($isOpen ? theme.colors.primaryGreen : theme.colors.danger)};
 `
