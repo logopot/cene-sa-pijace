@@ -147,14 +147,14 @@
   },
   "disclaimer": {
     "title": "Disclaimer",
-    "back": "Back to home",
-    "intro": "The data shown on the Cene sa pijace portal is collected through an automated process and is provided for informational purposes only. By using this site, you accept the terms set out below.",
-    "sourceHeading": "Data source",
-    "sourceBody": "All agricultural product price data is retrieved through an automated process from the official STIPS system (Sistem tržišnih informacija poljoprivrede Srbije - the Serbian Agricultural Market Information System), operated by the Ministry of Agriculture, Forestry and Water Management of the Republic of Serbia. Cene sa pijace is not a government authority and is not affiliated with the Ministry - the portal solely processes and displays publicly available data for easier browsing.",
-    "liabilityHeading": "Limitation of liability",
-    "liabilityBody1": "While we make reasonable efforts to keep the displayed data current, we do not guarantee its complete accuracy, completeness, or timeliness. Market prices change in real time and may differ from the most recently recorded values due to seasonal, market, or logistical factors outside our control.",
-    "liabilityBody2": "Cene sa pijace accepts no responsibility for inaccuracies or errors arising from manual data entry by market officials, nor for technical issues in the transfer of data from the source system.",
-    "liabilityBody3": "Information shown on this site is not official and must not be used as the sole basis for legal, financial, or commercial decisions. For official and up-to-date information, please contact the STIPS system or the relevant Ministry directly."
+    "back": "Back to Home",
+    "intro": "The data displayed on the Cene sa pijace portal is collected automatically and is intended solely for informational purposes. By using this website, the user accepts the terms and conditions outlined below.",
+    "sourceHeading": "Data Source",
+    "sourceBody": "All agricultural product price data on our portal is sourced from official and publicly available channels. The primary data sources are the official STIPS system (Agricultural Market Information System of Serbia), managed by the Ministry of Agriculture, Forestry and Water Management, as well as official websites of public utility companies (JKP) that manage local green markets across Serbia. The 'Cene sa pijace' portal is an independent digital solution solely intended to process, structure, and visually present this public data to make daily market tracking easier for citizens. This portal is not an official state or municipal authority, nor is it associated in any way with the aforementioned Ministry or utility companies.",
+    "liabilityHeading": "Limitation of Liability",
+    "liabilityBody1": "While we make reasonable efforts to ensure the displayed data remains up to date, we do not guarantee its absolute accuracy, completeness, or timeliness. Green market prices change in real time and may deviate from the last recorded values due to seasonal, market, or logistical factors beyond our control.",
+    "liabilityBody2": "The 'Cene sa pijace' portal is not liable for any inaccuracies or errors resulting from manual data entry by authorized market personnel, nor for any technical failures during data transmission from the source systems.",
+    "liabilityBody3": "The data displayed on this website is not considered official and should not be used as the sole basis for legal, financial, or commercial decisions. For official and up-to-date information, please refer directly to the STIPS system or the competent Ministry."
   },
   "dataValues": {
     "trend": {
