@@ -92,7 +92,10 @@ function ProductCard({ row, selection }) {
               <Icon />
             </IconCircle>
             <TitleBlock>
-              <div className="test-product-title" data-testid="product-title">
+              <div
+                className="product-title-container"
+                data-testid="product-title-container"
+              >
                 <ProductTitle>{productName}</ProductTitle>
                 <MarketSubtitle>
                   {pijacaLabel}, {gradLabel}
