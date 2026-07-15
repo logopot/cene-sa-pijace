@@ -3,7 +3,7 @@ import { CATEGORIES } from '../constants/categories.js'
 import { ALL_MARKETS } from '../constants/filters.js'
 import { parseMesto, isConsumerMarketType } from '../utils/market.js'
 import { shuffleArray } from '../utils/shuffle.js'
-import { getRowTime, getLatestWeekTime } from '../utils/week.js'
+import { pickWeeklyDrops } from '../utils/weeklyDrops.js'
 
 function matchesSelection(row, { category, grad, pijaca }) {
   if (category && row.Kategorija !== category) return false
@@ -54,22 +54,7 @@ export function useMarketExplorer(rows) {
     return shuffleArray(unique).slice(0, 8)
   }, [rows])
 
-  const globalLatestWeek = useMemo(() => getLatestWeekTime(rows), [rows])
-
-  const weeklyDrops = useMemo(() => {
-    if (globalLatestWeek === null) return []
-    const seen = new Set()
-    const drops = []
-    for (const row of rows) {
-      if (row.Trend !== 'pad') continue
-      if (getRowTime(row) !== globalLatestWeek) continue
-      const dedupeKey = `${row.Proizvod}-${row.Mesto}`
-      if (seen.has(dedupeKey)) continue
-      seen.add(dedupeKey)
-      drops.push(row)
-    }
-    return shuffleArray(drops).slice(0, 4)
-  }, [rows, globalLatestWeek])
+  const weeklyDrops = useMemo(() => pickWeeklyDrops(rows), [rows])
 
   const setCategory = useCallback((value) => {
     setCategoryState(value)
