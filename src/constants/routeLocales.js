@@ -105,3 +105,19 @@ export function getAllMarketsUrlSlug(language) {
 export function isAllMarketsUrlSlug(marketSlug) {
   return Object.values(ALL_MARKETS_URL_SLUGS).includes(marketSlug)
 }
+
+// Full static path (not just a URL word) for the disclaimer page, keyed by
+// language - App.jsx registers one route per entry here, all rendering the
+// same DisclaimerPage component.
+export const DISCLAIMER_PATH = {
+  sr: '/odricanje-od-odgovornosti',
+  en: '/disclaimer',
+}
+
+export function getDisclaimerPath(language) {
+  return DISCLAIMER_PATH[language] ?? DISCLAIMER_PATH[DEFAULT_LANGUAGE]
+}
+
+export function isDisclaimerPath(pathname) {
+  return Object.values(DISCLAIMER_PATH).includes(pathname)
+}

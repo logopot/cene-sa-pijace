@@ -13,7 +13,7 @@ import MarketCategoryDetails from './pages/MarketCategoryDetails/MarketCategoryD
 import Analytics from './pages/Analytics/Analytics.jsx'
 import NotFound from './pages/NotFound/NotFound.jsx'
 import { useMarketPrices } from './hooks/useMarketPrices.js'
-import { CITY_PATH_PREFIX } from './constants/routeLocales.js'
+import { CITY_PATH_PREFIX, DISCLAIMER_PATH } from './constants/routeLocales.js'
 import i18n from './i18n.js'
 import { GlobalStyle } from './styles/globalStyle.js'
 import { AppShell, Main } from './App.styled.js'
@@ -118,7 +118,11 @@ function App() {
             </Fragment>
           ))}
 
-          <Route path="/disclaimer" element={<DisclaimerPage />} />
+          {/* One route per language's disclaimer path (see routeLocales.js),
+              all rendering the same DisclaimerPage component. */}
+          {Object.values(DISCLAIMER_PATH).map((path) => (
+            <Route key={path} path={path} element={<DisclaimerPage />} />
+          ))}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Main>

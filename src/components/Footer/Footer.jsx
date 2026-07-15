@@ -1,5 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { Container } from 'react-bootstrap'
+import { getDisclaimerPath } from '../../constants/routeLocales.js'
 import {
   StyledFooter,
   FooterInner,
@@ -16,8 +17,9 @@ const STIPS_URL = 'https://www.stips.minpolj.gov.rs/'
 const PORTFOLIO_URL = 'https://logopot.rs'
 
 function Footer() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const year = new Date().getFullYear()
+  const disclaimerPath = getDisclaimerPath(i18n.language)
 
   return (
     <StyledFooter>
@@ -33,7 +35,7 @@ function Footer() {
             />
           </Copyright>
           <FooterRight>
-            <DisclaimerLink to="/disclaimer">{t('footer.disclaimerLink')}</DisclaimerLink>
+            <DisclaimerLink to={disclaimerPath}>{t('footer.disclaimerLink')}</DisclaimerLink>
             <FooterSeparator>•</FooterSeparator>
             <CreditText>
               <Trans
