@@ -21,6 +21,7 @@ export const theme = {
     jkpBlueTint: '#dbeafe',
     tertiary: '#b45309',
     tertiaryTint: '#fef3c7',
+    leafOrange: '#e75a24',
     chartGuide: '#cbd5e1',
     titleDark: '#0f172a',
     priceAccent: '#16a34a',

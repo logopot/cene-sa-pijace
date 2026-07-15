@@ -8,7 +8,9 @@ export const StyledNavbar = styled(Navbar)`
 `
 
 export const BrandLink = styled(Link)`
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
   text-decoration: none;
 
   &:hover {
@@ -16,11 +18,17 @@ export const BrandLink = styled(Link)`
   }
 `
 
+export const BrandText = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
 export const Brand = styled(Navbar.Brand)`
   color: ${({ theme }) => theme.colors.surface} !important;
   font-weight: 700;
   font-size: 1.4rem;
   letter-spacing: 0.02em;
+  margin-right: 0;
 `
 
 export const Tagline = styled.span`
