@@ -81,7 +81,7 @@ function rowsByTrend(rows, trendValue) {
   return matches
 }
 
-// Picks up to 4 products to feature as "biggest price drops", trying
+// Picks up to 8 products to feature as "biggest price drops", trying
 // progressively looser criteria so the section never disappears just
 // because this week's exact snapshot happens to have zero qualifying rows
 // (e.g. once JKP's daily archive rows - which never carry a Trend label -
@@ -95,7 +95,7 @@ export function pickWeeklyDrops(rows) {
   ]
   for (const tier of tiers) {
     const pool = tier()
-    if (pool.length > 0) return shuffleArray(pool).slice(0, 4)
+    if (pool.length > 0) return shuffleArray(pool).slice(0, 8)
   }
   return []
 }

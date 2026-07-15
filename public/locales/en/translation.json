@@ -58,7 +58,9 @@
   },
   "weeklyTrends": {
     "title": "Biggest Price Drops This Week",
-    "subtitle": "Products with the freshest price drops across markets in Serbia."
+    "subtitle": "Products with the freshest price drops across markets in Serbia.",
+    "scrollLeft": "Scroll left",
+    "scrollRight": "Scroll right"
   },
   "howItWorks": {
     "title": "How It Works",

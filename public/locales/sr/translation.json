@@ -58,7 +58,9 @@
   },
   "weeklyTrends": {
     "title": "Najveća pojeftinjenja ove nedelje",
-    "subtitle": "Proizvodi sa najsvežijim padom cene na pijacama širom Srbije."
+    "subtitle": "Proizvodi sa najsvežijim padom cene na pijacama širom Srbije.",
+    "scrollLeft": "Pomeri levo",
+    "scrollRight": "Pomeri desno"
   },
   "howItWorks": {
     "title": "Kako funkcioniše?",
