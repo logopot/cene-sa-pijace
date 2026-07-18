@@ -22,15 +22,15 @@ import {
   SubmitButton,
 } from './FilterBar.styled.js'
 
-const STEP_CATEGORY = 0
-const STEP_CITY = 1
+const STEP_CITY = 0
+const STEP_CATEGORY = 1
 const STEP_MARKET = 2
 const TOTAL_STEPS = 3
 
-// Indexed by step number - keep in sync with STEP_CATEGORY/STEP_CITY/STEP_MARKET.
+// Indexed by step number - keep in sync with STEP_CITY/STEP_CATEGORY/STEP_MARKET.
 const STEP_INSTRUCTION_KEYS = [
-  'filterBar.stepInstructionCategory',
   'filterBar.stepInstructionCity',
+  'filterBar.stepInstructionCategory',
   'filterBar.stepInstructionMarket',
 ]
 
@@ -49,7 +49,7 @@ function FilterBar({
   const navigate = useNavigate()
   // Drives the mobile "one field at a time" stepper only - the desktop layout
   // ignores it and always shows every field (see StepField's media query).
-  const [step, setStep] = useState(STEP_CATEGORY)
+  const [step, setStep] = useState(STEP_CITY)
 
   const categoryOptions = categories.map((cat) => ({ value: cat.name, label: t(`categories.${cat.slug}`) }))
   const cityOptions = cities.map((city) => ({ value: city, label: translateDataValue(t, 'grad', city) }))
@@ -58,17 +58,17 @@ function FilterBar({
     ...markets.map((market) => ({ value: market, label: translateDataValue(t, 'pijaca', market) })),
   ]
 
-  const handleCategoryChange = (value) => {
-    onCategoryChange(value)
-    setStep(value ? STEP_CITY : STEP_CATEGORY)
-  }
-
   const handleGradChange = (value) => {
     onGradChange(value)
-    setStep(value ? STEP_MARKET : STEP_CITY)
+    setStep(value ? STEP_CATEGORY : STEP_CITY)
   }
 
-  const handleBack = () => setStep((current) => Math.max(STEP_CATEGORY, current - 1))
+  const handleCategoryChange = (value) => {
+    onCategoryChange(value)
+    setStep(value ? STEP_MARKET : STEP_CATEGORY)
+  }
+
+  const handleBack = () => setStep((current) => Math.max(STEP_CITY, current - 1))
 
   const handleSubmit = () => {
     if (!category || !grad) return
@@ -80,7 +80,7 @@ function FilterBar({
       <Container>
         <MobileStepHeader>
           <StepHeaderTop>
-            <BackButton type="button" onClick={handleBack} $visible={step > STEP_CATEGORY}>
+            <BackButton type="button" onClick={handleBack} $visible={step > STEP_CITY}>
               <LuArrowLeft size={16} />
               {t('filterBar.back')}
             </BackButton>
@@ -90,16 +90,6 @@ function FilterBar({
         </MobileStepHeader>
 
         <Row className="g-3 align-items-end">
-          <StepField xs={12} md={3} $active={step === STEP_CATEGORY}>
-            <FieldLabel>{t('filterBar.categoryLabel')}</FieldLabel>
-            <CustomDropdown
-              options={categoryOptions}
-              value={category}
-              onChange={handleCategoryChange}
-              placeholder={t('filterBar.categoryPlaceholder')}
-            />
-          </StepField>
-
           <StepField xs={12} md={3} $active={step === STEP_CITY}>
             <FieldLabel>{t('filterBar.cityLabel')}</FieldLabel>
             <FieldRow>
@@ -108,10 +98,20 @@ function FilterBar({
                 value={grad}
                 onChange={handleGradChange}
                 placeholder={t('filterBar.cityPlaceholder')}
-                disabled={!category}
               />
-              <LocationDetectButton cities={cities} onDetect={handleGradChange} disabled={!category} />
+              <LocationDetectButton cities={cities} onDetect={handleGradChange} />
             </FieldRow>
+          </StepField>
+
+          <StepField xs={12} md={3} $active={step === STEP_CATEGORY}>
+            <FieldLabel>{t('filterBar.categoryLabel')}</FieldLabel>
+            <CustomDropdown
+              options={categoryOptions}
+              value={category}
+              onChange={handleCategoryChange}
+              placeholder={t('filterBar.categoryPlaceholder')}
+              disabled={!grad}
+            />
           </StepField>
 
           <StepField xs={12} md={3} $active={step === STEP_MARKET}>

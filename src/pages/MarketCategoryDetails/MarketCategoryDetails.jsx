@@ -17,8 +17,7 @@ import {
   PageHeader,
   IconWrap,
   TitleGroup,
-  CategoryTitle,
-  MarketLabel,
+  ContextHeading,
 } from './MarketCategoryDetails.styled.js'
 
 // Products for one category, scoped to either a single named market or every
@@ -89,6 +88,7 @@ function MarketCategoryDetails({ rows, loading, error }) {
   const backTo =
     isAllMarkets ? buildCityRoute(grad, i18n.language) : buildMarketRoute(grad, pijaca, i18n.language)
   const gradLabel = translateDataValue(t, 'grad', grad)
+  const marketLabel = isAllMarkets ? t('marketCategoryDetails.allMarketsShort') : translateDataValue(t, 'pijaca', pijaca)
 
   return (
     <>
@@ -104,12 +104,13 @@ function MarketCategoryDetails({ rows, loading, error }) {
             <Icon />
           </IconWrap>
           <TitleGroup>
-            <CategoryTitle>{t(`categories.${getCategorySlug(category)}`)}</CategoryTitle>
-            <MarketLabel>
-              {isAllMarkets ?
-                `${t('filterBar.marketAllOption')}, ${gradLabel}`
-              : `${translateDataValue(t, 'pijaca', pijaca)}, ${gradLabel}`}
-            </MarketLabel>
+            <ContextHeading>
+              {t('marketCategoryDetails.contextHeading', {
+                category: t(`categories.${getCategorySlug(category)}`),
+                market: marketLabel,
+                city: gradLabel,
+              })}
+            </ContextHeading>
           </TitleGroup>
         </PageHeader>
 

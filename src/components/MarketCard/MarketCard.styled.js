@@ -17,6 +17,8 @@ export const CardLink = styled(Link)`
 `;
 
 export const StyledCard = styled(Card)`
+  position: relative;
+  z-index: 1;
   height: 100%;
   cursor: pointer;
   border: 1px solid ${({ theme }) => theme.colors.border};
@@ -29,7 +31,13 @@ export const StyledCard = styled(Card)`
     padding: ${({ theme }) => theme.spacing.lg};
   }
 
+  /* Without position+z-index a hovered card is still a static-flow sibling,
+     so its enlarged shadow paints *underneath* the next card in DOM order
+     (the grid's next row/column) and reads as clipped at that shared edge,
+     even though nothing is actually overflow:hidden - see ProductCard.styled.js
+     for the same fix. */
   &:hover {
+    z-index: 10;
     transform: translateY(-4px);
     box-shadow: ${({ theme }) => theme.shadow.cardHover};
     border-color: ${({ theme }) => theme.colors.primaryGreen};

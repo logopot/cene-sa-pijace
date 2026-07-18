@@ -53,14 +53,14 @@ export const TitleGroup = styled.div`
   min-width: 0;
 `
 
-export const CategoryTitle = styled.h1`
-  font-size: 1.6rem;
+// Single self-describing sentence (city, category, and market all in one
+// line) rather than the old split title/subtitle pair - keeps the active
+// selection visible in one glance on mobile even once the filter bar itself
+// has scrolled out of view (see MarketCategoryDetails.jsx).
+export const ContextHeading = styled.h2`
+  font-size: 1.35rem;
   font-weight: ${({ theme }) => theme.font.weight.bold};
+  line-height: 1.3;
   margin: 0;
   color: ${({ theme }) => theme.colors.textDark};
-`
-
-export const MarketLabel = styled.span`
-  font-size: 0.95rem;
-  color: ${({ theme }) => theme.colors.textMuted};
 `

@@ -62,8 +62,8 @@
     "submit": "Prikaži cene",
     "back": "Nazad",
     "stepIndicator": "Korak {{current}} od {{total}}",
-    "stepInstructionCategory": "Izaberite kategoriju da nastavite",
-    "stepInstructionCity": "Izaberite grad",
+    "stepInstructionCategory": "Izaberite kategoriju",
+    "stepInstructionCity": "Izaberite grad da nastavite",
     "stepInstructionMarket": "Izaberite pijacu"
   },
   "locationDetect": {
@@ -133,6 +133,10 @@
   },
   "scrollToTop": {
     "label": "Nazad na vrh"
+  },
+  "marketCategoryDetails": {
+    "contextHeading": "Aktuelne cene za: {{category}} ({{market}}, {{city}})",
+    "allMarketsShort": "Sve pijace"
   },
   "analytics": {
     "back": "Nazad na pregled",

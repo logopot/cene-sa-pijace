@@ -12,26 +12,31 @@ function matchesSelection(row, { category, grad, pijaca }) {
   return true
 }
 
-// Owns only the homepage's chained Category -> City -> Market selection and
+// Owns only the homepage's chained Grad -> Category -> Market selection and
 // its landing-page sections - submitting the filter bar navigates to the
 // dedicated /grad/:citySlug/:marketSlug/:categorySlug results page (see
 // FilterBar) instead of toggling in-place state.
+//
+// Grad is the top-level, unfiltered choice (also the target of the location-
+// detect button - see LocationDetectButton.jsx), so it doesn't narrow by
+// category the way it used to when category came first. Category now narrows
+// by the chosen grad instead, mirroring the old direction one level down.
 export function useMarketExplorer(rows) {
   const [category, setCategoryState] = useState('')
   const [grad, setGradState] = useState('')
   const [pijaca, setPijaca] = useState('')
 
-  const categories = useMemo(() => {
-    const present = new Set(rows.map((row) => row.Kategorija))
-    return CATEGORIES.filter((cat) => present.has(cat.name))
+  const cities = useMemo(() => {
+    const unique = new Set(rows.map((row) => parseMesto(row.Mesto).grad))
+    return Array.from(unique).sort((a, b) => a.localeCompare(b))
   }, [rows])
 
-  const cities = useMemo(() => {
-    const unique = new Set(
-      rows.filter((row) => matchesSelection(row, { category, grad: '', pijaca: '' })).map((row) => parseMesto(row.Mesto).grad),
+  const categories = useMemo(() => {
+    const present = new Set(
+      rows.filter((row) => matchesSelection(row, { category: '', grad, pijaca: '' })).map((row) => row.Kategorija),
     )
-    return Array.from(unique).sort((a, b) => a.localeCompare(b))
-  }, [rows, category])
+    return CATEGORIES.filter((cat) => present.has(cat.name))
+  }, [rows, grad])
 
   const markets = useMemo(() => {
     if (!grad) return []
@@ -56,14 +61,21 @@ export function useMarketExplorer(rows) {
 
   const weeklyDrops = useMemo(() => pickWeeklyDrops(rows), [rows])
 
-  const setCategory = useCallback((value) => {
-    setCategoryState(value)
-    setGradState('')
-    setPijaca('')
-  }, [])
+  // Category is now the middle step (Grad -> Category -> Market), so
+  // changing it only invalidates the market choice below it, not the grad
+  // above it - defaults back to "every market in this city" rather than
+  // clearing the field, same as a fresh grad selection does.
+  const setCategory = useCallback(
+    (value) => {
+      setCategoryState(value)
+      setPijaca(grad ? ALL_MARKETS : '')
+    },
+    [grad],
+  )
 
   const setGrad = useCallback((value) => {
     setGradState(value)
+    setCategoryState('')
     setPijaca(value ? ALL_MARKETS : '')
   }, [])
 

@@ -62,8 +62,8 @@
     "submit": "Show Prices",
     "back": "Back",
     "stepIndicator": "Step {{current}} of {{total}}",
-    "stepInstructionCategory": "Select a category to continue",
-    "stepInstructionCity": "Select a city",
+    "stepInstructionCategory": "Select a category",
+    "stepInstructionCity": "Select a city to continue",
     "stepInstructionMarket": "Select a market"
   },
   "locationDetect": {
@@ -133,6 +133,10 @@
   },
   "scrollToTop": {
     "label": "Back to top"
+  },
+  "marketCategoryDetails": {
+    "contextHeading": "Current prices for: {{category}} ({{market}}, {{city}})",
+    "allMarketsShort": "All markets"
   },
   "analytics": {
     "back": "Back to overview",
