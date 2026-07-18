@@ -109,18 +109,6 @@
     "phase3": "Ređamo najsvežiju robu na čistu tezgu...",
     "phase4": "Zapisujemo rano jutarnje merenje cena..."
   },
-  "marketStatus": {
-    "openUntil": "Otvoreno • Radi do {{time}}",
-    "closed": "Zatvoreno",
-    "alwaysOpen": "Otvoreno (00–24h)",
-    "addressLabel": "Adresa",
-    "closedToday": "zatvoreno danas",
-    "tooltip": "Adresa: {{address}} • Radno vreme: {{hours}}",
-    "cardLabel": "Radno vreme",
-    "cardAlwaysOpen": "00–24č",
-    "cardOpenUntil": "do {{time}}č",
-    "cardClosed": "ne radi"
-  },
   "scrollToTop": {
     "label": "Nazad na vrh"
   },

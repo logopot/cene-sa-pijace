@@ -5,12 +5,10 @@ import { Container } from 'react-bootstrap'
 import { LuArrowLeft } from 'react-icons/lu'
 import { getCategoryIcon, getCategoryUrlSlug, resolveCategoryBySlug } from '../../utils/categoryIcons.js'
 import { translateDataValue } from '../../utils/translateValue.js'
-import { getMarketInfo } from '../../utils/marketTime.js'
 import { resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketCategoryRoute } from '../../utils/market.js'
 import { useProductAnalytics } from '../../hooks/useProductAnalytics.js'
 import PriceHistoryChart from '../../components/PriceHistoryChart/PriceHistoryChart.jsx'
 import CityComparisonChart from '../../components/CityComparisonChart/CityComparisonChart.jsx'
-import MarketStatusBadge from '../../components/MarketStatusBadge/MarketStatusBadge.jsx'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   BackButton,
@@ -18,8 +16,6 @@ import {
   IconWrap,
   ProductTitle,
   MarketSubtitle,
-  MarketMeta,
-  AddressLine,
   Section,
   SectionTitle,
 } from './Analytics.styled.js'
@@ -46,7 +42,6 @@ function Analytics({ rows }) {
 
   const Icon = getCategoryIcon(identity.kategorija)
   const productName = translateDataValue(t, 'proizvod', identity.proizvod)
-  const marketInfo = market ? getMarketInfo(market.grad, market.pijaca) : null
   const gradLabel = market ? translateDataValue(t, 'grad', market.grad) : null
   const pijacaLabel = market ? translateDataValue(t, 'pijaca', market.pijaca) : null
 
@@ -78,16 +73,6 @@ function Analytics({ rows }) {
             <MarketSubtitle>
               {pijacaLabel}, {gradLabel}
             </MarketSubtitle>
-          )}
-          {market && (
-            <MarketMeta>
-              <MarketStatusBadge grad={market.grad} pijaca={market.pijaca} />
-              {marketInfo && (
-                <AddressLine>
-                  {t('marketStatus.addressLabel')}: {marketInfo.address}
-                </AddressLine>
-              )}
-            </MarketMeta>
           )}
         </div>
       </PageHeader>

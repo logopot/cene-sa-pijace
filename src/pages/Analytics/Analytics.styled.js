@@ -51,19 +51,6 @@ export const MarketSubtitle = styled.p`
   margin: 0.15rem 0 0;
 `
 
-export const MarketMeta = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem 1rem;
-  margin-top: 0.6rem;
-`
-
-export const AddressLine = styled.span`
-  font-size: 0.85rem;
-  color: ${({ theme }) => theme.colors.textMuted};
-`
-
 export const Section = styled.section`
   margin-bottom: 2.5rem;
 `

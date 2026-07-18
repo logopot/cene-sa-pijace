@@ -109,18 +109,6 @@
     "phase3": "Stacking the freshest produce on the stall...",
     "phase4": "Polishing up the early morning market prices..."
   },
-  "marketStatus": {
-    "openUntil": "Open • Open until {{time}}",
-    "closed": "Closed",
-    "alwaysOpen": "Open (24h)",
-    "addressLabel": "Address",
-    "closedToday": "closed today",
-    "tooltip": "Address: {{address}} • Working hours: {{hours}}",
-    "cardLabel": "Working hours",
-    "cardAlwaysOpen": "open 00–24",
-    "cardOpenUntil": "open until {{time}}",
-    "cardClosed": "closed"
-  },
   "scrollToTop": {
     "label": "Back to top"
   },

@@ -6,7 +6,6 @@ import { LuArrowLeft, LuStore } from 'react-icons/lu'
 import { parseMesto, resolveGradBySlug, resolvePijacaBySlug, buildCityRoute } from '../../utils/market.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getRowTime, getRowRangeLabel, getLatestWeekTime } from '../../utils/week.js'
-import MarketStatusBadge from '../../components/MarketStatusBadge/MarketStatusBadge.jsx'
 import WeekStatus from '../../components/WeekStatus/WeekStatus.jsx'
 import ProductGrid from '../../components/ProductGrid/ProductGrid.jsx'
 import NotFound from '../NotFound/NotFound.jsx'
@@ -90,7 +89,6 @@ function MarketDetails({ rows, loading, error }) {
             <MarketTitle>{translateDataValue(t, 'pijaca', pijaca)}</MarketTitle>
             <CityLabel>{translateDataValue(t, 'grad', grad)}</CityLabel>
           </TitleGroup>
-          <MarketStatusBadge grad={grad} pijaca={pijaca} />
         </PageHeader>
 
         <WeekStatus weekLabel={weekLabel} isFallbackWeek={isFallbackWeek} />

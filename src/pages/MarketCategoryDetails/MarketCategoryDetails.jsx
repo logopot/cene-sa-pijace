@@ -8,7 +8,6 @@ import { parseMesto, resolveGradBySlug, resolveMarketSlug, buildCityRoute, build
 import { getCategoryIcon, getCategorySlug, resolveCategoryBySlug } from '../../utils/categoryIcons.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getRowTime, getRowRangeLabel, getLatestWeekTime } from '../../utils/week.js'
-import MarketStatusBadge from '../../components/MarketStatusBadge/MarketStatusBadge.jsx'
 import WeekStatus from '../../components/WeekStatus/WeekStatus.jsx'
 import ProductGrid from '../../components/ProductGrid/ProductGrid.jsx'
 import NotFound from '../NotFound/NotFound.jsx'
@@ -107,7 +106,6 @@ function MarketCategoryDetails({ rows, loading, error }) {
               : `${translateDataValue(t, 'pijaca', pijaca)}, ${gradLabel}`}
             </MarketLabel>
           </TitleGroup>
-          {!isAllMarkets && <MarketStatusBadge grad={grad} pijaca={pijaca} />}
         </PageHeader>
 
         <WeekStatus weekLabel={weekLabel} isFallbackWeek={isFallbackWeek} />

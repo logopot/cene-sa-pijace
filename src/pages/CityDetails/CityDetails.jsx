@@ -5,7 +5,6 @@ import { Alert, Col, Container, Row, Spinner } from 'react-bootstrap'
 import { LuArrowLeft, LuStore } from 'react-icons/lu'
 import { parseMesto, resolveGradBySlug, buildMarketRoute } from '../../utils/market.js'
 import { translateDataValue } from '../../utils/translateValue.js'
-import WorkingHoursStatus from '../../components/WorkingHoursStatus/WorkingHoursStatus.jsx'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
@@ -82,7 +81,6 @@ function CityDetails({ rows, loading, error }) {
             <MarketTileLink to={buildMarketRoute(grad, pijaca, i18n.language)}>
               <MarketTileCard>
                 <MarketTileName>{translateDataValue(t, 'pijaca', pijaca)}</MarketTileName>
-                <WorkingHoursStatus grad={grad} pijaca={pijaca} />
               </MarketTileCard>
             </MarketTileLink>
           </Col>
