@@ -79,10 +79,16 @@ export const Track = styled.div`
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.md}
-    ${({ theme }) => theme.spacing.lg} ${({ theme }) => theme.spacing.md};
-  scroll-padding-left: ${({ theme }) => theme.spacing.md};
-  scroll-padding-right: ${({ theme }) => theme.spacing.md};
+  /* overflow-x:auto forces the browser to clip the y-axis too (an element
+     can't scroll on one axis while staying visible on the other), which was
+     cropping ProductCard's hover box-shadow (theme.shadow.cardHover has up
+     to a 40px blur) at the track's edges. Can't drop overflow-x - that's
+     what makes this a scrollable carousel - so the padding below is sized
+     to the shadow's actual falloff instead, giving it room on every side. */
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.lg} ${({ theme }) => theme.spacing.xl}
+    ${({ theme }) => theme.spacing.lg};
+  scroll-padding-left: ${({ theme }) => theme.spacing.lg};
+  scroll-padding-right: ${({ theme }) => theme.spacing.lg};
 
   &::-webkit-scrollbar {
     display: none;

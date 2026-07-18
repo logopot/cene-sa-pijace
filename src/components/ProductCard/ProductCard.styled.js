@@ -4,6 +4,8 @@ import { Card } from "react-bootstrap";
 import { AppIconWrapper } from "../../styles/Card.styled.js";
 
 export const StyledCard = styled(Card)`
+  position: relative;
+  z-index: 1;
   height: 100%;
   border: none;
   border-radius: ${({ theme }) => theme.radius.xl};
@@ -19,7 +21,12 @@ export const StyledCard = styled(Card)`
     padding: ${({ theme }) => theme.spacing.lg};
   }
 
+  /* Without position+z-index a hovered card is still a static-flow sibling,
+     so its enlarged shadow paints *underneath* the next card in DOM order
+     (grid row-wrap or the WeeklyTrends carousel) and reads as clipped at
+     that shared edge, even though nothing is actually overflow:hidden. */
   &:hover {
+    z-index: 10;
     transform: translateY(-2px);
     box-shadow: ${({ theme }) => theme.shadow.cardHover};
   }
