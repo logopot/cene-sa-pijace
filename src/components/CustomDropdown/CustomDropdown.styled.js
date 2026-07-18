@@ -3,6 +3,11 @@ import styled from 'styled-components'
 export const Wrapper = styled.div`
   position: relative;
   width: 100%;
+  /* Only takes effect inside a flex parent (e.g. FilterBar's city FieldRow,
+     which pairs this with LocationDetectButton) - harmless everywhere else,
+     since Bootstrap's Col (this component's usual parent) isn't display:flex. */
+  flex: 1;
+  min-width: 0;
 `
 
 export const Trigger = styled.button`

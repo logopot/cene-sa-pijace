@@ -8,10 +8,12 @@ import { translateDataValue } from '../../utils/translateValue.js'
 import { getCategoryUrlSlug } from '../../utils/categoryIcons.js'
 import { buildMarketCategoryRoute } from '../../utils/market.js'
 import CustomDropdown from '../CustomDropdown/CustomDropdown.jsx'
+import LocationDetectButton from '../LocationDetectButton/LocationDetectButton.jsx'
 import {
   BackButton,
   Bar,
   FieldLabel,
+  FieldRow,
   MobileStepHeader,
   StepField,
   StepHeaderTop,
@@ -100,13 +102,16 @@ function FilterBar({
 
           <StepField xs={12} md={3} $active={step === STEP_CITY}>
             <FieldLabel>{t('filterBar.cityLabel')}</FieldLabel>
-            <CustomDropdown
-              options={cityOptions}
-              value={grad}
-              onChange={handleGradChange}
-              placeholder={t('filterBar.cityPlaceholder')}
-              disabled={!category}
-            />
+            <FieldRow>
+              <CustomDropdown
+                options={cityOptions}
+                value={grad}
+                onChange={handleGradChange}
+                placeholder={t('filterBar.cityPlaceholder')}
+                disabled={!category}
+              />
+              <LocationDetectButton cities={cities} onDetect={handleGradChange} disabled={!category} />
+            </FieldRow>
           </StepField>
 
           <StepField xs={12} md={3} $active={step === STEP_MARKET}>

@@ -19,6 +19,14 @@ export const FieldLabel = styled.span`
   margin-bottom: 0.25rem;
 `;
 
+// Lets a field's dropdown share its row with an adjacent action button (e.g.
+// the city step's LocationDetectButton) without widening the Bootstrap col.
+export const FieldRow = styled.div`
+  display: flex;
+  align-items: stretch;
+  gap: ${({ theme }) => theme.spacing.xs};
+`;
+
 // Only steps matching the mobile stepper's current step stay visible below
 // the desktop breakpoint - above it, Bootstrap's own col-md-* classes take
 // over and every field renders side by side as before.

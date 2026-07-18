@@ -66,6 +66,14 @@
     "stepInstructionCity": "Select a city",
     "stepInstructionMarket": "Select a market"
   },
+  "locationDetect": {
+    "buttonLabel": "Find my city",
+    "unsupported": "Your browser doesn't support sharing your location.",
+    "denied": "Location access was denied. Please pick a city manually.",
+    "unavailable": "We couldn't determine your location right now.",
+    "timeout": "Locating you took too long. Please try again.",
+    "noMatch": "No supported city was found near you for this category."
+  },
   "landing": {
     "title": "Explore Markets",
     "subtitle": "Pick a market or use the filters above to see prices."

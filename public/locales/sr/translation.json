@@ -66,6 +66,14 @@
     "stepInstructionCity": "Izaberite grad",
     "stepInstructionMarket": "Izaberite pijacu"
   },
+  "locationDetect": {
+    "buttonLabel": "Pronađi moj grad",
+    "unsupported": "Vaš pregledač ne podržava deljenje lokacije.",
+    "denied": "Pristup lokaciji je odbijen. Izaberite grad ručno.",
+    "unavailable": "Trenutno ne možemo da odredimo vašu lokaciju.",
+    "timeout": "Isteklo je vreme za određivanje lokacije. Pokušajte ponovo.",
+    "noMatch": "Nismo pronašli podržan grad u vašoj blizini za ovu kategoriju."
+  },
   "landing": {
     "title": "Istražite pijace",
     "subtitle": "Izaberite pijacu ili koristite filtere iznad da vidite cene."
