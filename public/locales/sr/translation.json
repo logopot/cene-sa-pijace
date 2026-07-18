@@ -94,8 +94,8 @@
     }
   },
   "weekStatus": {
-    "current": "Cene za period: {{week}}",
-    "official": "Zvanični podaci od: {{week}}"
+    "stips": "<bold>STIPS</bold> zvanični podaci za period: <bold>{{value}}</bold>",
+    "jkp": "<bold>JKP</bold> zvanični podaci od: <bold>{{value}}</bold>"
   },
   "productCard": {
     "source": "Izvor: {{source}}",

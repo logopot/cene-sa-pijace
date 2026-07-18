@@ -26,7 +26,7 @@ import {
 // tom gradu" option), at that scope's own latest available week.
 function useCategoryMarketData(rows, category, grad, pijaca) {
   return useMemo(() => {
-    if (!category || !grad || !pijaca) return { filteredRows: [], weekLabel: '', isFallbackWeek: false }
+    if (!category || !grad || !pijaca) return { filteredRows: [], weekLabel: '', isFallbackWeek: false, source: 'STIPS' }
 
     const scopedRows = rows.filter((row) => {
       if (row.Kategorija !== category) return false
@@ -43,8 +43,13 @@ function useCategoryMarketData(rows, category, grad, pijaca) {
     const isFallbackWeek =
       scopedLatestWeek !== null && globalLatestWeek !== null && scopedLatestWeek !== globalLatestWeek
     const weekLabel = filteredRows[0] ? getRowRangeLabel(filteredRows[0]) : ''
+    // See MarketDetails.jsx's useMarketData for the same convention - when
+    // pijaca is ALL_MARKETS this scope can technically span both sources,
+    // but the badge already only ever reflects filteredRows[0]'s own week
+    // shape (see weekLabel above), so source follows the same row.
+    const source = filteredRows[0]?.Source ? 'JKP' : 'STIPS'
 
-    return { filteredRows, weekLabel, isFallbackWeek }
+    return { filteredRows, weekLabel, isFallbackWeek, source }
   }, [rows, category, grad, pijaca])
 }
 
@@ -55,7 +60,7 @@ function MarketCategoryDetails({ rows, loading, error }) {
   const grad = useMemo(() => resolveGradBySlug(rows, citySlug), [rows, citySlug])
   const pijaca = useMemo(() => resolveMarketSlug(rows, grad, marketSlug), [rows, grad, marketSlug])
   const category = useMemo(() => resolveCategoryBySlug(categorySlug), [categorySlug])
-  const { filteredRows, weekLabel, isFallbackWeek } = useCategoryMarketData(rows, category, grad, pijaca)
+  const { filteredRows, weekLabel, isFallbackWeek, source } = useCategoryMarketData(rows, category, grad, pijaca)
 
   if (loading) {
     return (
@@ -108,7 +113,7 @@ function MarketCategoryDetails({ rows, loading, error }) {
           </TitleGroup>
         </PageHeader>
 
-        <WeekStatus weekLabel={weekLabel} isFallbackWeek={isFallbackWeek} />
+        <WeekStatus weekLabel={weekLabel} isFallbackWeek={isFallbackWeek} source={source} />
       </Container>
 
       <ProductGrid rows={filteredRows} selection={{ category, grad, pijaca }} />

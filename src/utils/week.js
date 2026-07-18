@@ -4,7 +4,7 @@ const ISO_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})/
 // JKP archive rows carry a literal ISO Date (see scripts/jkp-scraper);
 // reformat to the same Serbian DD.MM.YYYY. shape as formatWeekStartLabel
 // so STIPS and JKP points render identical axis/tooltip labels.
-function formatIsoDateLabel(isoDate) {
+export function formatIsoDateLabel(isoDate) {
   const match = isoDate?.match(ISO_DATE_RE)
   if (!match) return isoDate ?? ''
   const [, year, month, day] = match
@@ -55,9 +55,10 @@ export function getRowLabel(row) {
 }
 
 // Status-badge counterpart to getRowTime - a JKP row has no "range", just
-// the one date it was recorded on.
+// the one date it was recorded on, so it's formatted to the same Serbian
+// DD.MM.YYYY. notation rather than left as a raw ISO string.
 export function getRowRangeLabel(row) {
-  if (row.Date) return row.Date
+  if (row.Date) return formatIsoDateLabel(row.Date)
   return formatWeekRangeLabel(row.NedeljaOpis)
 }
 

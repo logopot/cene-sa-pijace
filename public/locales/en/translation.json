@@ -94,8 +94,8 @@
     }
   },
   "weekStatus": {
-    "current": "Prices for period: {{week}}",
-    "official": "Official data as of: {{week}}"
+    "stips": "<bold>STIPS</bold> official data for the period: <bold>{{value}}</bold>",
+    "jkp": "<bold>JKP</bold> official data as of: <bold>{{value}}</bold>"
   },
   "productCard": {
     "source": "Source: {{source}}",

@@ -26,7 +26,7 @@ import {
 // available week.
 function useMarketData(rows, grad, pijaca) {
   return useMemo(() => {
-    if (!grad || !pijaca) return { filteredRows: [], weekLabel: '', isFallbackWeek: false }
+    if (!grad || !pijaca) return { filteredRows: [], weekLabel: '', isFallbackWeek: false, source: 'STIPS' }
 
     const marketRows = rows.filter((row) => {
       const parsed = parseMesto(row.Mesto)
@@ -40,8 +40,12 @@ function useMarketData(rows, grad, pijaca) {
     const isFallbackWeek =
       marketLatestWeek !== null && globalLatestWeek !== null && marketLatestWeek !== globalLatestWeek
     const weekLabel = filteredRows[0] ? getRowRangeLabel(filteredRows[0]) : ''
+    // row.Source is only ever populated on JKP archive rows (see
+    // useProductAnalytics.js's same convention) - every market here is
+    // single-source, so the first row's shape speaks for the whole batch.
+    const source = filteredRows[0]?.Source ? 'JKP' : 'STIPS'
 
-    return { filteredRows, weekLabel, isFallbackWeek }
+    return { filteredRows, weekLabel, isFallbackWeek, source }
   }, [rows, grad, pijaca])
 }
 
@@ -51,7 +55,7 @@ function MarketDetails({ rows, loading, error }) {
 
   const grad = useMemo(() => resolveGradBySlug(rows, citySlug), [rows, citySlug])
   const pijaca = useMemo(() => resolvePijacaBySlug(rows, grad, marketSlug), [rows, grad, marketSlug])
-  const { filteredRows, weekLabel, isFallbackWeek } = useMarketData(rows, grad, pijaca)
+  const { filteredRows, weekLabel, isFallbackWeek, source } = useMarketData(rows, grad, pijaca)
 
   if (loading) {
     return (
@@ -103,7 +107,7 @@ function MarketDetails({ rows, loading, error }) {
           </TitleGroup>
         </PageHeader>
 
-        <WeekStatus weekLabel={weekLabel} isFallbackWeek={isFallbackWeek} />
+        <WeekStatus weekLabel={weekLabel} isFallbackWeek={isFallbackWeek} source={source} />
       </Container>
 
       <ProductGrid rows={filteredRows} selection={{ category: '', grad, pijaca }} />
