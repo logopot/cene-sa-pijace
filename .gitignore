@@ -2,19 +2,25 @@
 node_modules/
 **/node_modules/
 
-# 2. Blokiranje lokalnih build foldera
+# 2. Blokiranje lokalnih build foldera i Cloudflare okruženja
 dist/
 build/
-.claude/
+.pages/
+.wrangler/
 
-# 3. Blokiranje SVAKOG .env fajla u bilo kom podfolderu
+# 3. Blokiranje AI alata i internih beleški
+.claude/
+CLAUDE.md
+claude.md
+
+# 4. Blokiranje SVAKOG .env fajla u bilo kom podfolderu
 .env
 .env.local
 .env.*.local
 **/.env
 **/.env.local
 
-# 4. Blokiranje Google API ključeva i Service Account fajlova
+# 5. Blokiranje Google API ključeva i Service Account fajlova
 service-account.json
 **/service-account.json
 credentials.json
@@ -27,9 +33,12 @@ functions/lib/seo-manifest.mjs
 public/og/
 public/og-fallback.png
 
-# 5. Blokiranje operativnih sistema i logova
+# 7. Blokiranje operativnih sistema, logova i keša
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.eslintcache
 .DS_Store
 Thumbs.db
