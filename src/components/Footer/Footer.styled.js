@@ -89,17 +89,46 @@ const linkStyles = css`
 `;
 
 export const FooterRouteLink = styled(Link)`
-  ${linkStyles}
+  font-family: ${({ theme }) => theme.font.body};
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  text-decoration: none;
+  border-bottom: 1px solid ${({ theme }) => `${theme.colors.textSecondary}40`};
+  padding-bottom: 2px;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primaryGreen};
+    border-color: ${({ theme }) => theme.colors.primaryGreen};
+  }
 `;
 
 export const FooterExternalLink = styled.a`
   ${linkStyles}
 `;
 
+export const FooterLogoLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-top: -5px;
+  margin-left: ${({ theme }) => theme.spacing.xs};
+  color: ${({ theme }) => theme.colors.textMuted};
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primaryHover};
+  }
+`;
+
 export const Separator = styled.hr`
   border: none;
   border-top: 1px solid ${({ theme }) => theme.colors.borderLight};
-  margin: ${({ theme }) => theme.spacing.xl} 0 ${({ theme }) => theme.spacing.lg};
+  margin: ${({ theme }) => theme.spacing.xl} 0
+    ${({ theme }) => theme.spacing.lg};
 `;
 
 export const BottomSection = styled.div`
@@ -125,4 +154,3 @@ export const CreditText = styled.span`
   color: ${({ theme }) => theme.colors.textMuted};
   font-size: 0.85rem;
 `;
-

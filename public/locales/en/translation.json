@@ -141,7 +141,7 @@
     "tagline": "An independent market barometer giving you a fast, clear view of agricultural price trends at green markets across Serbia.",
     "copyright": "© {{year}} Cene sa pijace. All rights reserved.",
     "disclaimerLink": "Disclaimer",
-    "credit": "Design & development: <portfolioLink>Logopot</portfolioLink>",
+    "credit": "Design & development <portfolioLink></portfolioLink>",
     "nav": {
       "aboutHeading": "About the project"
     }

@@ -52,18 +52,27 @@ export const Description = styled.p`
 `;
 
 export const HomeButton = styled(Link)`
-  background: ${({ theme }) => theme.colors.primaryGreen};
-  border-radius: ${({ theme }) => theme.radius.lg};
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.colors.primaryGreen};
   color: ${({ theme }) => theme.colors.surface};
-  padding: 14px 28px;
-  font-weight: ${({ theme }) => theme.font.weight.bold};
+  font-family: ${({ theme }) => theme.font.heading};
+  font-size: 0.95rem;
+  font-weight: ${({ theme }) => theme.font.weight.semibold};
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0.75rem 1.75rem;
+  border-radius: ${({ theme }) => theme.radius.xl};
+  box-shadow: ${({ theme }) => theme.shadow.xs};
 
   &:hover,
   &:focus-visible {
-    transform: translateY(-2px);
-    background: ${({ theme }) => theme.colors.primaryHover};
+    background-color: ${({ theme }) => theme.colors.primaryHover};
     color: ${({ theme }) => theme.colors.surface};
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: ${({ theme }) => theme.shadow.xs};
   }
 `;

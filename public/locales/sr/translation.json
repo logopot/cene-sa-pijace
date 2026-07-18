@@ -138,10 +138,10 @@
     "noComparison": "Nema podataka za poređenje gradova."
   },
   "footer": {
-    "tagline": "Nezavisni pijačni barometar koji omogućava brz i jasan uvid u kretanje cena poljoprivrednih proizvoda na zelenim pijacama širom Srbije.",
+    "tagline": "Nezavisni pijačni barometar koji omogućava brz i jasan uvid u kretanje cena poljoprivrednih proizvoda na pijacama širom Srbije.",
     "copyright": "© {{year}} Cene sa pijace. Sva prava zadržana.",
     "disclaimerLink": "Odricanje od odgovornosti",
-    "credit": "Dizajn i razvoj: <portfolioLink>Logopot</portfolioLink>",
+    "credit": "Dizajn i razvoj <portfolioLink></portfolioLink>",
     "nav": {
       "aboutHeading": "O projektu"
     }

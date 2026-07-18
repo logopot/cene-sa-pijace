@@ -1,20 +1,17 @@
 import { Trans, useTranslation } from "react-i18next";
 import { Container } from "react-bootstrap";
-import Logo from "../Logo/Logo.jsx";
+import LogopotLogo from "../LogopotLogo/LogopotLogo.jsx";
 import { getDisclaimerPath } from "../../constants/routeLocales.js";
 import {
   StyledFooter,
   TopSection,
   BrandColumn,
-  BrandRow,
-  BrandTitle,
   Tagline,
   NavArea,
   NavColumn,
-  NavHeading,
   NavList,
   FooterRouteLink,
-  FooterExternalLink,
+  FooterLogoLink,
   Separator,
   BottomSection,
   Copyright,
@@ -22,6 +19,18 @@ import {
 } from "./Footer.styled.js";
 
 const PORTFOLIO_URL = "https://logopot.rs";
+
+function PortfolioLink() {
+  return (
+    <FooterLogoLink
+      href={PORTFOLIO_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <LogopotLogo size={40} />
+    </FooterLogoLink>
+  );
+}
 
 function Footer() {
   const { t, i18n } = useTranslation();
@@ -33,16 +42,11 @@ function Footer() {
       <Container>
         <TopSection>
           <BrandColumn>
-            <BrandRow>
-              <Logo isHeaderVersion={false} size={36} />
-              <BrandTitle>{t("app.name")}</BrandTitle>
-            </BrandRow>
             <Tagline>{t("footer.tagline")}</Tagline>
           </BrandColumn>
 
           <NavArea>
             <NavColumn>
-              <NavHeading>{t("footer.nav.aboutHeading")}</NavHeading>
               <NavList>
                 <li>
                   <FooterRouteLink to={disclaimerPath}>
@@ -62,13 +66,7 @@ function Footer() {
             <Trans
               i18nKey="footer.credit"
               components={{
-                portfolioLink: (
-                  <FooterExternalLink
-                    href={PORTFOLIO_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  />
-                ),
+                portfolioLink: <PortfolioLink />,
               }}
             />
           </CreditText>
