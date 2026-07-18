@@ -3,11 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { Alert, Container, Spinner } from 'react-bootstrap'
 import { LuArrowLeft, LuStore } from 'react-icons/lu'
-import { parseMesto, resolveGradBySlug, resolvePijacaBySlug, buildCityRoute } from '../../utils/market.js'
+import { parseMesto, resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketRoute } from '../../utils/market.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getRowTime, getRowRangeLabel, getLatestWeekTime } from '../../utils/week.js'
 import WeekStatus from '../../components/WeekStatus/WeekStatus.jsx'
 import ProductGrid from '../../components/ProductGrid/ProductGrid.jsx'
+import SEO from '../../components/SEO/SEO.jsx'
+import { SITE_URL, getMarketOgImage } from '../../constants/seo.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
@@ -73,8 +75,18 @@ function MarketDetails({ rows, loading, error }) {
     return <NotFound />
   }
 
+  const pijacaLabel = translateDataValue(t, 'pijaca', pijaca)
+  const gradLabel = translateDataValue(t, 'grad', grad)
+
   return (
     <>
+      <SEO
+        title={t('seo.market.title', { market: pijacaLabel, city: gradLabel })}
+        description={t('seo.market.description', { market: pijacaLabel, city: gradLabel })}
+        url={`${SITE_URL}${buildMarketRoute(grad, pijaca, i18n.language)}`}
+        image={getMarketOgImage(grad, pijaca)}
+      />
+
       <Container>
         <BackLink to={buildCityRoute(grad, i18n.language)}>
           <LuArrowLeft />
@@ -86,8 +98,8 @@ function MarketDetails({ rows, loading, error }) {
             <LuStore />
           </IconWrap>
           <TitleGroup>
-            <MarketTitle>{translateDataValue(t, 'pijaca', pijaca)}</MarketTitle>
-            <CityLabel>{translateDataValue(t, 'grad', grad)}</CityLabel>
+            <MarketTitle>{pijacaLabel}</MarketTitle>
+            <CityLabel>{gradLabel}</CityLabel>
           </TitleGroup>
         </PageHeader>
 

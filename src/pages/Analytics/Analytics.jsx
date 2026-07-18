@@ -9,6 +9,8 @@ import { resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketCate
 import { useProductAnalytics } from '../../hooks/useProductAnalytics.js'
 import PriceHistoryChart from '../../components/PriceHistoryChart/PriceHistoryChart.jsx'
 import CityComparisonChart from '../../components/CityComparisonChart/CityComparisonChart.jsx'
+import SEO from '../../components/SEO/SEO.jsx'
+import { SITE_URL, getProductOgImage } from '../../constants/seo.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   BackButton,
@@ -45,6 +47,27 @@ function Analytics({ rows }) {
   const gradLabel = market ? translateDataValue(t, 'grad', market.grad) : null
   const pijacaLabel = market ? translateDataValue(t, 'pijaca', market.pijaca) : null
 
+  // Google's Product rich-result schema wants a single offers block, not a
+  // per-city breakdown - cheapest/priciest (see useProductAnalytics) already
+  // give the low/high bound across cities for the product's latest week, so
+  // they map directly to AggregateOffer without recomputing anything.
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: productName,
+    category: identity.kategorija,
+    ...(analytics.cheapest &&
+      analytics.priciest && {
+        offers: {
+          '@type': 'AggregateOffer',
+          priceCurrency: 'RSD',
+          lowPrice: analytics.cheapest.price,
+          highPrice: analytics.priciest.price,
+          offerCount: analytics.cityComparison.length,
+        },
+      }),
+  }
+
   const handleBack = () => {
     if (grad && pijaca && categoryName) {
       navigate(buildMarketCategoryRoute(grad, pijaca, getCategoryUrlSlug(categoryName, i18n.language), i18n.language))
@@ -57,6 +80,14 @@ function Analytics({ rows }) {
 
   return (
     <Container>
+      <SEO
+        title={t('seo.product.title', { product: productName })}
+        description={t('seo.product.description', { product: productName })}
+        url={`${SITE_URL}${location.pathname}`}
+        image={getProductOgImage(identity.proizvod)}
+        jsonLd={jsonLd}
+      />
+
       <BackButton type="button" onClick={handleBack}>
         <LuArrowLeft />
         {t('analytics.backToMarket')}

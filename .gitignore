@@ -20,6 +20,13 @@ service-account.json
 credentials.json
 **/credentials.json
 
+# 6. Generisani SEO artefakti (scripts/generate-seo-map.mjs,
+# scripts/generate-og-images.mjs - regenerisu se u svakom "npm run build" preko
+# prebuild hook-a, vidi package.json)
+functions/lib/seo-manifest.mjs
+public/og/
+public/og-fallback.png
+
 # 5. Blokiranje operativnih sistema i logova
 npm-debug.log*
 yarn-debug.log*

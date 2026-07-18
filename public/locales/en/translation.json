@@ -29,6 +29,20 @@
     "sr": "Serbian",
     "en": "English"
   },
+  "seo": {
+    "home": {
+      "title": "Current Green Market Prices in Serbia | Market Price Barometer",
+      "description": "Track daily changes in agricultural product prices at green markets across Serbia. A fast, clear view of the market price barometer."
+    },
+    "product": {
+      "title": "{{product}} - Current Price at Serbian Markets",
+      "description": "Find out how much {{product}} costs today at green market stalls. Compare the lowest and highest prices by city."
+    },
+    "market": {
+      "title": "{{market}} Market ({{city}}) - Current Price Overview",
+      "description": "Fresh product prices at {{market}} market in {{city}}. Check the offer before you go shopping."
+    }
+  },
   "categories": {
     "eggsPoultry": "Eggs & Poultry",
     "meat": "Meat",

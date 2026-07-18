@@ -19,10 +19,21 @@ export default defineConfig([
     },
   },
   {
-    files: ['scripts/**/*.js'],
+    files: ['scripts/**/*.{js,mjs}'],
     extends: [js.configs.recommended],
     languageOptions: {
       globals: globals.node,
+    },
+  },
+  {
+    // Cloudflare Pages Functions run in the Workers runtime (Web-standard
+    // fetch/Request/Response/URL globals, same family as globals.browser)
+    // plus a couple of Workers-only APIs eslint's bundled sets don't know
+    // about, so browser globals just need HTMLRewriter added on top.
+    files: ['functions/**/*.{js,mjs}'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      globals: { ...globals.browser, HTMLRewriter: 'readonly' },
     },
   },
 ])

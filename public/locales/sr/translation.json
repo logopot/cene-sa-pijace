@@ -29,6 +29,20 @@
     "sr": "Srpski",
     "en": "Engleski"
   },
+  "seo": {
+    "home": {
+      "title": "Trenutne cene sa pijaca u Srbiji | Pijačni barometar",
+      "description": "Pratite svakodnevne promene cena poljoprivrednih proizvoda na pijacama širom Srbije. Brz i jasan uvid u pijačni barometar."
+    },
+    "product": {
+      "title": "{{product}} - Trenutna cena na pijacama u Srbiji",
+      "description": "Saznajte koliko danas košta {{product}} na pijačnim tezgama. Pogledajte najniže i najviše cene po gradovima."
+    },
+    "market": {
+      "title": "Pijaca {{market}} ({{city}}) - Pregled trenutnih cena",
+      "description": "Sveže cene proizvoda na pijaci {{market}} u gradu {{city}}. Proverite ponudu pre odlaska u kupovinu."
+    }
+  },
   "categories": {
     "eggsPoultry": "Jaja i živinsko meso",
     "meat": "Meso",

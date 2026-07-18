@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { Alert, Container, Spinner } from 'react-bootstrap'
 import { useMarketExplorer } from '../../hooks/useMarketExplorer.js'
+import SEO from '../SEO/SEO.jsx'
+import { SITE_URL } from '../../constants/seo.js'
 import Hero from '../Hero/Hero.jsx'
 import FilterBar from '../FilterBar/FilterBar.jsx'
 import WeeklyTrends from '../WeeklyTrends/WeeklyTrends.jsx'
@@ -32,6 +34,7 @@ function MarketExplorer({ rows, loading, error }) {
 
   return (
     <>
+      <SEO title={t('seo.home.title')} description={t('seo.home.description')} url={SITE_URL} />
       <Hero />
 
       <FilterBar
