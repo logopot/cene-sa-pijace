@@ -21,29 +21,33 @@ const OG_LOCALE = { sr: 'sr_RS', en: 'en_US' }
 // behavior. If those translation keys change, update the matching template
 // below too.
 const HOME_SR = {
-  title: 'Trenutne cene sa pijaca u Srbiji | Pijačni barometar',
+  title: 'Aktuelne cene sa pijaca u Srbiji | Pijačni portal',
   description:
-    'Pratite svakodnevne promene cena poljoprivrednih proizvoda na pijacama širom Srbije. Brz i jasan uvid u pijačni barometar.',
+    'Pratite svakodnevne promene cena poljoprivrednih proizvoda na pijacama širom Srbije. Brz i jasan uvid u pijačni portal.',
 }
 
 const FALLBACK_SR = {
-  title: 'Cene sa pijace | Nezavisni pijačni barometar',
+  title: 'Cene sa pijace | Nezavisni pijačni portal',
   description:
-    'Nezavisni pijačni barometar u Srbiji. Pratite svakodnevne promene i pregled trenutnih cena poljoprivrednih proizvoda na pijacama širom zemlje.',
+    'Nezavisni pijačni portal u Srbiji. Pratite aktuelne cene poljoprivrednih proizvoda na domaćim pijacama.',
 }
 
 const DISCLAIMER = {
   sr: {
     title: 'Odricanje od odgovornosti | Cene sa pijace',
-    description:
-      'Uslovi korišćenja i izvor podataka portala Cene sa pijace - nezavisnog pijačnog barometra u Srbiji.',
+    description: 'Uslovi korišćenja i izvor podataka portala Cene sa pijace - nezavisnog pijačnog portala u Srbiji.',
   },
   en: {
     title: 'Disclaimer | Cene sa pijace',
-    description: 'Terms of use and data sources for Cene sa pijace, an independent market price barometer in Serbia.',
+    description: 'Terms of use and data sources for Cene sa pijace, an independent market price portal in Serbia.',
   },
 }
 
+// City and market pages share one brand-forward title ("Cene sa pijace") -
+// the specific location lives in the description instead, matching what the
+// OG image itself renders for these two route types (see
+// scripts/generate-og-images.mjs). Product pages keep a per-product title,
+// since the product name is the one thing worth a distinct headline.
 function productCopy(name, lang) {
   return lang === 'en'
     ? {
@@ -51,21 +55,22 @@ function productCopy(name, lang) {
         description: `Find out how much ${name} costs today at green market stalls. Compare the lowest and highest prices by city.`,
       }
     : {
-        title: `${name} - Trenutna cena na pijacama u Srbiji`,
+        title: `${name} - Aktuelna cena na pijacama u Srbiji`,
         description: `Saznajte koliko danas košta ${name} na pijačnim tezgama. Pogledajte najniže i najviše cene po gradovima.`,
       }
 }
 
-function marketCopy(market, city, lang) {
+// City and market names are already resolved to the right language by the
+// manifest (see scripts/generate-seo-map.mjs's translateDataValue calls), so
+// this format itself doesn't need a per-language branch.
+function marketCopy(market, city) {
+  return { title: 'Cene sa pijace', description: `${city} • ${market}` }
+}
+
+function cityCopy(city, lang) {
   return lang === 'en'
-    ? {
-        title: `${market} Market (${city}) - Current Price Overview`,
-        description: `Fresh product prices at ${market} market in ${city}. Check the offer before you go shopping.`,
-      }
-    : {
-        title: `Pijaca ${market} (${city}) - Pregled trenutnih cena`,
-        description: `Sveže cene proizvoda na pijaci ${market} u gradu ${city}. Proverite ponudu pre odlaska u kupovinu.`,
-      }
+    ? { title: 'Cene sa pijace', description: `${city} • Current Prices at Green Markets` }
+    : { title: 'Cene sa pijace', description: `${city} • Aktuelne cene na pijacama` }
 }
 
 function resolveMeta(pathname) {
@@ -85,9 +90,17 @@ function resolveMeta(pathname) {
       return { ...copy, lang: entry.lang, image: `${SITE_URL}/og-fallback.png`, url }
     }
 
+    case 'city':
+      return {
+        ...cityCopy(entry.city, entry.lang),
+        lang: entry.lang,
+        image: `${SITE_URL}/og/cities/${entry.slug}.png`,
+        url,
+      }
+
     case 'market':
       return {
-        ...marketCopy(entry.market, entry.city, entry.lang),
+        ...marketCopy(entry.market, entry.city),
         lang: entry.lang,
         image: `${SITE_URL}/og/markets/${entry.slug}.png`,
         url,

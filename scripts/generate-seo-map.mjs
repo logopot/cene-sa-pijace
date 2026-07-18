@@ -3,7 +3,7 @@
 // middleware (functions/_middleware.js) imports the generated file and does
 // a plain object lookup per request - no network/database calls happen on
 // the request path, only here at build time.
-import { parseMesto, buildMarketRoute, buildMarketCategoryRoute } from '../src/utils/market.js'
+import { parseMesto, buildCityRoute, buildMarketRoute, buildMarketCategoryRoute } from '../src/utils/market.js'
 import { getCategoryUrlSlug } from '../src/utils/categoryIcons.js'
 import { DISCLAIMER_PATH } from '../src/constants/routeLocales.js'
 import {
@@ -11,6 +11,7 @@ import {
   getProductUrlSlug,
   getCanonicalProductSlug,
   getCanonicalMarketSlug,
+  getCanonicalCitySlug,
   SUPPORTED_LANGUAGES,
 } from './lib/productLabels.mjs'
 import { fetchAllMarketRows, readLocalEnvFile, ROOT } from './lib/googleSheets.mjs'
@@ -35,6 +36,7 @@ function buildManifest(rows) {
 
   // Keyed so repeat rows (every week's price snapshot re-lists the same
   // market/product) collapse to one manifest entry each.
+  const cities = new Map()
   const markets = new Map()
   const products = new Map()
 
@@ -42,6 +44,7 @@ function buildManifest(rows) {
     const { grad, pijaca } = parseMesto(row.Mesto)
     if (!grad || !pijaca) continue
 
+    cities.set(grad, grad)
     markets.set(`${grad}|${pijaca}`, { grad, pijaca })
 
     if (row.Kategorija && row.Proizvod) {
@@ -55,6 +58,15 @@ function buildManifest(rows) {
   }
 
   for (const lang of SUPPORTED_LANGUAGES) {
+    for (const grad of cities.values()) {
+      entries[buildCityRoute(grad, lang)] = {
+        type: 'city',
+        lang,
+        city: translateDataValue(lang, 'grad', grad),
+        slug: getCanonicalCitySlug(grad),
+      }
+    }
+
     for (const { grad, pijaca } of markets.values()) {
       const marketPath = buildMarketRoute(grad, pijaca, lang)
       entries[marketPath] = {

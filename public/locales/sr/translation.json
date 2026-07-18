@@ -31,15 +31,15 @@
   },
   "seo": {
     "home": {
-      "title": "Trenutne cene sa pijaca u Srbiji | Pijačni barometar",
-      "description": "Pratite svakodnevne promene cena poljoprivrednih proizvoda na pijacama širom Srbije. Brz i jasan uvid u pijačni barometar."
+      "title": "Aktuelne cene sa pijaca u Srbiji | Pijačni portal",
+      "description": "Pratite svakodnevne promene cena poljoprivrednih proizvoda na pijacama širom Srbije. Brz i jasan uvid u pijačni portal."
     },
     "product": {
-      "title": "{{product}} - Trenutna cena na pijacama u Srbiji",
+      "title": "{{product}} - Aktuelna cena na pijacama u Srbiji",
       "description": "Saznajte koliko danas košta {{product}} na pijačnim tezgama. Pogledajte najniže i najviše cene po gradovima."
     },
     "market": {
-      "title": "Pijaca {{market}} ({{city}}) - Pregled trenutnih cena",
+      "title": "Pijaca {{market}} ({{city}}) - Pregled aktuelnih cena",
       "description": "Sveže cene proizvoda na pijaci {{market}} u gradu {{city}}. Proverite ponudu pre odlaska u kupovinu."
     }
   },
@@ -140,7 +140,7 @@
     "noComparison": "Nema podataka za poređenje gradova."
   },
   "footer": {
-    "tagline": "Nezavisni pijačni barometar koji omogućava brz i jasan uvid u kretanje cena poljoprivrednih proizvoda na pijacama širom Srbije.",
+    "tagline": "Nezavisni pijačni portal koji omogućava brz i jasan uvid u kretanje cena poljoprivrednih proizvoda na pijacama širom Srbije.",
     "copyright": "© {{year}} Cene sa pijace. Sva prava zadržana.",
     "disclaimerLink": "Odricanje od odgovornosti",
     "credit": "Dizajn i razvoj <portfolioLink></portfolioLink>",

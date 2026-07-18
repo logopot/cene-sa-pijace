@@ -8,7 +8,12 @@ import satori from 'satori'
 import { Resvg } from '@resvg/resvg-js'
 import { theme } from '../src/styles/theme.js'
 import { parseMesto } from '../src/utils/market.js'
-import { translateDataValue, getCanonicalProductSlug, getCanonicalMarketSlug } from './lib/productLabels.mjs'
+import {
+  translateDataValue,
+  getCanonicalProductSlug,
+  getCanonicalMarketSlug,
+  getCanonicalCitySlug,
+} from './lib/productLabels.mjs'
 import { fetchAllMarketRows, readLocalEnvFile, ROOT } from './lib/googleSheets.mjs'
 import { loadGoogleFontWeight } from './lib/googleFont.mjs'
 
@@ -16,9 +21,15 @@ readLocalEnvFile()
 
 const WIDTH = 1200
 const HEIGHT = 630
+const CITIES_DIR = path.join(ROOT, 'public/og/cities')
 const PRODUCTS_DIR = path.join(ROOT, 'public/og/products')
 const MARKETS_DIR = path.join(ROOT, 'public/og/markets')
 const FALLBACK_PATH = path.join(ROOT, 'public/og-fallback.png')
+
+// Top-left masthead tag, identical across every image type - see
+// buildTemplate below, where city/market/product only vary the big title and
+// subtitle, not this brand anchor.
+const EYEBROW = 'Nezavisni pijačni portal'
 
 function h(type, props = {}, children = []) {
   return { type, props: { ...props, children } }
@@ -36,7 +47,7 @@ function pickTitleFontSize(text) {
   return 42
 }
 
-function buildTemplate({ eyebrow, title, subtitle }) {
+function buildTemplate({ title, subtitle }) {
   return h(
     'div',
     {
@@ -80,7 +91,7 @@ function buildTemplate({ eyebrow, title, subtitle }) {
                     marginBottom: 28,
                   },
                 },
-                eyebrow,
+                EYEBROW,
               ),
               h(
                 'div',
@@ -153,12 +164,18 @@ async function loadFonts() {
 }
 
 function collectItems(rows) {
+  const cities = new Map()
   const markets = new Map()
   const products = new Map()
 
   for (const row of rows) {
     const { grad, pijaca } = parseMesto(row.Mesto)
     if (!grad || !pijaca) continue
+
+    const citySlug = getCanonicalCitySlug(grad)
+    if (!cities.has(citySlug)) {
+      cities.set(citySlug, { slug: citySlug, city: translateDataValue('sr', 'grad', grad) })
+    }
 
     const marketSlug = getCanonicalMarketSlug(grad, pijaca)
     if (!markets.has(marketSlug)) {
@@ -180,10 +197,11 @@ function collectItems(rows) {
     }
   }
 
-  return { markets: [...markets.values()], products: [...products.values()] }
+  return { cities: [...cities.values()], markets: [...markets.values()], products: [...products.values()] }
 }
 
 async function main() {
+  mkdirSync(CITIES_DIR, { recursive: true })
   mkdirSync(PRODUCTS_DIR, { recursive: true })
   mkdirSync(MARKETS_DIR, { recursive: true })
 
@@ -201,31 +219,47 @@ async function main() {
   // Sheets is unreachable.
   const fallbackPng = await renderPng(
     buildTemplate({
-      eyebrow: 'Pijačni barometar',
       title: 'Cene sa pijace',
-      subtitle: 'Nezavisni pijačni barometar u Srbiji',
+      subtitle: 'Pratite aktuelne cene na pijacama širom Srbije',
     }),
     fonts,
   )
   writeFileSync(FALLBACK_PATH, fallbackPng)
   console.log('[generate-og-images] wrote og-fallback.png')
 
+  let cities
   let markets
   let products
   try {
     const rows = await fetchAllMarketRows()
-    ;({ markets, products } = collectItems(rows))
+    ;({ cities, markets, products } = collectItems(rows))
   } catch (error) {
     console.warn('[generate-og-images] could not fetch sheet data, only the fallback image was generated:', error.message)
     return
   }
 
+  // City and market images share the same brand-forward title ("Cene sa
+  // pijace") - the specific location lives in the subtitle instead (see
+  // functions/_middleware.js's matching og:title/description behavior for
+  // these two route types). Product images keep the product name as the big
+  // title, since that's the one thing worth a distinct headline per image.
+  for (const city of cities) {
+    const png = await renderPng(
+      buildTemplate({
+        title: 'Cene sa pijace',
+        subtitle: `${city.city} • Aktuelne cene na pijacama`,
+      }),
+      fonts,
+    )
+    writeFileSync(path.join(CITIES_DIR, `${city.slug}.png`), png)
+  }
+  console.log(`[generate-og-images] wrote ${cities.length} city images`)
+
   for (const market of markets) {
     const png = await renderPng(
       buildTemplate({
-        eyebrow: 'Pijaca',
-        title: market.market,
-        subtitle: `Pregled pijačnih cena • ${market.city}`,
+        title: 'Cene sa pijace',
+        subtitle: `${market.city} • ${market.market}`,
       }),
       fonts,
     )
@@ -236,9 +270,8 @@ async function main() {
   for (const product of products) {
     const png = await renderPng(
       buildTemplate({
-        eyebrow: 'Trenutna cena',
         title: product.name,
-        subtitle: 'Trenutne cene na pijacama u Srbiji',
+        subtitle: 'Aktuelne cene na pijacama u Srbiji',
       }),
       fonts,
     )

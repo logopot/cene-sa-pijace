@@ -46,4 +46,9 @@ export function getCanonicalMarketSlug(grad, pijaca) {
   return `${slugify(grad)}-${slugify(pijaca)}`
 }
 
+// Canonical, language-independent identity for a city.
+export function getCanonicalCitySlug(grad) {
+  return slugify(grad)
+}
+
 export { slugify }
