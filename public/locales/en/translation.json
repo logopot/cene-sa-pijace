@@ -135,7 +135,7 @@
     "label": "Back to top"
   },
   "marketCategoryDetails": {
-    "contextHeading": "Current prices for: {{category}} ({{market}}, {{city}})",
+    "contextHeading": "Current prices for {{category}} ({{market}}, {{city}})",
     "allMarketsShort": "All markets"
   },
   "analytics": {

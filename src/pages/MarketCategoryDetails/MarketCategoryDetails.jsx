@@ -7,6 +7,7 @@ import { ALL_MARKETS } from '../../constants/filters.js'
 import { parseMesto, resolveGradBySlug, resolveMarketSlug, buildCityRoute, buildMarketRoute } from '../../utils/market.js'
 import { getCategoryIcon, getCategorySlug, resolveCategoryBySlug } from '../../utils/categoryIcons.js'
 import { translateDataValue } from '../../utils/translateValue.js'
+import { lowercaseFirst } from '../../utils/formatText.js'
 import { getRowTime, getRowRangeLabel, getLatestWeekTime } from '../../utils/week.js'
 import WeekStatus from '../../components/WeekStatus/WeekStatus.jsx'
 import ProductGrid from '../../components/ProductGrid/ProductGrid.jsx'
@@ -106,7 +107,7 @@ function MarketCategoryDetails({ rows, loading, error }) {
           <TitleGroup>
             <ContextHeading>
               {t('marketCategoryDetails.contextHeading', {
-                category: t(`categories.${getCategorySlug(category)}`),
+                category: lowercaseFirst(t(`categories.${getCategorySlug(category)}`)),
                 market: marketLabel,
                 city: gradLabel,
               })}

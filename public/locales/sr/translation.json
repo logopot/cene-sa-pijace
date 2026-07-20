@@ -135,7 +135,7 @@
     "label": "Nazad na vrh"
   },
   "marketCategoryDetails": {
-    "contextHeading": "Aktuelne cene za: {{category}} ({{market}}, {{city}})",
+    "contextHeading": "Aktuelne cene za {{category}} ({{market}}, {{city}})",
     "allMarketsShort": "Sve pijace"
   },
   "analytics": {
