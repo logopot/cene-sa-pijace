@@ -95,7 +95,11 @@ function MarketDetails({ rows, loading, error }) {
         <Breadcrumbs
           items={[
             { label: t('breadcrumbs.home'), to: '/' },
-            { label: gradLabel, to: buildCityRoute(grad, i18n.language) },
+            {
+              label: gradLabel,
+              to: buildCityRoute(grad, i18n.language),
+              mobileLabel: t('navigation.backToCityMarkets', { city: gradLabel }),
+            },
             { label: pijacaLabel },
           ]}
         />

@@ -86,6 +86,9 @@
     "navLabel": "Navigacija",
     "home": "Početna"
   },
+  "navigation": {
+    "backToCityMarkets": "{{city}}, sve pijace"
+  },
   "weeklyTrends": {
     "title": "Najveća pojeftinjenja ove nedelje",
     "subtitle": "Proizvodi sa najsvežijim padom cene na pijacama širom Srbije.",
@@ -110,8 +113,9 @@
     }
   },
   "weekStatus": {
-    "stips": "<bold>STIPS</bold> zvanični podaci za period: <bold>{{value}}</bold>",
-    "jkp": "<bold>JKP</bold> zvanični podaci od: <bold>{{value}}</bold>"
+    "stips": "STIPS",
+    "jkp": "JKP",
+    "dateRange": "Zvanični podaci: {{value}}"
   },
   "productCard": {
     "source": "Izvor: {{source}}",

@@ -1,6 +1,6 @@
-import { Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { LuBadgeCheck, LuArchive } from 'react-icons/lu'
-import { StatusBadge } from './WeekStatus.styled.js'
+import { StatusBadge, TextGroup, SourceName, DateMeta } from './WeekStatus.styled.js'
 
 // Keyed by the same Source-presence convention useProductAnalytics.js
 // already uses to split STIPS vs JKP points (row.Source is only ever
@@ -12,14 +12,18 @@ const SOURCE_KEYS = {
 }
 
 function WeekStatus({ weekLabel, isFallbackWeek, source }) {
+  const { t } = useTranslation()
   if (!weekLabel) return null
 
-  const i18nKey = SOURCE_KEYS[source] ?? SOURCE_KEYS.STIPS
+  const sourceKey = SOURCE_KEYS[source] ?? SOURCE_KEYS.STIPS
 
   return (
     <StatusBadge $archived={isFallbackWeek}>
       {isFallbackWeek ? <LuArchive /> : <LuBadgeCheck />}
-      <Trans i18nKey={i18nKey} values={{ value: weekLabel }} components={{ bold: <strong /> }} />
+      <TextGroup>
+        <SourceName>{t(sourceKey)}</SourceName>
+        <DateMeta>{t('weekStatus.dateRange', { value: weekLabel })}</DateMeta>
+      </TextGroup>
     </StatusBadge>
   )
 }

@@ -18,15 +18,36 @@ export const StatusBadge = styled.div`
   font-weight: 500;
   letter-spacing: 0.01em;
 
-  strong {
-    font-weight: 700;
-    color: ${({ theme }) => theme.colors.textDark};
-  }
-
   svg {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
     color: ${({ $archived, theme }) => ($archived ? theme.colors.textMuted : theme.colors.primaryGreen)};
   }
+`
+
+// Source name and date metadata sit side by side at desktop widths; below
+// 576px they stack (source name stays on the icon's line, the localized
+// date range gets its own line below) so a long range never squeezes/wraps
+// against the source name mid-word on narrow screens.
+export const TextGroup = styled.div`
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.xs};
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: ${({ theme }) => theme.spacing.xxs};
+  }
+`
+
+export const SourceName = styled.span`
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.textDark};
+`
+
+export const DateMeta = styled.span`
+  color: ${({ theme }) => theme.colors.textSecondary};
 `

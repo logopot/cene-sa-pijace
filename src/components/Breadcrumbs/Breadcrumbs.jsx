@@ -2,11 +2,14 @@ import { useTranslation } from 'react-i18next'
 import { LuArrowLeft, LuChevronRight } from 'react-icons/lu'
 import { Nav, List, Item, Crumb, CurrentCrumb, Separator, MobileBack, MobileBackLabel } from './Breadcrumbs.styled.js'
 
-// items: [{ label, to }, ...] - every item but the last one is a real link;
-// the last item is the current page (no `to`, marked aria-current="page").
-// Desktop renders the full trail (see Nav's breakpoint); mobile collapses to
-// a single pill pointing at the immediate parent (items[items.length - 2]),
-// its label swapped in per page instead of a generic "back" string.
+// items: [{ label, to, mobileLabel? }, ...] - every item but the last one is
+// a real link; the last item is the current page (no `to`, marked
+// aria-current="page"). Desktop renders the full trail (see Nav's
+// breakpoint); mobile collapses to a single pill pointing at the immediate
+// parent (items[items.length - 2]). The pill shows that parent's own
+// `mobileLabel` when given (e.g. MarketDetails wants "{city}, sve pijace"
+// instead of the bare city name the desktop crumb uses), falling back to its
+// regular `label` otherwise.
 function Breadcrumbs({ items }) {
   const { t } = useTranslation()
 
@@ -36,7 +39,7 @@ function Breadcrumbs({ items }) {
 
       <MobileBack to={parent.to}>
         <LuArrowLeft size={16} />
-        <MobileBackLabel>{parent.label}</MobileBackLabel>
+        <MobileBackLabel>{parent.mobileLabel ?? parent.label}</MobileBackLabel>
       </MobileBack>
     </>
   )

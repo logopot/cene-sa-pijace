@@ -86,6 +86,9 @@
     "navLabel": "Breadcrumb",
     "home": "Home"
   },
+  "navigation": {
+    "backToCityMarkets": "{{city}}, all markets"
+  },
   "weeklyTrends": {
     "title": "Biggest Price Drops This Week",
     "subtitle": "Products with the freshest price drops across markets in Serbia.",
@@ -110,8 +113,9 @@
     }
   },
   "weekStatus": {
-    "stips": "<bold>STIPS</bold> official data for the period: <bold>{{value}}</bold>",
-    "jkp": "<bold>JKP</bold> official data as of: <bold>{{value}}</bold>"
+    "stips": "STIPS",
+    "jkp": "JKP",
+    "dateRange": "Official data: {{value}}"
   },
   "productCard": {
     "source": "Source: {{source}}",
