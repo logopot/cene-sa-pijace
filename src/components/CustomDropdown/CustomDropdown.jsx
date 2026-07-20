@@ -17,7 +17,25 @@ import {
 // variant is the standalone bordered trigger the mobile stepper still uses.
 // Both share every bit of open/close/keyboard/outside-click behavior below;
 // only the trigger's visual shell and its extra `label` differ.
-function CustomDropdown({ options, value, onChange, placeholder, disabled = false, variant = 'pill', label }) {
+// segmentPosition ('first' | 'middle' | 'last') only matters for the segment
+// variant - it tells SegmentTrigger which corners of its hover/open
+// highlight should follow PillBar's own outer curve (see
+// CustomDropdown.styled.js). leadingAction is an optional
+// ({ onSelect }) => ReactNode rendered above the option list (see
+// FilterBar.jsx's Grad segment + LocationMenuItem.jsx) - calling onSelect is
+// exactly like picking a normal option, applying the value and closing the
+// menu.
+function CustomDropdown({
+  options,
+  value,
+  onChange,
+  placeholder,
+  disabled = false,
+  variant = 'pill',
+  label,
+  segmentPosition,
+  leadingAction,
+}) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
   const wrapperRef = useRef(null)
@@ -40,11 +58,14 @@ function CustomDropdown({ options, value, onChange, placeholder, disabled = fals
   // Moves real DOM focus onto the active option whenever the menu opens or
   // the roving index changes - screen readers announce role="option" state
   // correctly only when the option itself is focused, not just highlighted.
+  // Skipped when a leadingAction exists so Tab naturally lands there first
+  // (it renders before the listbox in DOM order) instead of being jumped
+  // over the moment the menu opens.
   useEffect(() => {
-    if (isOpen && activeIndex >= 0) {
+    if (isOpen && activeIndex >= 0 && !leadingAction) {
       listRef.current?.children[activeIndex]?.focus()
     }
-  }, [isOpen, activeIndex])
+  }, [isOpen, activeIndex, leadingAction])
 
   const selectedOption = options.find((option) => option.value === value)
 
@@ -82,6 +103,20 @@ function CustomDropdown({ options, value, onChange, placeholder, disabled = fals
     closeMenu()
   }
 
+  // A separate, deliberately ref-free selection path for leadingAction (see
+  // the render call below) - leadingAction is a render prop, invoked
+  // synchronously during render, and handleSelect's closeMenu reads
+  // triggerRef.current, which React's ref-safety lint rule rejects passing
+  // into anything called at render time. Skipping the refocus-on-select
+  // behavior for this one path is an acceptable trade-off: picking "detect
+  // my location" already re-renders the whole segment with a new city, so
+  // returning focus to the trigger isn't as load-bearing as it is for a
+  // normal option pick.
+  const handleLeadingActionSelect = (optionValue) => {
+    onChange(optionValue)
+    setIsOpen(false)
+  }
+
   const handleListKeyDown = (event) => {
     if (event.key === 'ArrowDown') {
       event.preventDefault()
@@ -116,6 +151,7 @@ function CustomDropdown({ options, value, onChange, placeholder, disabled = fals
           onKeyDown={handleTriggerKeyDown}
           disabled={disabled}
           $isOpen={isOpen}
+          $position={segmentPosition}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
         >
@@ -143,6 +179,7 @@ function CustomDropdown({ options, value, onChange, placeholder, disabled = fals
 
       {isOpen && (
         <Menu>
+          {leadingAction?.({ onSelect: handleLeadingActionSelect })}
           <MenuList role="listbox" ref={listRef} onKeyDown={handleListKeyDown}>
             {options.map((option, index) => (
               <MenuItem

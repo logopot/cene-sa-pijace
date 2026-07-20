@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
 import { CATEGORIES } from '../constants/categories.js'
-import { ALL_MARKETS } from '../constants/filters.js'
+import { ALL_MARKETS, ALL_CATEGORIES } from '../constants/filters.js'
 import { parseMesto, isConsumerMarketType } from '../utils/market.js'
 import { shuffleArray } from '../utils/shuffle.js'
 import { pickWeeklyDrops } from '../utils/weeklyDrops.js'
 
 function matchesSelection(row, { category, grad, pijaca }) {
-  if (category && row.Kategorija !== category) return false
+  if (category && category !== ALL_CATEGORIES && row.Kategorija !== category) return false
   if (grad && parseMesto(row.Mesto).grad !== grad) return false
   if (pijaca && pijaca !== ALL_MARKETS && parseMesto(row.Mesto).pijaca !== pijaca) return false
   return true
@@ -73,9 +73,14 @@ export function useMarketExplorer(rows) {
     [grad],
   )
 
+  // Picking a city (manually or via geolocation - see LocationMenuItem.jsx)
+  // now defaults category/pijaca to their "everything" sentinels instead of
+  // leaving them empty, so the submit button is clickable the instant a city
+  // is chosen (see FilterBar.jsx's handleSubmit) rather than requiring the
+  // user to also pick a category/market first.
   const setGrad = useCallback((value) => {
     setGradState(value)
-    setCategoryState('')
+    setCategoryState(value ? ALL_CATEGORIES : '')
     setPijaca(value ? ALL_MARKETS : '')
   }, [])
 

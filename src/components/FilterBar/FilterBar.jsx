@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Container } from 'react-bootstrap'
 import { LuArrowLeft, LuSearch } from 'react-icons/lu'
-import { ALL_MARKETS } from '../../constants/filters.js'
+import { ALL_MARKETS, ALL_CATEGORIES } from '../../constants/filters.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getCategoryUrlSlug } from '../../utils/categoryIcons.js'
-import { buildMarketCategoryRoute } from '../../utils/market.js'
+import { buildCityRoute, buildMarketRoute, buildMarketCategoryRoute } from '../../utils/market.js'
 import CustomDropdown from '../CustomDropdown/CustomDropdown.jsx'
 import LocationDetectButton from '../LocationDetectButton/LocationDetectButton.jsx'
+import LocationMenuItem from '../LocationDetectButton/LocationMenuItem.jsx'
 import {
   BackButton,
   Bar,
-  DesktopBarRow,
   FieldLabel,
   FieldRow,
   MobileFieldsRow,
@@ -53,11 +53,14 @@ function FilterBar({
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   // Drives the mobile "one field at a time" stepper only (MobileFieldsRow) -
-  // the desktop segmented pill bar (DesktopBarRow) always shows every field
-  // at once regardless of step.
+  // the desktop segmented pill bar (PillBar) always shows every field at
+  // once regardless of step.
   const [step, setStep] = useState(STEP_CITY)
 
-  const categoryOptions = categories.map((cat) => ({ value: cat.name, label: t(`categories.${cat.slug}`) }))
+  const categoryOptions = [
+    { value: ALL_CATEGORIES, label: t('filterBar.categoryAllOption') },
+    ...categories.map((cat) => ({ value: cat.name, label: t(`categories.${cat.slug}`) })),
+  ]
   const cityOptions = cities.map((city) => ({ value: city, label: translateDataValue(t, 'grad', city) }))
   const marketOptions = [
     { value: ALL_MARKETS, label: t('filterBar.marketAllOption') },
@@ -76,9 +79,19 @@ function FilterBar({
 
   const handleBack = () => setStep((current) => Math.max(STEP_CITY, current - 1))
 
+  // A real category still goes to the dedicated category-results page; the
+  // "Sve kategorije" sentinel has no route of its own, so it falls back to
+  // whichever page already shows every category - the specific market page,
+  // or the whole city if no specific market was picked either.
   const handleSubmit = () => {
-    if (!category || !grad) return
-    navigate(buildMarketCategoryRoute(grad, pijaca, getCategoryUrlSlug(category, i18n.language), i18n.language))
+    if (!grad) return
+    if (category && category !== ALL_CATEGORIES) {
+      navigate(buildMarketCategoryRoute(grad, pijaca, getCategoryUrlSlug(category, i18n.language), i18n.language))
+    } else if (pijaca && pijaca !== ALL_MARKETS) {
+      navigate(buildMarketRoute(grad, pijaca, i18n.language))
+    } else {
+      navigate(buildCityRoute(grad, i18n.language))
+    }
   }
 
   return (
@@ -132,59 +145,54 @@ function FilterBar({
           </StepField>
 
           <StepField xs={12} md={3} $active={step === STEP_MARKET}>
-            <SubmitButton type="button" disabled={!category || !grad} onClick={handleSubmit}>
+            <SubmitButton type="button" disabled={!grad} onClick={handleSubmit}>
               {t('filterBar.submit')}
             </SubmitButton>
           </StepField>
         </MobileFieldsRow>
 
-        <DesktopBarRow>
-          <LocationDetectButton cities={cities} onDetect={handleGradChange} />
+        <PillBar>
+          <CustomDropdown
+            variant="segment"
+            segmentPosition="first"
+            label={t('filterBar.cityLabel')}
+            options={cityOptions}
+            value={grad}
+            onChange={handleGradChange}
+            placeholder={t('filterBar.cityPlaceholder')}
+            leadingAction={({ onSelect }) => <LocationMenuItem cities={cities} onSelect={onSelect} />}
+          />
 
-          <PillBar>
-            <CustomDropdown
-              variant="segment"
-              label={t('filterBar.cityLabel')}
-              options={cityOptions}
-              value={grad}
-              onChange={handleGradChange}
-              placeholder={t('filterBar.cityPlaceholder')}
-            />
+          <SegmentDivider aria-hidden="true" />
 
-            <SegmentDivider aria-hidden="true" />
+          <CustomDropdown
+            variant="segment"
+            segmentPosition="middle"
+            label={t('filterBar.categoryLabel')}
+            options={categoryOptions}
+            value={category}
+            onChange={handleCategoryChange}
+            placeholder={t('filterBar.categoryPlaceholder')}
+            disabled={!grad}
+          />
 
-            <CustomDropdown
-              variant="segment"
-              label={t('filterBar.categoryLabel')}
-              options={categoryOptions}
-              value={category}
-              onChange={handleCategoryChange}
-              placeholder={t('filterBar.categoryPlaceholder')}
-              disabled={!grad}
-            />
+          <SegmentDivider aria-hidden="true" />
 
-            <SegmentDivider aria-hidden="true" />
+          <CustomDropdown
+            variant="segment"
+            segmentPosition="last"
+            label={t('filterBar.marketLabel')}
+            options={marketOptions}
+            value={pijaca}
+            onChange={onPijacaChange}
+            placeholder={t('filterBar.marketAllOption')}
+            disabled={!grad}
+          />
 
-            <CustomDropdown
-              variant="segment"
-              label={t('filterBar.marketLabel')}
-              options={marketOptions}
-              value={pijaca}
-              onChange={onPijacaChange}
-              placeholder={t('filterBar.marketAllOption')}
-              disabled={!grad}
-            />
-
-            <SubmitCircle
-              type="button"
-              disabled={!category || !grad}
-              onClick={handleSubmit}
-              aria-label={t('filterBar.submit')}
-            >
-              <LuSearch />
-            </SubmitCircle>
-          </PillBar>
-        </DesktopBarRow>
+          <SubmitCircle type="button" disabled={!grad} onClick={handleSubmit} aria-label={t('filterBar.submit')}>
+            <LuSearch />
+          </SubmitCircle>
+        </PillBar>
       </Container>
     </Bar>
   )

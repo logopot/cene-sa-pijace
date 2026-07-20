@@ -63,6 +63,7 @@
     "cityPlaceholder": "Select a city",
     "marketLabel": "Market",
     "marketAllOption": "All markets in this city",
+    "categoryAllOption": "All categories",
     "submit": "Show Prices",
     "back": "Back",
     "stepIndicator": "Step {{current}} of {{total}}",
@@ -72,6 +73,7 @@
   },
   "locationDetect": {
     "buttonLabel": "Find my city",
+    "menuLabel": "Find my location",
     "unsupported": "Your browser doesn't support sharing your location.",
     "denied": "Location access was denied. Please pick a city manually.",
     "unavailable": "We couldn't determine your location right now.",

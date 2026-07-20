@@ -63,6 +63,7 @@
     "cityPlaceholder": "Izaberite grad",
     "marketLabel": "Pijaca",
     "marketAllOption": "Sve pijace u tom gradu",
+    "categoryAllOption": "Sve kategorije",
     "submit": "Prikaži cene",
     "back": "Nazad",
     "stepIndicator": "Korak {{current}} od {{total}}",
@@ -72,6 +73,7 @@
   },
   "locationDetect": {
     "buttonLabel": "Pronađi moj grad",
+    "menuLabel": "Pronađi moju lokaciju",
     "unsupported": "Vaš pregledač ne podržava deljenje lokacije.",
     "denied": "Pristup lokaciji je odbijen. Izaberite grad ručno.",
     "unavailable": "Trenutno ne možemo da odredimo vašu lokaciju.",

@@ -45,28 +45,21 @@ export const MobileFieldsRow = styled(Row)`
   }
 `;
 
-// Hidden below the desktop breakpoint - the mobile stepper (MobileStepHeader
-// + MobileFieldsRow) covers narrow screens instead.
-export const DesktopBarRow = styled.div`
+// The segmented, pill-shaped unified bar - one continuous rounded container
+// housing all three filter segments plus the submit circle, in the style of
+// a unified search bar but built entirely from our own tokens (soft shadow,
+// not a hard black one; brand green action button, not a copy of any other
+// product's palette). Hidden below the desktop breakpoint - the mobile
+// stepper (MobileStepHeader + MobileFieldsRow) covers narrow screens instead.
+export const PillBar = styled.div`
   display: none;
 
   @media (min-width: 768px) {
     display: flex;
     align-items: center;
-    gap: ${({ theme }) => theme.spacing.sm};
+    width: 100%;
   }
-`;
 
-// The segmented, pill-shaped unified bar - one continuous rounded container
-// housing all three filter segments plus the submit circle, in the style of
-// a unified search bar but built entirely from our own tokens (soft shadow,
-// not a hard black one; brand green action button, not a copy of any other
-// product's palette).
-export const PillBar = styled.div`
-  display: flex;
-  align-items: center;
-  flex: 1;
-  min-width: 0;
   padding: ${({ theme }) => theme.spacing.xxs};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radius.pill};

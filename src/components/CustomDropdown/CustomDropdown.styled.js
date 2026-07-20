@@ -94,6 +94,17 @@ export const MenuList = styled.ul`
 // PillBar already supplies the border/shadow/rounding for all three segments
 // at once. Shares every open/close/keyboard behavior with Trigger; only the
 // visual shell differs.
+//
+// The hover/open highlight's own corners follow $position so they read as
+// part of PillBar's single continuous curve rather than three independent
+// rounded rectangles: the first segment only rounds its left corners, the
+// last only its right, and the middle segment stays perfectly square.
+const SEGMENT_HIGHLIGHT_RADIUS = {
+  first: ({ theme }) => `${theme.radius.pill} 0 0 ${theme.radius.pill}`,
+  middle: () => '0',
+  last: ({ theme }) => `0 ${theme.radius.pill} ${theme.radius.pill} 0`,
+}
+
 export const SegmentTrigger = styled.button`
   display: flex;
   flex-direction: column;
@@ -104,7 +115,7 @@ export const SegmentTrigger = styled.button`
   height: 100%;
   padding: 0.5rem ${({ theme }) => theme.spacing.md};
   border: none;
-  border-radius: ${({ theme }) => theme.radius.pill};
+  border-radius: ${(props) => (SEGMENT_HIGHLIGHT_RADIUS[props.$position] ?? SEGMENT_HIGHLIGHT_RADIUS.middle)(props)};
   background-color: ${({ $isOpen, theme }) => ($isOpen ? theme.colors.borderLight : 'transparent')};
   font-family: inherit;
   text-align: left;
