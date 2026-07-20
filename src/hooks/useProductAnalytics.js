@@ -2,20 +2,12 @@ import { useMemo } from 'react'
 import { parseMesto } from '../utils/market.js'
 import { productMatchesSlug } from '../utils/productId.js'
 import { getRowLabel, getRowTime } from '../utils/week.js'
+import { getAveragePrice as getComparablePrice } from '../utils/price.js'
 
 function average(values) {
   const valid = values.filter((value) => value !== null && value !== undefined)
   if (valid.length === 0) return null
   return valid.reduce((sum, value) => sum + value, 0) / valid.length
-}
-
-// CenaDom is normally a precomputed single price (see sheetsService.js), but
-// falls back to the mathematical midpoint of CenaMin/CenaMax so a STIPS
-// price *range* still yields one comparable number instead of dropping out
-// of the comparison entirely.
-function getComparablePrice(row) {
-  if (row.CenaDom !== null && row.CenaDom !== undefined) return row.CenaDom
-  return average([row.CenaMin, row.CenaMax])
 }
 
 // categoryName comes from the URL's :categorySlug segment and always applies

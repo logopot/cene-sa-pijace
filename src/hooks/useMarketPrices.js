@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchMarketPrices, fetchJkpPrices } from '../services/sheetsService.js'
+import { hasAnyPrice } from '../utils/price.js'
 
 export function useMarketPrices() {
   const [rows, setRows] = useState([])
@@ -12,7 +13,11 @@ export function useMarketPrices() {
     Promise.all([fetchMarketPrices(), fetchJkpPrices()])
       .then(([stipsRows, jkpRows]) => {
         if (cancelled) return
-        setRows([...stipsRows, ...jkpRows])
+        // Some source records carry no usable price in any field (a fully
+        // blank scrape row) - these render nothing useful anywhere in the UI,
+        // so they're dropped here rather than reaching every downstream page
+        // (grids, charts, weekly trends) individually.
+        setRows([...stipsRows, ...jkpRows].filter(hasAnyPrice))
         setLoading(false)
       })
       .catch((err) => {

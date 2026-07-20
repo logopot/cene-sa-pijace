@@ -6,6 +6,7 @@ import { translateDataValue } from "../../utils/translateValue.js";
 import { classifyComment } from "../../utils/comment.js";
 import { spaceBeforeParens } from "../../utils/formatText.js";
 import { getTrendIcon } from "../../utils/trend.js";
+import { getDisplayPrice, getAveragePrice } from "../../utils/price.js";
 import { getSourceLabel } from "../../utils/marketTime.js";
 
 import {
@@ -73,6 +74,8 @@ function ProductCard({ row, selection }) {
   const TrendIcon = getTrendIcon(row.Trend);
   const trendVariant = hasTrendData ? row.Trend : "none";
   const comment = classifyComment(row.Komentar);
+  const avgPrice = getAveragePrice(row);
+  const displayPrice = getDisplayPrice(row);
 
   return (
     <CardLink
@@ -109,7 +112,7 @@ function ProductCard({ row, selection }) {
               <MetaLabel>{t("productCard.avgPrice")}</MetaLabel>
               <MetaValue>
                 {t("productCard.avgPriceValue", {
-                  price: formatPrice(row.CenaDom),
+                  price: formatPrice(avgPrice),
                 })}
               </MetaValue>
             </MetaBadge>
@@ -145,10 +148,14 @@ function ProductCard({ row, selection }) {
             <CommentText>{comment.value}</CommentText>
           )}
 
-          <PriceValue>
-            {formatPrice(row.CenaMin)} - {formatPrice(row.CenaMax)}{" "}
-            {t("productCard.priceUnit", { unit: jedMere })}
-          </PriceValue>
+          {displayPrice && (
+            <PriceValue>
+              {displayPrice.type === "range" ?
+                `${formatPrice(displayPrice.min)} - ${formatPrice(displayPrice.max)}`
+              : formatPrice(displayPrice.value)}{" "}
+              {t("productCard.priceUnit", { unit: jedMere })}
+            </PriceValue>
+          )}
 
           <CardFooter>
             <SourceTag>
