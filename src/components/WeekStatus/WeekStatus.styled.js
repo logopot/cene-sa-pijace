@@ -7,8 +7,8 @@ export const StatusBadge = styled.div`
   display: inline-flex;
   align-items: flex-start;
   gap: 0.5rem;
-  margin-top: 3rem;
-  margin-bottom: 1.5rem;
+  margin-top: ${({ theme }) => theme.spacing.lg};
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
   padding: 0.5rem 1rem;
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radius.md};
