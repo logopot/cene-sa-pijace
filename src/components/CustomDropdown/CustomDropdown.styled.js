@@ -98,11 +98,13 @@ export const MenuList = styled.ul`
 // The hover/open highlight's own corners follow $position so they read as
 // part of PillBar's single continuous curve rather than three independent
 // rounded rectangles: the first segment only rounds its left corners, the
-// last only its right, and the middle segment stays perfectly square.
+// last only its right, and the middle segment stays perfectly square. Uses
+// theme.radius.xl (24px) rather than the fully-rounded pill token, matching
+// PillBar's own outer border-radius - our card radius, not a stadium shape.
 const SEGMENT_HIGHLIGHT_RADIUS = {
-  first: ({ theme }) => `${theme.radius.pill} 0 0 ${theme.radius.pill}`,
+  first: ({ theme }) => `${theme.radius.xl} 0 0 ${theme.radius.xl}`,
   middle: () => '0',
-  last: ({ theme }) => `0 ${theme.radius.pill} ${theme.radius.pill} 0`,
+  last: ({ theme }) => `0 ${theme.radius.xl} ${theme.radius.xl} 0`,
 }
 
 // The last segment's own background already extends the full width of its

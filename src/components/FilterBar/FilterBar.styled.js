@@ -34,7 +34,7 @@ export const PillBar = styled.div`
   min-height: 56px;
   padding: ${({ theme }) => theme.spacing.xxs};
   border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radius.pill};
+  border-radius: ${({ theme }) => theme.radius.xl};
   background-color: ${({ theme }) => theme.colors.surface};
   box-shadow: ${({ theme }) => theme.shadow.sm};
 `;
