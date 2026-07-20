@@ -99,7 +99,10 @@ export const MenuItem = styled.li`
     $isSelected ? theme.font.weight.semibold : theme.font.weight.regular};
   background-color: ${({ theme, $isSelected }) => ($isSelected ? theme.colors.primaryTint : 'transparent')};
 
-  &:hover {
+  &:hover,
+  &:focus,
+  &:focus-visible {
     background-color: ${({ theme }) => theme.colors.bg};
+    outline: none;
   }
 `

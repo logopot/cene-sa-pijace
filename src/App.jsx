@@ -113,7 +113,7 @@ function App() {
               />
               <Route
                 path={`/${prefix}/:citySlug/:marketSlug/:categorySlug/:productSlug`}
-                element={<Analytics key={location.key} rows={rows} />}
+                element={<Analytics key={location.key} rows={rows} loading={loading} error={error} />}
               />
             </Fragment>
           ))}

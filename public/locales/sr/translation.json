@@ -122,7 +122,9 @@
   "results": {
     "loading": "Učitavanje podataka...",
     "error": "Greška pri učitavanju podataka sa Google Sheets-a.",
-    "empty": "Nema podataka za prikaz."
+    "emptyTitle": "Nema rezultata za ovu kombinaciju filtera",
+    "emptyDescription": "Pokušajte sa drugom pijacom, kategorijom ili gradom.",
+    "emptyAction": "Nazad na početnu"
   },
   "loader": {
     "message": "Učitavanje pijačne baze podataka...",

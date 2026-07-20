@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Container } from 'react-bootstrap'
+import { Alert, Container, Spinner } from 'react-bootstrap'
 import { LuArrowLeft } from 'react-icons/lu'
 import { getCategoryIcon, getCategoryUrlSlug, resolveCategoryBySlug } from '../../utils/categoryIcons.js'
 import { translateDataValue } from '../../utils/translateValue.js'
@@ -13,6 +13,7 @@ import SEO from '../../components/SEO/SEO.jsx'
 import { SITE_URL, getProductOgImage } from '../../constants/seo.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
+  StatusSection,
   BackButton,
   PageHeader,
   IconWrap,
@@ -22,7 +23,7 @@ import {
   SectionTitle,
 } from './Analytics.styled.js'
 
-function Analytics({ rows }) {
+function Analytics({ rows, loading, error }) {
   const { t, i18n } = useTranslation()
   const { citySlug, marketSlug, categorySlug, productSlug } = useParams()
   const location = useLocation()
@@ -37,6 +38,28 @@ function Analytics({ rows }) {
 
   const analytics = useProductAnalytics(rows, productSlug, productFilters, grad, categoryName)
   const { identity } = analytics
+
+  // Deep-linked/shared URLs land here before the app shell's own fetch has a
+  // chance to run again - without these two gates, a data-fetch failure or a
+  // still-loading rows array would fall straight into the not-found branch
+  // below and misreport a real outage as "this page doesn't exist".
+  if (loading) {
+    return (
+      <StatusSection>
+        <Spinner animation="border" role="status" aria-label={t('results.loading')} />
+      </StatusSection>
+    )
+  }
+
+  if (error) {
+    return (
+      <StatusSection>
+        <Container>
+          <Alert variant="danger">{t('results.error')}</Alert>
+        </Container>
+      </StatusSection>
+    )
+  }
 
   if (!grad || !pijaca || !categoryName || !identity.proizvod) {
     return <NotFound />

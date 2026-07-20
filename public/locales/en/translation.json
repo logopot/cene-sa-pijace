@@ -122,7 +122,9 @@
   "results": {
     "loading": "Loading data...",
     "error": "Failed to load data from Google Sheets.",
-    "empty": "No data to display."
+    "emptyTitle": "No results for this filter combination",
+    "emptyDescription": "Try a different market, category, or city.",
+    "emptyAction": "Back to homepage"
   },
   "loader": {
     "message": "Loading the market database...",

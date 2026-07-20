@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { Alert, Col, Container, Row } from 'react-bootstrap'
+import { Col, Container, Row } from 'react-bootstrap'
+import { LuSearchX } from 'react-icons/lu'
 import ProductCard from '../ProductCard/ProductCard.jsx'
-import { Section } from './ProductGrid.styled.js'
+import { Section, EmptyState, EmptyIcon, EmptyTitle, EmptyDescription, EmptyAction } from './ProductGrid.styled.js'
 
 function ProductGrid({ rows, selection }) {
   const { t } = useTranslation()
@@ -10,7 +11,14 @@ function ProductGrid({ rows, selection }) {
     <Section>
       <Container>
         {rows.length === 0 ? (
-          <Alert variant="secondary">{t('results.empty')}</Alert>
+          <EmptyState>
+            <EmptyIcon aria-hidden="true">
+              <LuSearchX />
+            </EmptyIcon>
+            <EmptyTitle>{t('results.emptyTitle')}</EmptyTitle>
+            <EmptyDescription>{t('results.emptyDescription')}</EmptyDescription>
+            <EmptyAction to="/">{t('results.emptyAction')}</EmptyAction>
+          </EmptyState>
         ) : (
           <Row className="g-3">
             {rows.map((row, index) => (

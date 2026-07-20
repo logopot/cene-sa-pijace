@@ -1,6 +1,13 @@
 import styled from 'styled-components'
 import { AppIconWrapper } from '../../styles/Card.styled.js'
 
+export const StatusSection = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+`
+
 export const BackButton = styled.button`
   display: inline-flex;
   align-items: center;
