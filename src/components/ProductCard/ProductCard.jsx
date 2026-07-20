@@ -6,7 +6,7 @@ import { translateDataValue } from "../../utils/translateValue.js";
 import { classifyComment } from "../../utils/comment.js";
 import { spaceBeforeParens } from "../../utils/formatText.js";
 import { getTrendIcon } from "../../utils/trend.js";
-import { getDisplayPrice, getAveragePrice } from "../../utils/price.js";
+import { getDisplayPrice } from "../../utils/price.js";
 import { getSourceLabel } from "../../utils/marketTime.js";
 
 import {
@@ -74,7 +74,6 @@ function ProductCard({ row, selection }) {
   const TrendIcon = getTrendIcon(row.Trend);
   const trendVariant = hasTrendData ? row.Trend : "none";
   const comment = classifyComment(row.Komentar);
-  const avgPrice = getAveragePrice(row);
   const displayPrice = getDisplayPrice(row);
 
   return (
@@ -112,7 +111,7 @@ function ProductCard({ row, selection }) {
               <MetaLabel>{t("productCard.avgPrice")}</MetaLabel>
               <MetaValue>
                 {t("productCard.avgPriceValue", {
-                  price: formatPrice(avgPrice),
+                  price: formatPrice(row.CenaDom),
                 })}
               </MetaValue>
             </MetaBadge>

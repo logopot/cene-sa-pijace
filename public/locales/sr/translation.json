@@ -117,7 +117,7 @@
   },
   "productCard": {
     "source": "Izvor: {{source}}",
-    "avgPrice": "Prosečna cena",
+    "avgPrice": "Najčešća cena",
     "avgPriceValue": "{{price}} RSD",
     "priceUnit": "RSD / {{unit}}",
     "packaging": "Pakovanje",
