@@ -73,6 +73,43 @@ function matchRegionDistrict(mesto) {
   return null
 }
 
+// A Serbian district (okrug) name is a single adjective (e.g. "Braničevski",
+// "Jablanički", "Raški") - unlike REGION_DISTRICTS's own compound districts
+// above, the wholesale/regional sheet sometimes lists these bare, with no
+// "okrug" suffix at all. Display-only normalization (see
+// normalizeDistrictLabel below); city names in our data never happen to end
+// this way, so the suffix check alone is enough to tell districts apart from
+// cities without a hardcoded name list.
+const DISTRICT_ADJECTIVE_SUFFIXES = ['ski', 'čki', 'ški']
+
+// Mačvanski's two sub-regions (LO/Loznica, ŠA/Šabac) don't fit the plain
+// "append okrug at the end" rule - "okrug" has to land between the adjective
+// and the sub-region code (e.g. "Mačvanski LO" -> "Mačvanski okrug LO"), so
+// they're handled as an explicit exception rather than the generic suffix
+// rule.
+const DISTRICT_SUBREGION_LABELS = {
+  'Mačvanski LO': 'Mačvanski okrug LO',
+  'Mačvanski ŠA': 'Mačvanski okrug ŠA',
+}
+
+// Normalizes a grad display label to always read "<district> okrug" for
+// district-shaped names, without ever double-appending onto one that already
+// has it (e.g. REGION_DISTRICTS's own "Severnobački okrug") - a no-op for
+// anything that isn't a district at all (a normal city name). Display-only:
+// callers apply this to the label they're about to render, never to the raw
+// `grad` value itself, which stays exactly as parseMesto/REGION_DISTRICTS
+// produced it for routing/filtering/matching (see translateDataValue in
+// utils/translateValue.js and scripts/lib/productLabels.mjs, the two places
+// this actually gets called from).
+export function normalizeDistrictLabel(label) {
+  if (!label) return label
+  if (DISTRICT_SUBREGION_LABELS[label]) return DISTRICT_SUBREGION_LABELS[label]
+  if (label.toLowerCase().includes('okrug')) return label
+
+  const isDistrictAdjective = DISTRICT_ADJECTIVE_SUFFIXES.some((suffix) => label.endsWith(suffix))
+  return isDistrictAdjective ? `${label} okrug` : label
+}
+
 // Mesto values from the sheet come in a few shapes:
 // - "Grad-Type" for markets with no proper name, e.g. "Beograd-kvantaška pijaca"
 // - "Name-Grad-Type" for named markets, e.g. "Kalenić-Beograd-zelena pijaca",

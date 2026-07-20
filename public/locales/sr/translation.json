@@ -59,20 +59,16 @@
   "filterBar": {
     "categoryLabel": "Kategorija",
     "categoryPlaceholder": "Izaberite kategoriju",
-    "cityLabel": "Grad",
-    "cityPlaceholder": "Izaberite grad",
+    "cityLabel": "Grad ili okrug",
+    "cityPlaceholder": "Izaberite grad ili okrug",
     "marketLabel": "Pijaca",
     "marketAllOption": "Sve pijace u tom gradu",
     "categoryAllOption": "Sve kategorije",
     "submit": "Prikaži cene",
-    "back": "Nazad",
-    "stepIndicator": "Korak {{current}} od {{total}}",
-    "stepInstructionCategory": "Izaberite kategoriju",
-    "stepInstructionCity": "Izaberite grad da nastavite",
-    "stepInstructionMarket": "Izaberite pijacu"
+    "mobileTriggerLabel": "Započnite pretragu",
+    "close": "Zatvori"
   },
   "locationDetect": {
-    "buttonLabel": "Pronađi moj grad",
     "menuLabel": "Pronađi moju lokaciju",
     "unsupported": "Vaš pregledač ne podržava deljenje lokacije.",
     "denied": "Pristup lokaciji je odbijen. Izaberite grad ručno.",

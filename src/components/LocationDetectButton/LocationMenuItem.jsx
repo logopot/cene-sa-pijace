@@ -12,16 +12,18 @@ const ERROR_MESSAGE_KEYS = {
   'no-match': 'locationDetect.noMatch',
 }
 
-// Auto-dismisses its own error message after a few seconds, same convention
-// as LocationDetectButton.jsx (no app-wide toast system to hook into).
+// Auto-dismisses its own error message after a few seconds - this app has no
+// app-wide toast system, so this stays a small, self-contained transient
+// message.
 const MESSAGE_TIMEOUT_MS = 5000
 
-// First row inside the desktop Grad segment's dropdown menu (see
-// FilterBar.jsx's leadingAction) - same detect flow as the standalone
-// LocationDetectButton, just rendered as a menu action instead of an
-// external icon button. onSelect is CustomDropdown's own handleSelect, so a
-// successful detect both applies the city and closes the menu exactly like
-// clicking a normal option would.
+// First row inside the Grad section's option list, shared by both the
+// desktop segmented bar (FilterBar.jsx's leadingAction, passed to
+// CustomDropdown) and the mobile accordion drawer
+// (MobileFilterDrawer.jsx). onSelect is whatever the caller wants to happen
+// on a successful detect - CustomDropdown's own handleSelect on desktop
+// (applies the city and closes the dropdown), or MobileFilterDrawer's
+// handleGradSelect on mobile (applies the city and collapses the Grad row).
 function LocationMenuItem({ cities, onSelect }) {
   const { t } = useTranslation()
   const { status, errorReason, detect, reset } = useLocationDetect()

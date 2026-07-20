@@ -12,7 +12,7 @@ const GEOLOCATION_OPTIONS = {
 
 // Wraps navigator.geolocation + findNearestCity behind one imperative
 // detect(availableCities, onFound) call, so the triggering component (see
-// LocationDetectButton.jsx) only ever has to render off `status`/`errorReason`.
+// LocationMenuItem.jsx) only ever has to render off `status`/`errorReason`.
 export function useLocationDetect() {
   const [status, setStatus] = useState('idle') // 'idle' | 'locating' | 'success' | 'error'
   const [errorReason, setErrorReason] = useState(null) // 'unsupported' | 'denied' | 'unavailable' | 'timeout' | 'no-match'

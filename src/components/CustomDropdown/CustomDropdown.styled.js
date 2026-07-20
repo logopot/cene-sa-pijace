@@ -105,6 +105,17 @@ const SEGMENT_HIGHLIGHT_RADIUS = {
   last: ({ theme }) => `0 ${theme.radius.pill} ${theme.radius.pill} 0`,
 }
 
+// The last segment's own background already extends the full width of its
+// cell (background always fills the padding box, independent of padding) -
+// this only nudges its *text* left so it never renders underneath the
+// floating SubmitCircle that overlaps this segment's right edge (see
+// FilterBar.styled.js's PillBar/SubmitCircle). 48px is SubmitCircle's own
+// width; spacing.sm is a small breathing gap before the icon.
+const SEGMENT_PADDING = {
+  last: ({ theme }) => `0.5rem calc(48px + ${theme.spacing.sm}) 0.5rem ${theme.spacing.md}`,
+}
+const DEFAULT_SEGMENT_PADDING = ({ theme }) => `0.5rem ${theme.spacing.md}`
+
 export const SegmentTrigger = styled.button`
   display: flex;
   flex-direction: column;
@@ -113,7 +124,7 @@ export const SegmentTrigger = styled.button`
   gap: 2px;
   width: 100%;
   height: 100%;
-  padding: 0.5rem ${({ theme }) => theme.spacing.md};
+  padding: ${(props) => (SEGMENT_PADDING[props.$position] ?? DEFAULT_SEGMENT_PADDING)(props)};
   border: none;
   border-radius: ${(props) => (SEGMENT_HIGHLIGHT_RADIUS[props.$position] ?? SEGMENT_HIGHLIGHT_RADIUS.middle)(props)};
   background-color: ${({ $isOpen, theme }) => ($isOpen ? theme.colors.borderLight : 'transparent')};

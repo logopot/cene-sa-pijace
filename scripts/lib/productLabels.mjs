@@ -1,5 +1,6 @@
 import { slugify } from '../../src/utils/productId.js'
 import { getCategorySlug } from '../../src/utils/categoryIcons.js'
+import { normalizeDistrictLabel } from '../../src/utils/market.js'
 import { readJsonFile } from './googleSheets.mjs'
 
 // Node-safe stand-in for src/utils/translateValue.js + the private
@@ -19,11 +20,15 @@ export const SUPPORTED_LANGUAGES = ['sr', 'en']
 
 // Mirrors translateDataValue(t, field, raw) - dictionary miss falls back to
 // the raw Serbian value (e.g. a product with no translation yet), same
-// graceful-fallback rule as the live UI.
+// graceful-fallback rule as the live UI. 'grad' also gets
+// normalizeDistrictLabel applied, same as the client-side version, so the
+// SEO manifest/OG images built by this script show "Braničevski okrug" etc.
+// too, not just the live in-app UI.
 export function translateDataValue(language, field, raw) {
   if (raw === undefined || raw === null || raw === '') return raw
   const dict = LOCALES[language]?.dataValues?.[field] ?? {}
-  return dict[raw] ?? raw
+  const value = dict[raw] ?? raw
+  return field === 'grad' ? normalizeDistrictLabel(value) : value
 }
 
 // The URL word for a product name in `language` - mirrors productId.js's

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Button, Col, Row } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
 export const Bar = styled.div`
   position: sticky;
@@ -11,46 +11,16 @@ export const Bar = styled.div`
   box-shadow: ${({ theme }) => theme.shadow.sm};
 `;
 
-export const FieldLabel = styled.span`
-  display: block;
-  font-size: 0.8rem;
-  font-weight: ${({ theme }) => theme.font.weight.semibold};
-  color: ${({ theme }) => theme.colors.textSecondary};
-  margin-bottom: 0.25rem;
-`;
-
-// Lets a field's dropdown share its row with an adjacent action button (e.g.
-// the city step's LocationDetectButton) without widening the Bootstrap col.
-export const FieldRow = styled.div`
-  display: flex;
-  align-items: stretch;
-  gap: ${({ theme }) => theme.spacing.xs};
-`;
-
-// Only steps matching the mobile stepper's current step stay visible below
-// the desktop breakpoint - above it, Bootstrap's own col-md-* classes take
-// over and every field renders side by side as before.
-export const StepField = styled(Col)`
-  @media (max-width: 767px) {
-    display: ${({ $active }) => ($active ? "block" : "none")};
-  }
-`;
-
-// The stepped mobile grid (StepField's Row) now only ever renders below the
-// desktop breakpoint - DesktopBarRow's segmented pill takes over above it,
-// so both layouts never show at once.
-export const MobileFieldsRow = styled(Row)`
-  @media (min-width: 768px) {
-    display: none;
-  }
-`;
-
 // The segmented, pill-shaped unified bar - one continuous rounded container
 // housing all three filter segments plus the submit circle, in the style of
 // a unified search bar but built entirely from our own tokens (soft shadow,
 // not a hard black one; brand green action button, not a copy of any other
-// product's palette). Hidden below the desktop breakpoint - the mobile
-// stepper (MobileStepHeader + MobileFieldsRow) covers narrow screens instead.
+// product's palette). Hidden below the desktop breakpoint - MobileFilterDrawer
+// (see that component) covers narrow screens instead.
+// position: relative + a fixed min-height anchor SubmitCircle's absolute
+// placement below - the button floats on top of the last segment rather
+// than reserving its own flex slot, so that segment's own hover background
+// can extend all the way to the pill's right edge, underneath the button.
 export const PillBar = styled.div`
   display: none;
 
@@ -60,6 +30,8 @@ export const PillBar = styled.div`
     width: 100%;
   }
 
+  position: relative;
+  min-height: 56px;
   padding: ${({ theme }) => theme.spacing.xxs};
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radius.pill};
@@ -80,14 +52,23 @@ export const SegmentDivider = styled.span`
 // Circular submit action, always brand green regardless of the neutral pill
 // around it - the one deliberately colored element in the bar, and the only
 // thing that visually says "this is our app," not a generic pill-search copy.
+// Absolutely positioned (see PillBar) rather than a normal flex sibling, so
+// it visually overlaps the Pijaca segment's own hover background instead of
+// carving out its own reserved slot - z-index keeps it clickable above that
+// segment's trigger. `right` reuses PillBar's own padding token so the gap
+// to the outer border matches the min-height math (56px - 48px = 2 * 4px)
+// exactly on all three sides.
 export const SubmitCircle = styled.button`
+  position: absolute;
+  top: 50%;
+  right: ${({ theme }) => theme.spacing.xxs};
+  transform: translateY(-50%);
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   width: 48px;
   height: 48px;
-  margin-left: ${({ theme }) => theme.spacing.xxs};
   border: none;
   border-radius: 50%;
   background-color: ${({ theme }) => theme.colors.primaryGreen};
@@ -112,70 +93,9 @@ export const SubmitCircle = styled.button`
   }
 `;
 
-// Hidden entirely at desktop widths since the stepper (progress text + back
-// navigation + instruction line) only exists to compensate for mobile
-// showing one field at a time.
-export const MobileStepHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  margin-bottom: ${({ theme }) => theme.spacing.sm};
-
-  @media (min-width: 768px) {
-    display: none;
-  }
-`;
-
-export const StepHeaderTop = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-export const StepIndicator = styled.span`
-  font-size: 0.8rem;
-  font-weight: ${({ theme }) => theme.font.weight.medium};
-  color: ${({ theme }) => theme.colors.textMuted};
-`;
-
-export const StepInstruction = styled.p`
-  margin: 0;
-  font-size: 0.8rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
-`;
-
-export const BackButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: transparent;
-  border: none;
-  border-radius: ${({ theme }) => theme.radius.pill};
-  padding: ${({ theme }) => theme.spacing.xs};
-  margin: 0;
-  font-size: 0.85rem;
-  font-weight: ${({ theme }) => theme.font.weight.semibold};
-  color: ${({ theme }) => theme.colors.primaryGreen};
-  cursor: pointer;
-  visibility: ${({ $visible }) => ($visible ? "visible" : "hidden")};
-  transition: background-color 0.2s ease, color 0.2s ease;
-
-  svg {
-    color: ${({ theme }) => theme.colors.primaryGreen};
-    transition: color 0.2s ease;
-  }
-
-  &:hover,
-  &:focus {
-    color: ${({ theme }) => theme.colors.primaryHover};
-    background-color: ${({ theme }) => theme.colors.primaryTint};
-
-    svg {
-      color: ${({ theme }) => theme.colors.primaryHover};
-    }
-  }
-`;
-
+// Wide green CTA - the desktop stepper's old submit button, now reused as-is
+// for MobileFilterDrawer's sticky footer (see that component) since both
+// want the same full-width primary action styling.
 export const SubmitButton = styled(Button)`
   display: flex;
   align-items: center;
