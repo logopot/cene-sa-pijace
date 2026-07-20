@@ -1,11 +1,11 @@
 import styled from 'styled-components'
 
-// One neutral, subtle container regardless of source/freshness - only the
-// icon's color varies (see WeekStatus.jsx), so the badge itself never reads
-// as a colored "alert" state.
+// One neutral container regardless of source/freshness - the checkmark icon
+// is always the same shape and color (see WeekStatus.jsx), so the badge
+// never reads as a degraded/alert state.
 export const StatusBadge = styled.div`
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
   margin-top: 3rem;
   margin-bottom: 1.5rem;
@@ -22,7 +22,12 @@ export const StatusBadge = styled.div`
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    color: ${({ $archived, theme }) => ($archived ? theme.colors.textMuted : theme.colors.primaryGreen)};
+    /* Nudges the icon down from the row's flex-start edge to sit level with
+       the source name's cap height instead of its full line box - matters
+       once TextGroup wraps to two lines below 576px and the icon would
+       otherwise float noticeably above the first line of text. */
+    margin-top: 2px;
+    color: ${({ theme }) => theme.colors.primaryGreen};
   }
 `
 

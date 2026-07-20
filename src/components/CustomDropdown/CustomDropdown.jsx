@@ -1,8 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
 import { LuChevronDown } from 'react-icons/lu'
-import { Menu, MenuItem, MenuList, Trigger, TriggerLabel, Wrapper } from './CustomDropdown.styled.js'
+import {
+  Menu,
+  MenuItem,
+  MenuList,
+  Trigger,
+  TriggerLabel,
+  SegmentTrigger,
+  SegmentLabel,
+  SegmentValue,
+  Wrapper,
+} from './CustomDropdown.styled.js'
 
-function CustomDropdown({ options, value, onChange, placeholder, disabled = false }) {
+// variant="segment" is FilterBar's desktop pill-bar cell (label on top,
+// value below, no border of its own - see PillBar); the default "pill"
+// variant is the standalone bordered trigger the mobile stepper still uses.
+// Both share every bit of open/close/keyboard/outside-click behavior below;
+// only the trigger's visual shell and its extra `label` differ.
+function CustomDropdown({ options, value, onChange, placeholder, disabled = false, variant = 'pill', label }) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
   const wrapperRef = useRef(null)
@@ -93,21 +108,38 @@ function CustomDropdown({ options, value, onChange, placeholder, disabled = fals
 
   return (
     <Wrapper ref={wrapperRef}>
-      <Trigger
-        ref={triggerRef}
-        type="button"
-        onClick={handleTriggerClick}
-        onKeyDown={handleTriggerKeyDown}
-        disabled={disabled}
-        $isOpen={isOpen}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-      >
-        <TriggerLabel $isPlaceholder={!selectedOption}>
-          {selectedOption ? selectedOption.label : placeholder}
-        </TriggerLabel>
-        <LuChevronDown size={16} />
-      </Trigger>
+      {variant === 'segment' ?
+        <SegmentTrigger
+          ref={triggerRef}
+          type="button"
+          onClick={handleTriggerClick}
+          onKeyDown={handleTriggerKeyDown}
+          disabled={disabled}
+          $isOpen={isOpen}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+        >
+          <SegmentLabel>{label}</SegmentLabel>
+          <SegmentValue $isPlaceholder={!selectedOption}>
+            {selectedOption ? selectedOption.label : placeholder}
+          </SegmentValue>
+        </SegmentTrigger>
+      : <Trigger
+          ref={triggerRef}
+          type="button"
+          onClick={handleTriggerClick}
+          onKeyDown={handleTriggerKeyDown}
+          disabled={disabled}
+          $isOpen={isOpen}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+        >
+          <TriggerLabel $isPlaceholder={!selectedOption}>
+            {selectedOption ? selectedOption.label : placeholder}
+          </TriggerLabel>
+          <LuChevronDown size={16} />
+        </Trigger>
+      }
 
       {isOpen && (
         <Menu>

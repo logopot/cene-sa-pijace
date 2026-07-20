@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Container, Row } from 'react-bootstrap'
-import { LuArrowLeft } from 'react-icons/lu'
+import { Container } from 'react-bootstrap'
+import { LuArrowLeft, LuSearch } from 'react-icons/lu'
 import { ALL_MARKETS } from '../../constants/filters.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getCategoryUrlSlug } from '../../utils/categoryIcons.js'
@@ -12,14 +12,19 @@ import LocationDetectButton from '../LocationDetectButton/LocationDetectButton.j
 import {
   BackButton,
   Bar,
+  DesktopBarRow,
   FieldLabel,
   FieldRow,
+  MobileFieldsRow,
   MobileStepHeader,
+  PillBar,
+  SegmentDivider,
   StepField,
   StepHeaderTop,
   StepIndicator,
   StepInstruction,
   SubmitButton,
+  SubmitCircle,
 } from './FilterBar.styled.js'
 
 const STEP_CITY = 0
@@ -47,8 +52,9 @@ function FilterBar({
 }) {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
-  // Drives the mobile "one field at a time" stepper only - the desktop layout
-  // ignores it and always shows every field (see StepField's media query).
+  // Drives the mobile "one field at a time" stepper only (MobileFieldsRow) -
+  // the desktop segmented pill bar (DesktopBarRow) always shows every field
+  // at once regardless of step.
   const [step, setStep] = useState(STEP_CITY)
 
   const categoryOptions = categories.map((cat) => ({ value: cat.name, label: t(`categories.${cat.slug}`) }))
@@ -89,7 +95,7 @@ function FilterBar({
           <StepInstruction>{t(STEP_INSTRUCTION_KEYS[step])}</StepInstruction>
         </MobileStepHeader>
 
-        <Row className="g-3 align-items-end">
+        <MobileFieldsRow className="g-3 align-items-end">
           <StepField xs={12} md={3} $active={step === STEP_CITY}>
             <FieldLabel>{t('filterBar.cityLabel')}</FieldLabel>
             <FieldRow>
@@ -130,7 +136,55 @@ function FilterBar({
               {t('filterBar.submit')}
             </SubmitButton>
           </StepField>
-        </Row>
+        </MobileFieldsRow>
+
+        <DesktopBarRow>
+          <LocationDetectButton cities={cities} onDetect={handleGradChange} />
+
+          <PillBar>
+            <CustomDropdown
+              variant="segment"
+              label={t('filterBar.cityLabel')}
+              options={cityOptions}
+              value={grad}
+              onChange={handleGradChange}
+              placeholder={t('filterBar.cityPlaceholder')}
+            />
+
+            <SegmentDivider aria-hidden="true" />
+
+            <CustomDropdown
+              variant="segment"
+              label={t('filterBar.categoryLabel')}
+              options={categoryOptions}
+              value={category}
+              onChange={handleCategoryChange}
+              placeholder={t('filterBar.categoryPlaceholder')}
+              disabled={!grad}
+            />
+
+            <SegmentDivider aria-hidden="true" />
+
+            <CustomDropdown
+              variant="segment"
+              label={t('filterBar.marketLabel')}
+              options={marketOptions}
+              value={pijaca}
+              onChange={onPijacaChange}
+              placeholder={t('filterBar.marketAllOption')}
+              disabled={!grad}
+            />
+
+            <SubmitCircle
+              type="button"
+              disabled={!category || !grad}
+              onClick={handleSubmit}
+              aria-label={t('filterBar.submit')}
+            >
+              <LuSearch />
+            </SubmitCircle>
+          </PillBar>
+        </DesktopBarRow>
       </Container>
     </Bar>
   )

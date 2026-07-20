@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Button, Col } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 
 export const Bar = styled.div`
   position: sticky;
@@ -33,6 +33,89 @@ export const FieldRow = styled.div`
 export const StepField = styled(Col)`
   @media (max-width: 767px) {
     display: ${({ $active }) => ($active ? "block" : "none")};
+  }
+`;
+
+// The stepped mobile grid (StepField's Row) now only ever renders below the
+// desktop breakpoint - DesktopBarRow's segmented pill takes over above it,
+// so both layouts never show at once.
+export const MobileFieldsRow = styled(Row)`
+  @media (min-width: 768px) {
+    display: none;
+  }
+`;
+
+// Hidden below the desktop breakpoint - the mobile stepper (MobileStepHeader
+// + MobileFieldsRow) covers narrow screens instead.
+export const DesktopBarRow = styled.div`
+  display: none;
+
+  @media (min-width: 768px) {
+    display: flex;
+    align-items: center;
+    gap: ${({ theme }) => theme.spacing.sm};
+  }
+`;
+
+// The segmented, pill-shaped unified bar - one continuous rounded container
+// housing all three filter segments plus the submit circle, in the style of
+// a unified search bar but built entirely from our own tokens (soft shadow,
+// not a hard black one; brand green action button, not a copy of any other
+// product's palette).
+export const PillBar = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  padding: ${({ theme }) => theme.spacing.xxs};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.pill};
+  background-color: ${({ theme }) => theme.colors.surface};
+  box-shadow: ${({ theme }) => theme.shadow.sm};
+`;
+
+// Thin separator between segments - a hairline rather than a visible border
+// on each segment, so three adjacent segments still read as one continuous
+// bar (matches PillBar's single outer border/shadow doing all the framing).
+export const SegmentDivider = styled.span`
+  flex-shrink: 0;
+  width: 1px;
+  height: 28px;
+  background-color: ${({ theme }) => theme.colors.border};
+`;
+
+// Circular submit action, always brand green regardless of the neutral pill
+// around it - the one deliberately colored element in the bar, and the only
+// thing that visually says "this is our app," not a generic pill-search copy.
+export const SubmitCircle = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  margin-left: ${({ theme }) => theme.spacing.xxs};
+  border: none;
+  border-radius: 50%;
+  background-color: ${({ theme }) => theme.colors.primaryGreen};
+  color: ${({ theme }) => theme.colors.surface};
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover:not(:disabled),
+  &:focus-visible:not(:disabled) {
+    background-color: ${({ theme }) => theme.colors.primaryHover};
+  }
+
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.disabledBg};
+    color: ${({ theme }) => theme.colors.textMuted};
+    cursor: not-allowed;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
   }
 `;
 

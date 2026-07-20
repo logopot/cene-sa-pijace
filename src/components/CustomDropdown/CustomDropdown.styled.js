@@ -89,6 +89,56 @@ export const MenuList = styled.ul`
   }
 `
 
+// Desktop segmented-bar trigger (see FilterBar.jsx's PillBar) - a bare,
+// borderless cell instead of Trigger's own standalone pill, since the outer
+// PillBar already supplies the border/shadow/rounding for all three segments
+// at once. Shares every open/close/keyboard behavior with Trigger; only the
+// visual shell differs.
+export const SegmentTrigger = styled.button`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+  padding: 0.5rem ${({ theme }) => theme.spacing.md};
+  border: none;
+  border-radius: ${({ theme }) => theme.radius.pill};
+  background-color: ${({ $isOpen, theme }) => ($isOpen ? theme.colors.borderLight : 'transparent')};
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: ${({ theme }) => theme.colors.borderLight};
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+`
+
+export const SegmentLabel = styled.span`
+  font-size: 0.7rem;
+  font-weight: ${({ theme }) => theme.font.weight.semibold};
+  color: ${({ theme }) => theme.colors.textMuted};
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+`
+
+export const SegmentValue = styled.span`
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.95rem;
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+  color: ${({ theme, $isPlaceholder }) => ($isPlaceholder ? theme.colors.textMuted : theme.colors.textDark)};
+`
+
 export const MenuItem = styled.li`
   padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
   border-radius: ${({ theme }) => theme.radius.md};
