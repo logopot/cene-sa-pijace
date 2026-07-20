@@ -10,32 +10,6 @@ export const StatusSection = styled.div`
   min-height: 40vh;
 `
 
-export const BackLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 1.5rem 0 1rem;
-  padding: 0.4rem 0.75rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radius.lg};
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.textSecondary};
-  font-weight: ${({ theme }) => theme.font.weight.medium};
-  text-decoration: none;
-
-  &:hover,
-  &:focus-visible {
-    border-color: ${({ theme }) => theme.colors.primaryGreen};
-    color: ${({ theme }) => theme.colors.primaryGreen};
-    text-decoration: none;
-  }
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-`
-
 export const PageHeader = styled.div`
   display: flex;
   align-items: center;

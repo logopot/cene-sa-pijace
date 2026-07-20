@@ -2,13 +2,13 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { Alert, Col, Container, Row, Spinner } from 'react-bootstrap'
-import { LuArrowLeft, LuStore } from 'react-icons/lu'
+import { LuStore } from 'react-icons/lu'
 import { parseMesto, resolveGradBySlug, buildMarketRoute } from '../../utils/market.js'
 import { translateDataValue } from '../../utils/translateValue.js'
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
-  BackLink,
   PageHeader,
   IconWrap,
   CityTitle,
@@ -61,18 +61,22 @@ function CityDetails({ rows, loading, error }) {
     return <NotFound />
   }
 
+  const gradLabel = translateDataValue(t, 'grad', grad)
+
   return (
     <Container>
-      <BackLink to="/">
-        <LuArrowLeft />
-        {t('analytics.back')}
-      </BackLink>
+      <Breadcrumbs
+        items={[
+          { label: t('breadcrumbs.home'), to: '/' },
+          { label: gradLabel },
+        ]}
+      />
 
       <PageHeader>
         <IconWrap>
           <LuStore />
         </IconWrap>
-        <CityTitle>{translateDataValue(t, 'grad', grad)}</CityTitle>
+        <CityTitle>{gradLabel}</CityTitle>
       </PageHeader>
 
       <Row className="g-3">

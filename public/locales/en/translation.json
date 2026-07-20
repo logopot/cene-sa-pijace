@@ -82,6 +82,10 @@
     "title": "Explore Markets",
     "subtitle": "Pick a market or use the filters above to see prices."
   },
+  "breadcrumbs": {
+    "navLabel": "Breadcrumb",
+    "home": "Home"
+  },
   "weeklyTrends": {
     "title": "Biggest Price Drops This Week",
     "subtitle": "Products with the freshest price drops across markets in Serbia.",
@@ -145,8 +149,6 @@
     "allMarketsShort": "All markets"
   },
   "analytics": {
-    "back": "Back to overview",
-    "backToMarket": "Back to market",
     "historyTitle": "Price history",
     "comparisonTitle": "City comparison",
     "cheapest": "Cheapest",

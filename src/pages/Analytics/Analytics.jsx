@@ -1,20 +1,19 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { Alert, Container, Spinner } from 'react-bootstrap'
-import { LuArrowLeft } from 'react-icons/lu'
-import { getCategoryIcon, getCategoryUrlSlug, resolveCategoryBySlug } from '../../utils/categoryIcons.js'
+import { getCategoryIcon, getCategorySlug, getCategoryUrlSlug, resolveCategoryBySlug } from '../../utils/categoryIcons.js'
 import { translateDataValue } from '../../utils/translateValue.js'
-import { resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketCategoryRoute } from '../../utils/market.js'
+import { resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketRoute, buildMarketCategoryRoute } from '../../utils/market.js'
 import { useProductAnalytics } from '../../hooks/useProductAnalytics.js'
 import PriceHistoryChart from '../../components/PriceHistoryChart/PriceHistoryChart.jsx'
 import CityComparisonChart from '../../components/CityComparisonChart/CityComparisonChart.jsx'
 import SEO from '../../components/SEO/SEO.jsx'
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import { SITE_URL, getProductOgImage } from '../../constants/seo.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
-  BackButton,
   PageHeader,
   IconWrap,
   ProductTitle,
@@ -27,7 +26,6 @@ function Analytics({ rows, loading, error }) {
   const { t, i18n } = useTranslation()
   const { citySlug, marketSlug, categorySlug, productSlug } = useParams()
   const location = useLocation()
-  const navigate = useNavigate()
 
   const productFilters = location.state?.productFilters
 
@@ -91,15 +89,17 @@ function Analytics({ rows, loading, error }) {
       }),
   }
 
-  const handleBack = () => {
-    if (grad && pijaca && categoryName) {
-      navigate(buildMarketCategoryRoute(grad, pijaca, getCategoryUrlSlug(categoryName, i18n.language), i18n.language))
-    } else if (grad) {
-      navigate(buildCityRoute(grad, i18n.language))
-    } else {
-      navigate('/')
-    }
-  }
+  const categoryLabel = t(`categories.${getCategorySlug(categoryName)}`)
+  const breadcrumbItems = [
+    { label: t('breadcrumbs.home'), to: '/' },
+    { label: gradLabel, to: buildCityRoute(grad, i18n.language) },
+    { label: pijacaLabel, to: buildMarketRoute(grad, pijaca, i18n.language) },
+    {
+      label: categoryLabel,
+      to: buildMarketCategoryRoute(grad, pijaca, getCategoryUrlSlug(categoryName, i18n.language), i18n.language),
+    },
+    { label: productName },
+  ]
 
   return (
     <Container>
@@ -111,10 +111,7 @@ function Analytics({ rows, loading, error }) {
         jsonLd={jsonLd}
       />
 
-      <BackButton type="button" onClick={handleBack}>
-        <LuArrowLeft />
-        {t('analytics.backToMarket')}
-      </BackButton>
+      <Breadcrumbs items={breadcrumbItems} />
 
       <PageHeader>
         <IconWrap>

@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { Alert, Container, Spinner } from 'react-bootstrap'
-import { LuArrowLeft } from 'react-icons/lu'
 import { ALL_MARKETS } from '../../constants/filters.js'
 import {
   parseMesto,
@@ -19,11 +18,11 @@ import { getRowTime, getRowRangeLabel, getLatestWeekTime } from '../../utils/wee
 import WeekStatus from '../../components/WeekStatus/WeekStatus.jsx'
 import ProductGrid from '../../components/ProductGrid/ProductGrid.jsx'
 import SEO from '../../components/SEO/SEO.jsx'
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import { SITE_URL, getMarketOgImage } from '../../constants/seo.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
-  BackLink,
   PageHeader,
   IconWrap,
   TitleGroup,
@@ -114,8 +113,6 @@ function MarketCategoryDetails({ rows, loading, error }) {
 
   const Icon = getCategoryIcon(category)
   const isAllMarkets = pijaca === ALL_MARKETS
-  const backTo =
-    isAllMarkets ? buildCityRoute(grad, i18n.language) : buildMarketRoute(grad, pijaca, i18n.language)
   const gradLabel = translateDataValue(t, 'grad', grad)
   const marketLabel = isAllMarkets ? t('marketCategoryDetails.allMarketsShort') : translateDataValue(t, 'pijaca', pijaca)
   const categoryLabel = t(`categories.${getCategorySlug(category)}`)
@@ -129,6 +126,16 @@ function MarketCategoryDetails({ rows, loading, error }) {
       `${SITE_URL}${buildMarketRoute(grad, pijaca, i18n.language)}`
     : `${SITE_URL}${buildMarketCategoryRoute(grad, pijaca, getCategoryUrlSlug(category, i18n.language), i18n.language)}`
 
+  // "Sve pijace" (isAllMarkets) has no route of its own distinct from the
+  // city page itself, so its trail skips straight from city to category
+  // rather than inserting a non-clickable "Sve pijace" crumb.
+  const breadcrumbItems = [
+    { label: t('breadcrumbs.home'), to: '/' },
+    { label: gradLabel, to: buildCityRoute(grad, i18n.language) },
+    ...(isAllMarkets ? [] : [{ label: marketLabel, to: buildMarketRoute(grad, pijaca, i18n.language) }]),
+    { label: categoryLabel },
+  ]
+
   return (
     <>
       <SEO
@@ -139,10 +146,7 @@ function MarketCategoryDetails({ rows, loading, error }) {
       />
 
       <Container>
-        <BackLink to={backTo}>
-          <LuArrowLeft />
-          {t('analytics.back')}
-        </BackLink>
+        <Breadcrumbs items={breadcrumbItems} />
 
         <PageHeader>
           <IconWrap>

@@ -2,18 +2,18 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
 import { Alert, Container, Spinner } from 'react-bootstrap'
-import { LuArrowLeft, LuStore } from 'react-icons/lu'
+import { LuStore } from 'react-icons/lu'
 import { parseMesto, resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketRoute } from '../../utils/market.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getRowTime, getRowRangeLabel, getLatestWeekTime } from '../../utils/week.js'
 import WeekStatus from '../../components/WeekStatus/WeekStatus.jsx'
 import ProductGrid from '../../components/ProductGrid/ProductGrid.jsx'
 import SEO from '../../components/SEO/SEO.jsx'
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import { SITE_URL, getMarketOgImage } from '../../constants/seo.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
-  BackLink,
   PageHeader,
   IconWrap,
   TitleGroup,
@@ -92,10 +92,13 @@ function MarketDetails({ rows, loading, error }) {
       />
 
       <Container>
-        <BackLink to={buildCityRoute(grad, i18n.language)}>
-          <LuArrowLeft />
-          {t('analytics.back')}
-        </BackLink>
+        <Breadcrumbs
+          items={[
+            { label: t('breadcrumbs.home'), to: '/' },
+            { label: gradLabel, to: buildCityRoute(grad, i18n.language) },
+            { label: pijacaLabel },
+          ]}
+        />
 
         <PageHeader>
           <IconWrap>

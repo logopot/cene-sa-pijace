@@ -82,6 +82,10 @@
     "title": "Istražite pijace",
     "subtitle": "Izaberite pijacu ili koristite filtere iznad da vidite cene."
   },
+  "breadcrumbs": {
+    "navLabel": "Navigacija",
+    "home": "Početna"
+  },
   "weeklyTrends": {
     "title": "Najveća pojeftinjenja ove nedelje",
     "subtitle": "Proizvodi sa najsvežijim padom cene na pijacama širom Srbije.",
@@ -145,8 +149,6 @@
     "allMarketsShort": "Sve pijace"
   },
   "analytics": {
-    "back": "Nazad na pregled",
-    "backToMarket": "Nazad na pijacu",
     "historyTitle": "Istorija cena",
     "comparisonTitle": "Poređenje po gradovima",
     "cheapest": "Najjeftinije",
