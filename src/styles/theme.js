@@ -44,6 +44,11 @@ export const theme = {
     md: "12px",
     xl: "24px",
     pill: "999px",
+    // FilterBar's floating submit button: concentric with PillBar's xl
+    // (24px) corner at an 8px (spacing.xs) inset, so both curves share a
+    // center point 6px apart in radius - not on the lg/xl scale itself,
+    // it's derived from that geometry rather than a general-purpose size.
+    control: "18px",
   },
   spacing: {
     xxs: "4px",

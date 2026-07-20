@@ -49,19 +49,20 @@ export const SegmentDivider = styled.span`
   background-color: ${({ theme }) => theme.colors.border};
 `;
 
-// Circular submit action, always brand green regardless of the neutral pill
-// around it - the one deliberately colored element in the bar, and the only
-// thing that visually says "this is our app," not a generic pill-search copy.
+// Submit action, always brand green regardless of the neutral bar around it -
+// the one deliberately colored element in the bar, and the only thing that
+// visually says "this is our app," not a generic pill-search copy.
 // Absolutely positioned (see PillBar) rather than a normal flex sibling, so
 // it visually overlaps the Pijaca segment's own hover background instead of
 // carving out its own reserved slot - z-index keeps it clickable above that
-// segment's trigger. `right` reuses PillBar's own padding token so the gap
-// to the outer border matches the min-height math (56px - 48px = 2 * 4px)
-// exactly on all three sides.
+// segment's trigger. `right: 8px` + `border-radius: 18px` are a deliberately
+// concentric pairing with PillBar's own 24px/8px-inset corner (see PillBar) -
+// same center point, 6px smaller radius throughout - rather than a circle,
+// which reads as visually "louder" than PillBar's now-squared-off curve.
 export const SubmitCircle = styled.button`
   position: absolute;
   top: 50%;
-  right: ${({ theme }) => theme.spacing.xxs};
+  right: ${({ theme }) => theme.spacing.xs};
   transform: translateY(-50%);
   z-index: 2;
   display: flex;
@@ -70,7 +71,7 @@ export const SubmitCircle = styled.button`
   width: 48px;
   height: 48px;
   border: none;
-  border-radius: 50%;
+  border-radius: ${({ theme }) => theme.radius.control};
   background-color: ${({ theme }) => theme.colors.primaryGreen};
   color: ${({ theme }) => theme.colors.surface};
   cursor: pointer;
