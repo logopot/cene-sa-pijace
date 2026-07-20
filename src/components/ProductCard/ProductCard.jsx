@@ -7,6 +7,7 @@ import { classifyComment } from "../../utils/comment.js";
 import { spaceBeforeParens } from "../../utils/formatText.js";
 import { getTrendIcon } from "../../utils/trend.js";
 import { getDisplayPrice } from "../../utils/price.js";
+import { resolveUnit } from "../../utils/unit.js";
 import { getSourceLabel } from "../../utils/marketTime.js";
 
 import {
@@ -54,8 +55,16 @@ function ProductCard({ row, selection }) {
   const productName = translateDataValue(t, "proizvod", row.Proizvod);
   const gradLabel = translateDataValue(t, "grad", grad);
   const pijacaLabel = translateDataValue(t, "pijaca", pijaca);
-  const jedMere = translateDataValue(t, "jedMere", row.JedMere);
-  const pakovanje = translateDataValue(t, "pakovanje", row.Pakovanje);
+  const jedMere = translateDataValue(
+    t,
+    "jedMere",
+    resolveUnit(row.JedMere, row.Kategorija),
+  );
+  const pakovanje = translateDataValue(
+    t,
+    "pakovanje",
+    resolveUnit(row.Pakovanje, row.Kategorija),
+  );
   const poreklo = spaceBeforeParens(
     translateDataValue(t, "poreklo", row.Poreklo),
   );
@@ -152,7 +161,9 @@ function ProductCard({ row, selection }) {
               {displayPrice.type === "range" ?
                 `${formatPrice(displayPrice.min)} - ${formatPrice(displayPrice.max)}`
               : formatPrice(displayPrice.value)}{" "}
-              {t("productCard.priceUnit", { unit: jedMere })}
+              {jedMere ?
+                t("productCard.priceUnit", { unit: jedMere })
+              : t("productCard.priceNoUnit")}
             </PriceValue>
           )}
 

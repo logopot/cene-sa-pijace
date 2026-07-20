@@ -120,6 +120,7 @@
     "avgPrice": "Most common price",
     "avgPriceValue": "{{price}} RSD",
     "priceUnit": "RSD / {{unit}}",
+    "priceNoUnit": "RSD",
     "packaging": "Packaging",
     "origin": "Origin",
     "offer": "Offer",

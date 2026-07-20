@@ -120,6 +120,7 @@
     "avgPrice": "Najčešća cena",
     "avgPriceValue": "{{price}} RSD",
     "priceUnit": "RSD / {{unit}}",
+    "priceNoUnit": "RSD",
     "packaging": "Pakovanje",
     "origin": "Poreklo",
     "offer": "Ponuda",
