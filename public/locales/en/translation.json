@@ -41,6 +41,10 @@
     "market": {
       "title": "{{market}} Market ({{city}}) - Current Price Overview",
       "description": "Fresh product prices at {{market}} market in {{city}}. Check the offer before you go shopping."
+    },
+    "category": {
+      "title": "{{category}} Prices at {{market}} Market ({{city}})",
+      "description": "Current prices for {{category}} at {{market}} market in {{city}}."
     }
   },
   "categories": {

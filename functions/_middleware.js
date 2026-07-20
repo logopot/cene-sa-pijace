@@ -67,6 +67,12 @@ function marketCopy(market, city) {
   return { title: 'Cene sa pijace', description: `${city} • ${market}` }
 }
 
+function categoryCopy(category, market, city, lang) {
+  return lang === 'en'
+    ? { title: `${category} Prices at ${market} Market (${city})`, description: `${city} • ${market} • ${category}` }
+    : { title: `${category} - Cene na pijaci ${market} (${city})`, description: `${city} • ${market} • ${category}` }
+}
+
 function cityCopy(city, lang) {
   return lang === 'en'
     ? { title: 'Cene sa pijace', description: `${city} • Current Prices at Green Markets` }
@@ -104,6 +110,18 @@ function resolveMeta(pathname) {
         lang: entry.lang,
         image: `${SITE_URL}/og/markets/${entry.slug}.png`,
         url,
+      }
+
+    // canonicalPath collapses onto the plain market page when that market's
+    // entire catalog is one category (see generate-seo-map.mjs) - the two
+    // routes list identical products, so og:url/canonical point at the
+    // market page instead of asking search engines to index both.
+    case 'category':
+      return {
+        ...categoryCopy(entry.category, entry.market, entry.city, entry.lang),
+        lang: entry.lang,
+        image: `${SITE_URL}/og/markets/${entry.slug}.png`,
+        url: entry.canonicalPath ? `${SITE_URL}${entry.canonicalPath}` : url,
       }
 
     case 'product':
@@ -153,6 +171,7 @@ function rewriteHtml(response, meta) {
     .on('meta[name="twitter:title"]', new SetAttribute('content', meta.title))
     .on('meta[name="twitter:description"]', new SetAttribute('content', meta.description))
     .on('meta[name="twitter:image"]', new SetAttribute('content', meta.image))
+    .on('link[rel="canonical"]', new SetAttribute('href', meta.url))
     .transform(response)
 }
 

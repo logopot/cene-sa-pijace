@@ -8,6 +8,7 @@ import { getCategoryUrlSlug } from '../src/utils/categoryIcons.js'
 import { DISCLAIMER_PATH } from '../src/constants/routeLocales.js'
 import {
   translateDataValue,
+  translateCategory,
   getProductUrlSlug,
   getCanonicalProductSlug,
   getCanonicalMarketSlug,
@@ -38,7 +39,14 @@ function buildManifest(rows) {
   // market/product) collapse to one manifest entry each.
   const cities = new Map()
   const markets = new Map()
+  const marketCategories = new Map()
   const products = new Map()
+  // grad|pijaca -> Set of distinct Kategorija values, used below to detect a
+  // market whose entire catalog is one category (see MarketCategoryDetails's
+  // useMarketCategoryCount) - its /:categorySlug route lists the exact same
+  // products as its /:marketSlug route, so that category entry canonicalizes
+  // onto the market page instead of getting its own manifest identity.
+  const categoriesByMarket = new Map()
 
   for (const row of rows) {
     const { grad, pijaca } = parseMesto(row.Mesto)
@@ -48,6 +56,11 @@ function buildManifest(rows) {
     markets.set(`${grad}|${pijaca}`, { grad, pijaca })
 
     if (row.Kategorija && row.Proizvod) {
+      const marketKey = `${grad}|${pijaca}`
+      marketCategories.set(`${marketKey}|${row.Kategorija}`, { grad, pijaca, kategorija: row.Kategorija })
+      if (!categoriesByMarket.has(marketKey)) categoriesByMarket.set(marketKey, new Set())
+      categoriesByMarket.get(marketKey).add(row.Kategorija)
+
       products.set(`${grad}|${pijaca}|${row.Kategorija}|${row.Proizvod}`, {
         grad,
         pijaca,
@@ -75,6 +88,22 @@ function buildManifest(rows) {
         market: translateDataValue(lang, 'pijaca', pijaca),
         city: translateDataValue(lang, 'grad', grad),
         slug: getCanonicalMarketSlug(grad, pijaca),
+      }
+    }
+
+    for (const { grad, pijaca, kategorija } of marketCategories.values()) {
+      const marketPath = buildMarketRoute(grad, pijaca, lang)
+      const categoryUrlSlug = getCategoryUrlSlug(kategorija, lang)
+      const categoryPath = buildMarketCategoryRoute(grad, pijaca, categoryUrlSlug, lang)
+      const isOnlyCategory = categoriesByMarket.get(`${grad}|${pijaca}`)?.size === 1
+      entries[categoryPath] = {
+        type: 'category',
+        lang,
+        category: translateCategory(lang, kategorija),
+        market: translateDataValue(lang, 'pijaca', pijaca),
+        city: translateDataValue(lang, 'grad', grad),
+        slug: getCanonicalMarketSlug(grad, pijaca),
+        canonicalPath: isOnlyCategory ? marketPath : categoryPath,
       }
     }
 

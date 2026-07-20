@@ -4,13 +4,22 @@ import { useParams } from 'react-router-dom'
 import { Alert, Container, Spinner } from 'react-bootstrap'
 import { LuArrowLeft } from 'react-icons/lu'
 import { ALL_MARKETS } from '../../constants/filters.js'
-import { parseMesto, resolveGradBySlug, resolveMarketSlug, buildCityRoute, buildMarketRoute } from '../../utils/market.js'
-import { getCategoryIcon, getCategorySlug, resolveCategoryBySlug } from '../../utils/categoryIcons.js'
+import {
+  parseMesto,
+  resolveGradBySlug,
+  resolveMarketSlug,
+  buildCityRoute,
+  buildMarketRoute,
+  buildMarketCategoryRoute,
+} from '../../utils/market.js'
+import { getCategoryIcon, getCategorySlug, getCategoryUrlSlug, resolveCategoryBySlug } from '../../utils/categoryIcons.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { lowercaseFirst } from '../../utils/formatText.js'
 import { getRowTime, getRowRangeLabel, getLatestWeekTime } from '../../utils/week.js'
 import WeekStatus from '../../components/WeekStatus/WeekStatus.jsx'
 import ProductGrid from '../../components/ProductGrid/ProductGrid.jsx'
+import SEO from '../../components/SEO/SEO.jsx'
+import { SITE_URL, getMarketOgImage } from '../../constants/seo.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
@@ -20,6 +29,24 @@ import {
   TitleGroup,
   ContextHeading,
 } from './MarketCategoryDetails.styled.js'
+
+// How many distinct categories a single named market carries across all of
+// its rows (not just the latest week) - a market whose entire catalog is one
+// category (e.g. a "stočna pijaca" that only ever sells Meso) makes its own
+// /:categorySlug route byte-for-byte identical to the plain market route, so
+// that case collapses this page's canonical/og:url onto the market page
+// instead of asking search engines to index two URLs for one product list.
+function useMarketCategoryCount(rows, grad, pijaca) {
+  return useMemo(() => {
+    if (!grad || !pijaca || pijaca === ALL_MARKETS) return null
+    const categories = new Set()
+    for (const row of rows) {
+      const parsed = parseMesto(row.Mesto)
+      if (parsed.grad === grad && parsed.pijaca === pijaca) categories.add(row.Kategorija)
+    }
+    return categories.size
+  }, [rows, grad, pijaca])
+}
 
 // Products for one category, scoped to either a single named market or every
 // market in the city (pijaca === ALL_MARKETS, the homepage's "Sve pijace u
@@ -61,6 +88,7 @@ function MarketCategoryDetails({ rows, loading, error }) {
   const pijaca = useMemo(() => resolveMarketSlug(rows, grad, marketSlug), [rows, grad, marketSlug])
   const category = useMemo(() => resolveCategoryBySlug(categorySlug), [categorySlug])
   const { filteredRows, weekLabel, isFallbackWeek, source } = useCategoryMarketData(rows, category, grad, pijaca)
+  const marketCategoryCount = useMarketCategoryCount(rows, grad, pijaca)
 
   if (loading) {
     return (
@@ -90,9 +118,26 @@ function MarketCategoryDetails({ rows, loading, error }) {
     isAllMarkets ? buildCityRoute(grad, i18n.language) : buildMarketRoute(grad, pijaca, i18n.language)
   const gradLabel = translateDataValue(t, 'grad', grad)
   const marketLabel = isAllMarkets ? t('marketCategoryDetails.allMarketsShort') : translateDataValue(t, 'pijaca', pijaca)
+  const categoryLabel = t(`categories.${getCategorySlug(category)}`)
+
+  // A single-category market's own /:categorySlug page lists the exact same
+  // products as its /:marketSlug page, so canonicalize to the market page
+  // rather than asking search engines to index two URLs for one product list
+  // (see useMarketCategoryCount above).
+  const canonicalUrl =
+    marketCategoryCount === 1 ?
+      `${SITE_URL}${buildMarketRoute(grad, pijaca, i18n.language)}`
+    : `${SITE_URL}${buildMarketCategoryRoute(grad, pijaca, getCategoryUrlSlug(category, i18n.language), i18n.language)}`
 
   return (
     <>
+      <SEO
+        title={t('seo.category.title', { category: categoryLabel, market: marketLabel, city: gradLabel })}
+        description={t('seo.category.description', { category: categoryLabel, market: marketLabel, city: gradLabel })}
+        url={canonicalUrl}
+        image={isAllMarkets ? undefined : getMarketOgImage(grad, pijaca)}
+      />
+
       <Container>
         <BackLink to={backTo}>
           <LuArrowLeft />

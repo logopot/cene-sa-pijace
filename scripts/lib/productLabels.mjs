@@ -1,4 +1,5 @@
 import { slugify } from '../../src/utils/productId.js'
+import { getCategorySlug } from '../../src/utils/categoryIcons.js'
 import { readJsonFile } from './googleSheets.mjs'
 
 // Node-safe stand-in for src/utils/translateValue.js + the private
@@ -30,6 +31,15 @@ export function translateDataValue(language, field, raw) {
 // products fall back to slugifying the raw Serbian name).
 export function getProductUrlSlug(proizvod, language) {
   return slugify(translateDataValue(language, 'proizvod', proizvod))
+}
+
+// Category display names live under the top-level `categories.*` key (see
+// src/utils/categoryIcons.js's getCategorySlug), not `dataValues.*` like the
+// sheet-sourced fields translateDataValue handles - kept as its own lookup
+// rather than folding into that dictionary.
+export function translateCategory(language, kategorijaName) {
+  const slug = getCategorySlug(kategorijaName)
+  return LOCALES[language]?.categories?.[slug] ?? kategorijaName
 }
 
 // Canonical, language-independent identity for a product - used to key its
