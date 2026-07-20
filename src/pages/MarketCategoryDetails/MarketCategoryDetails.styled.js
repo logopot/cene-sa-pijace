@@ -10,15 +10,22 @@ export const StatusSection = styled.div`
 
 export const PageHeader = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
 `
 
+// ContextHeading can wrap to two or three lines (city + category + market in
+// one sentence), so PageHeader aligns to flex-start rather than center - a
+// tall multi-line heading would otherwise pull the icon down toward its own
+// vertical middle instead of its first line. The 4px nudge compensates for
+// the heading's own line-height leading, lining the icon's top edge up with
+// the cap-height of that first line instead of the taller line box above it.
 export const IconWrap = styled(AppIconWrapper)`
   background-color: ${({ theme }) => theme.colors.iconBg};
   color: ${({ theme }) => theme.colors.primaryGreen};
+  margin-top: 4px;
 `
 
 export const TitleGroup = styled.div`
