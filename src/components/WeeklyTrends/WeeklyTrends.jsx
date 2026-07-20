@@ -11,6 +11,7 @@ import {
   Subtitle,
   NavControls,
   NavButton,
+  Viewport,
   Track,
   Slide,
 } from './WeeklyTrends.styled.js'
@@ -75,13 +76,15 @@ function WeeklyTrends({ rows }) {
             </NavButton>
           </NavControls>
         </SectionHeader>
-        <Track ref={trackRef} onScroll={handleScroll}>
-          {rows.map((row) => (
-            <Slide key={`${row.Mesto}-${row.Proizvod}-${row.Velicina}-${row.Pakovanje}`}>
-              <ProductCard row={row} />
-            </Slide>
-          ))}
-        </Track>
+        <Viewport>
+          <Track ref={trackRef} onScroll={handleScroll}>
+            {rows.map((row) => (
+              <Slide key={`${row.Mesto}-${row.Proizvod}-${row.Velicina}-${row.Pakovanje}`}>
+                <ProductCard row={row} />
+              </Slide>
+            ))}
+          </Track>
+        </Viewport>
       </Container>
     </Section>
   )
