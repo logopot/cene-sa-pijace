@@ -14,6 +14,7 @@ import Analytics from './pages/Analytics/Analytics.jsx'
 import NotFound from './pages/NotFound/NotFound.jsx'
 import { useMarketPrices } from './hooks/useMarketPrices.js'
 import { CITY_PATH_PREFIX, DISCLAIMER_PATH } from './constants/routeLocales.js'
+import { FilterProvider } from './context/FilterContext.jsx'
 import i18n from './i18n.js'
 import { GlobalStyle } from './styles/globalStyle.js'
 import { AppShell, Main } from './App.styled.js'
@@ -82,53 +83,55 @@ function App() {
   }
 
   return (
-    <AppShell>
-      <GlobalStyle />
-      <ScrollToTop />
-      <Header rows={rows} />
-      <Main>
-        <Routes>
-          <Route
-            path="/"
-            element={<MarketExplorer key={location.key} rows={rows} loading={loading} error={error} />}
-          />
+    <FilterProvider rows={rows}>
+      <AppShell>
+        <GlobalStyle />
+        <ScrollToTop />
+        <Header rows={rows} />
+        <Main>
+          <Routes>
+            <Route
+              path="/"
+              element={<MarketExplorer key={location.key} rows={rows} loading={loading} error={error} />}
+            />
 
-          {/* One route tree per language's city-path prefix (/grad/... for
-              sr, /city/... for en, see routeLocales.js) - both shapes share
-              the same param names and page components, so a URL built under
-              either language always resolves. */}
-          {Object.values(CITY_PATH_PREFIX).map((prefix) => (
-            <Fragment key={prefix}>
-              <Route
-                path={`/${prefix}/:citySlug`}
-                element={<CityDetails key={location.key} rows={rows} loading={loading} error={error} />}
-              />
-              <Route
-                path={`/${prefix}/:citySlug/:marketSlug`}
-                element={<MarketDetails key={location.key} rows={rows} loading={loading} error={error} />}
-              />
-              <Route
-                path={`/${prefix}/:citySlug/:marketSlug/:categorySlug`}
-                element={<MarketCategoryDetails key={location.key} rows={rows} loading={loading} error={error} />}
-              />
-              <Route
-                path={`/${prefix}/:citySlug/:marketSlug/:categorySlug/:productSlug`}
-                element={<Analytics key={location.key} rows={rows} loading={loading} error={error} />}
-              />
-            </Fragment>
-          ))}
+            {/* One route tree per language's city-path prefix (/grad/... for
+                sr, /city/... for en, see routeLocales.js) - both shapes share
+                the same param names and page components, so a URL built under
+                either language always resolves. */}
+            {Object.values(CITY_PATH_PREFIX).map((prefix) => (
+              <Fragment key={prefix}>
+                <Route
+                  path={`/${prefix}/:citySlug`}
+                  element={<CityDetails key={location.key} rows={rows} loading={loading} error={error} />}
+                />
+                <Route
+                  path={`/${prefix}/:citySlug/:marketSlug`}
+                  element={<MarketDetails key={location.key} rows={rows} loading={loading} error={error} />}
+                />
+                <Route
+                  path={`/${prefix}/:citySlug/:marketSlug/:categorySlug`}
+                  element={<MarketCategoryDetails key={location.key} rows={rows} loading={loading} error={error} />}
+                />
+                <Route
+                  path={`/${prefix}/:citySlug/:marketSlug/:categorySlug/:productSlug`}
+                  element={<Analytics key={location.key} rows={rows} loading={loading} error={error} />}
+                />
+              </Fragment>
+            ))}
 
-          {/* One route per language's disclaimer path (see routeLocales.js),
-              all rendering the same DisclaimerPage component. */}
-          {Object.values(DISCLAIMER_PATH).map((path) => (
-            <Route key={path} path={path} element={<DisclaimerPage />} />
-          ))}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Main>
-      <Footer />
-      <ScrollToTopButton />
-    </AppShell>
+            {/* One route per language's disclaimer path (see routeLocales.js),
+                all rendering the same DisclaimerPage component. */}
+            {Object.values(DISCLAIMER_PATH).map((path) => (
+              <Route key={path} path={path} element={<DisclaimerPage />} />
+            ))}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Main>
+        <Footer />
+        <ScrollToTopButton />
+      </AppShell>
+    </FilterProvider>
   )
 }
 

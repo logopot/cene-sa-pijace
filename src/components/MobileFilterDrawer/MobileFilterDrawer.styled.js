@@ -40,9 +40,11 @@ export const TriggerBar = styled.button`
   }
 `
 
-// Full-screen mobile overlay - sits above the sticky Bar (z-index 1000, see
-// FilterBar.styled.js) and everything else on the page, but below nothing
-// else at runtime (FullScreenLoader's 9999 only ever exists during boot).
+// Full-screen mobile overlay - Bar itself is a static block now (see
+// FilterBar.styled.js), so this stacks directly against the document root;
+// it still sits above everything else on the page (ScrollToTopButton's 999
+// is the next-highest) but below nothing at runtime (FullScreenLoader's
+// 9999 only ever exists during boot).
 export const Overlay = styled.div`
   position: fixed;
   inset: 0;

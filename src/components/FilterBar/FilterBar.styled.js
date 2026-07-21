@@ -1,10 +1,11 @@
 import styled from "styled-components";
 import { Button } from "react-bootstrap";
 
+// Static, not sticky - this now lives inside the global Header (see
+// Header.jsx), which itself scrolls away normally; a sticky child under a
+// non-sticky ancestor would detach and float alone once the brand row above
+// it scrolled out of view.
 export const Bar = styled.div`
-  position: sticky;
-  top: 0;
-  z-index: 1000;
   background-color: ${({ theme }) => theme.colors.surface};
   border-bottom: 1px solid ${({ theme }) => theme.colors.border};
   padding: ${({ theme }) => theme.spacing.md} 0;
