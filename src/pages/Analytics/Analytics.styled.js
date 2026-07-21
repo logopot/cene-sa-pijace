@@ -38,11 +38,11 @@ export const IconWrap = styled(AppIconWrapper)`
   flex-shrink: 0;
 `
 
-// Scaled down below 768px so the title + price columns both fit in one row
-// without wrapping - full desktop size once there's room for both side by
-// side without cramping.
+// Title keeps close to its original size on mobile (the left column isn't
+// the one squeezing the row - see PriceValue/SourceLabel below, which give
+// up the space instead) so product names stay easily readable.
 export const ProductTitle = styled.h1`
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: ${({ theme }) => theme.font.weight.bold};
   margin: 0;
   color: ${({ theme }) => theme.colors.textDark};
@@ -53,7 +53,7 @@ export const ProductTitle = styled.h1`
 `
 
 export const MarketSubtitle = styled.p`
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: ${({ theme }) => theme.colors.textMuted};
   margin: 0.15rem 0 0;
 
@@ -75,8 +75,12 @@ export const PriceBlock = styled.div`
   text-align: right;
 `
 
+// Deliberately smaller than ProductTitle on mobile (the reverse of desktop's
+// hierarchy) - the right column is the one that gives up size so the two
+// columns balance in one row instead of the price visually outweighing the
+// title it's attached to.
 export const PriceValue = styled.span`
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: ${({ theme }) => theme.font.weight.bold};
   color: ${({ theme }) => theme.colors.textDark};
   white-space: nowrap;
@@ -86,16 +90,16 @@ export const PriceValue = styled.span`
   }
 `
 
-// Plain text, not a badge - shares MarketSubtitle's exact typography (same
-// size/color/weight) so the price's provenance note reads as the same
-// secondary-text register as the market subtitle above it, rather than a
-// distinct UI element competing for attention. Allowed to wrap (unlike
-// PriceValue) since it's the longest string in the header and the column
-// itself may be fairly narrow on mobile.
+// Plain text, not a badge - shares MarketSubtitle's typography register
+// (muted, smaller than its price) so the price's provenance note reads as
+// secondary text, rather than a distinct UI element competing for
+// attention. Allowed to wrap (unlike PriceValue) since it's the longest
+// string in the header and the column itself may be fairly narrow on mobile.
 export const SourceLabel = styled.span`
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: ${({ theme }) => theme.font.weight.regular};
   color: ${({ theme }) => theme.colors.textMuted};
+  text-align: right;
 
   @media (min-width: 768px) {
     font-size: 0.95rem;
