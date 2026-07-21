@@ -166,22 +166,12 @@ function Analytics({ rows, loading, error }) {
 
         <Section>
           <SectionTitle>{t('analytics.marketComparisonTitle', { city: gradLabel })}</SectionTitle>
-          <MarketComparisonChart
-            data={analytics.marketComparison}
-            cheapest={analytics.cheapestMarket}
-            priciest={analytics.priciestMarket}
-            highlightPijaca={market?.pijaca}
-          />
+          <MarketComparisonChart data={analytics.marketComparison} highlightPijaca={market?.pijaca} />
         </Section>
 
         <Section>
           <SectionTitle>{t('analytics.comparisonTitle')}</SectionTitle>
-          <CityComparisonChart
-            data={analytics.cityComparison}
-            cheapest={analytics.cheapest}
-            priciest={analytics.priciest}
-            highlightGrad={market?.grad}
-          />
+          <CityComparisonChart data={analytics.cityComparison} highlightGrad={market?.grad} />
         </Section>
       </Container>
     </>

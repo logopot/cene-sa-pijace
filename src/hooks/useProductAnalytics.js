@@ -176,8 +176,6 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
     cheapest: cityComparison[0] ?? null,
     priciest: cityComparison[cityComparison.length - 1] ?? null,
     marketComparison,
-    cheapestMarket: marketComparison[0] ?? null,
-    priciestMarket: marketComparison[marketComparison.length - 1] ?? null,
     currentMarket,
   }
 }
