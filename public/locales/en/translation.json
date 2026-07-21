@@ -165,7 +165,8 @@
     "noHistory": "No historical data for this product.",
     "noComparison": "No data available for city comparison.",
     "noMarketComparison": "No data available to compare markets in this city.",
-    "singleMarketNote": "This is the only market in this city with current data."
+    "singleMarketNote": "This is the only market in this city with current data.",
+    "priceSourceLabel": "Most common price · {{source}}"
   },
   "footer": {
     "tagline": "An independent market portal giving you a fast, clear view of agricultural price trends at green markets across Serbia.",
