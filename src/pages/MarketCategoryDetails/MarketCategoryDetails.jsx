@@ -15,6 +15,7 @@ import { getCategoryIcon, getCategorySlug, getCategoryUrlSlug, resolveCategoryBy
 import { translateDataValue } from '../../utils/translateValue.js'
 import { lowercaseFirst } from '../../utils/formatText.js'
 import { getRowTime, getRowRangeLabel, getLatestWeekTime } from '../../utils/week.js'
+import { compareForAllMarketsView } from '../../utils/productSort.js'
 import WeekStatus from '../../components/WeekStatus/WeekStatus.jsx'
 import ProductGrid from '../../components/ProductGrid/ProductGrid.jsx'
 import SEO from '../../components/SEO/SEO.jsx'
@@ -67,6 +68,12 @@ function useCategoryMarketData(rows, category, grad, pijaca) {
 
     const filteredRows =
       scopedLatestWeek === null ? [] : scopedRows.filter((row) => getRowTime(row) === scopedLatestWeek)
+    // Sve pijace u tom gradu mixes every market's cards together - without
+    // this, otherwise-identical products end up scattered/grouped by market
+    // in whatever order the sheet happened to list them, instead of reading
+    // as one clean, price-comparable A-Z list. A single specific market has
+    // no such mixing problem, so it keeps its existing (unsorted) order.
+    if (pijaca === ALL_MARKETS) filteredRows.sort(compareForAllMarketsView)
     const isFallbackWeek =
       scopedLatestWeek !== null && globalLatestWeek !== null && scopedLatestWeek !== globalLatestWeek
     const weekLabel = filteredRows[0] ? getRowRangeLabel(filteredRows[0]) : ''
