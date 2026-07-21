@@ -155,7 +155,7 @@
   },
   "analytics": {
     "historyTitle": "Istorija cena",
-    "marketComparisonTitle": "Poređenje po pijacama: {{city}}",
+    "marketComparisonTitle": "Poređenje po pijacama za {{city}}",
     "comparisonTitle": "Poređenje po gradovima",
     "cheapest": "Najjeftinije",
     "priciest": "Najskuplje",
