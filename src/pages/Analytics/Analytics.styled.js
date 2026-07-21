@@ -63,18 +63,14 @@ export const PriceValue = styled.span`
   white-space: nowrap;
 `
 
-// Neutral pill, deliberately duller than PriceValue - a data-provenance note,
-// not something competing with the price for attention.
-export const SourceBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  padding: 2px ${({ theme }) => theme.spacing.xs};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radius.md};
-  background-color: ${({ theme }) => theme.colors.borderLight};
-  color: ${({ theme }) => theme.colors.textSecondary};
-  font-size: 0.75rem;
-  font-weight: ${({ theme }) => theme.font.weight.medium};
+// Plain text, not a badge - shares MarketSubtitle's exact typography (same
+// size/color/weight) so the price's provenance note reads as the same
+// secondary-text register as the market subtitle above it, rather than a
+// distinct UI element competing for attention.
+export const SourceLabel = styled.span`
+  font-size: 0.95rem;
+  font-weight: ${({ theme }) => theme.font.weight.regular};
+  color: ${({ theme }) => theme.colors.textMuted};
   white-space: nowrap;
 `
 

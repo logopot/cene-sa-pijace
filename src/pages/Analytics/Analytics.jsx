@@ -22,7 +22,7 @@ import {
   MarketSubtitle,
   PriceBlock,
   PriceValue,
-  SourceBadge,
+  SourceLabel,
   Section,
   SectionTitle,
 } from './Analytics.styled.js'
@@ -147,7 +147,7 @@ function Analytics({ rows, loading, error }) {
                 {formatPrice(analytics.currentMarket.price)}{' '}
                 {jedMereLabel ? t('productCard.priceUnit', { unit: jedMereLabel }) : t('productCard.priceNoUnit')}
               </PriceValue>
-              <SourceBadge>{t('productCard.source', { source: analytics.currentMarket.sourceLabel })}</SourceBadge>
+              <SourceLabel>{t('productCard.source', { source: analytics.currentMarket.sourceLabel })}</SourceLabel>
             </PriceBlock>
           )}
         </PageHeader>
