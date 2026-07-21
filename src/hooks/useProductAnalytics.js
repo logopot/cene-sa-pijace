@@ -10,6 +10,32 @@ function average(values) {
   return valid.reduce((sum, value) => sum + value, 0) / valid.length
 }
 
+// Picks a single representative price for a city out of its markets' own
+// CenaDom-preferring prices (see getComparablePrice), rather than averaging
+// them - an unweighted mean was producing a city-level figure that matched
+// no real market (Kvantaš at 500 and Skadarlija at 750 blending into a
+// Belgrade number of 625 that neither market ever charged), which visually
+// contradicted marketComparison's own per-market prices on the same page. A
+// single-market city trivially returns that market's own price; a
+// multi-market city returns the price the most markets agree on (the mode)
+// so the figure stays grounded in an actual observed CenaDom. Ties fall back
+// to the lowest price for a deterministic result independent of Map
+// iteration order.
+function dominantPrice(prices) {
+  if (prices.length === 0) return null
+  const counts = new Map()
+  for (const price of prices) counts.set(price, (counts.get(price) ?? 0) + 1)
+  let best = null
+  let bestCount = 0
+  for (const [price, count] of counts) {
+    if (count > bestCount || (count === bestCount && (best === null || price < best))) {
+      best = price
+      bestCount = count
+    }
+  }
+  return best
+}
+
 // categoryName comes from the URL's :categorySlug segment and always applies
 // (works even for a direct/bookmarked visit with no router state). filters
 // disambiguates products whose names still collide within that category (see
@@ -86,7 +112,10 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
       }
     })
     return Array.from(byCity.entries())
-      .map(([grad, { rows: cityRows }]) => ({ grad, price: average(cityRows.map(getComparablePrice)) }))
+      .map(([grad, { rows: cityRows }]) => ({
+        grad,
+        price: dominantPrice(cityRows.map(getComparablePrice).filter((price) => price !== null)),
+      }))
       .filter((entry) => entry.price !== null)
       .sort((a, b) => a.price - b.price)
   }, [itemRows])
