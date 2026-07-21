@@ -13,29 +13,18 @@ function average(values) {
 }
 
 // Picks a single representative price for a city out of its markets' own
-// CenaDom-preferring prices (see getComparablePrice), rather than averaging
-// them - an unweighted mean was producing a city-level figure that matched
-// no real market (Kvantaš at 500 and Skadarlija at 750 blending into a
-// Belgrade number of 625 that neither market ever charged), which visually
-// contradicted marketComparison's own per-market prices on the same page. A
-// single-market city trivially returns that market's own price; a
-// multi-market city returns the price the most markets agree on (the mode)
-// so the figure stays grounded in an actual observed CenaDom. Ties fall back
-// to the lowest price for a deterministic result independent of Map
-// iteration order.
-function dominantPrice(prices) {
+// CenaDom-preferring prices (see getComparablePrice) - the highest price any
+// market in that city actually charges. Averaging (625 for Kvantaš at 500 +
+// Skadarlija at 750) invented a figure no market ever charged; picking the
+// mode broke just as badly the moment a city's markets didn't repeat a price
+// (Kvantaš 500 / Kalenić 700 / Skadarlija 750, no two alike, tie-broke down
+// to the lowest at 500) - it let Belgrade's true 750 RSD market get
+// undercounted below cheaper cities like Leskovac at 600, which is never
+// correct: a city's aggregate can't be lower than one of its own markets. A
+// single-market city trivially returns that market's own price.
+function highestMarketPrice(prices) {
   if (prices.length === 0) return null
-  const counts = new Map()
-  for (const price of prices) counts.set(price, (counts.get(price) ?? 0) + 1)
-  let best = null
-  let bestCount = 0
-  for (const [price, count] of counts) {
-    if (count > bestCount || (count === bestCount && (best === null || price < best))) {
-      best = price
-      bestCount = count
-    }
-  }
-  return best
+  return Math.max(...prices)
 }
 
 // categoryName comes from the URL's :categorySlug segment and always applies
@@ -116,7 +105,7 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
     return Array.from(byCity.entries())
       .map(([grad, { rows: cityRows }]) => ({
         grad,
-        price: dominantPrice(cityRows.map(getComparablePrice).filter((price) => price !== null)),
+        price: highestMarketPrice(cityRows.map(getComparablePrice).filter((price) => price !== null)),
       }))
       .filter((entry) => entry.price !== null)
       .sort((a, b) => a.price - b.price)
