@@ -83,7 +83,8 @@
   },
   "breadcrumbs": {
     "navLabel": "Navigacija",
-    "home": "Početna"
+    "home": "Početna",
+    "back": "Idi nazad"
   },
   "navigation": {
     "backToCityMarkets": "{{city}}, sve pijace"

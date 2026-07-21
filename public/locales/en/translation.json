@@ -83,7 +83,8 @@
   },
   "breadcrumbs": {
     "navLabel": "Breadcrumb",
-    "home": "Home"
+    "home": "Home",
+    "back": "Go back"
   },
   "navigation": {
     "backToCityMarkets": "{{city}}, all markets"

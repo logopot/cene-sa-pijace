@@ -62,14 +62,21 @@ export const Separator = styled.span`
 // Same pill visual language as the BackLink it replaces (see
 // CityDetails.styled.js/MarketDetails.styled.js/MarketCategoryDetails.styled.js/
 // Analytics.styled.js - all now delegate to this component instead), but only
-// ever shown below the desktop trail's own breakpoint.
-export const MobileBack = styled(Link)`
+// ever shown below the desktop trail's own breakpoint. A <button> rather than
+// a Link - it decides at click-time between real browser-back navigation and
+// a fallback route (see Breadcrumbs.jsx), so it can't be a plain href.
+// min-height/min-width keep the tap target at the standard 44px accessible
+// minimum even though the pill's own padding+content would otherwise render
+// a few px shorter.
+export const MobileBack = styled.button`
   display: none;
 
   @media (max-width: 767px) {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
+    min-width: 44px;
+    min-height: 44px;
     max-width: 100%;
     margin: 1.5rem 0 1rem;
     padding: 0.4rem 0.75rem;
@@ -77,8 +84,11 @@ export const MobileBack = styled(Link)`
     border-radius: ${({ theme }) => theme.radius.lg};
     background: ${({ theme }) => theme.colors.surface};
     color: ${({ theme }) => theme.colors.textSecondary};
+    font-family: inherit;
+    font-size: 1rem;
     font-weight: ${({ theme }) => theme.font.weight.medium};
     text-decoration: none;
+    cursor: pointer;
   }
 
   &:hover,
