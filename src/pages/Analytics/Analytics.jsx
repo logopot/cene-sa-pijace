@@ -17,6 +17,7 @@ import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
   PageHeader,
+  TitleGroup,
   IconWrap,
   ProductTitle,
   MarketSubtitle,
@@ -128,18 +129,20 @@ function Analytics({ rows, loading, error }) {
         <Breadcrumbs items={breadcrumbItems} />
 
         <PageHeader>
-          <IconWrap>
-            {/* eslint-disable-next-line react-hooks/static-components -- Icon is a stable module-level reference, not created during render */}
-            <Icon />
-          </IconWrap>
-          <div>
-            <ProductTitle>{productName}</ProductTitle>
-            {market && (
-              <MarketSubtitle>
-                {pijacaLabel}, {gradLabel}
-              </MarketSubtitle>
-            )}
-          </div>
+          <TitleGroup>
+            <IconWrap>
+              {/* eslint-disable-next-line react-hooks/static-components -- Icon is a stable module-level reference, not created during render */}
+              <Icon />
+            </IconWrap>
+            <div>
+              <ProductTitle>{productName}</ProductTitle>
+              {market && (
+                <MarketSubtitle>
+                  {pijacaLabel}, {gradLabel}
+                </MarketSubtitle>
+              )}
+            </div>
+          </TitleGroup>
 
           {analytics.currentMarket && (
             <PriceBlock>
