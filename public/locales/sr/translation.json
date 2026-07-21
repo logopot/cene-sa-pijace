@@ -155,6 +155,7 @@
   },
   "analytics": {
     "historyTitle": "Istorija cena",
+    "marketComparisonTitle": "Poređenje po pijacama: {{city}}",
     "comparisonTitle": "Poređenje po gradovima",
     "cheapest": "Najjeftinije",
     "priciest": "Najskuplje",
@@ -162,7 +163,9 @@
     "stipsSourceLabel": "STIPS",
     "jkpSourceLabel": "JKP Beogradske pijace",
     "noHistory": "Nema istorijskih podataka za ovaj proizvod.",
-    "noComparison": "Nema podataka za poređenje gradova."
+    "noComparison": "Nema podataka za poređenje gradova.",
+    "noMarketComparison": "Nema podataka za poređenje pijaca u ovom gradu.",
+    "singleMarketNote": "Prikazana je jedina pijaca u ovom gradu sa trenutnim podacima."
   },
   "footer": {
     "tagline": "Nezavisni pijačni portal koji omogućava brz i jasan uvid u kretanje cena poljoprivrednih proizvoda na pijacama širom Srbije.",

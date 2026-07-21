@@ -155,6 +155,7 @@
   },
   "analytics": {
     "historyTitle": "Price history",
+    "marketComparisonTitle": "Market comparison: {{city}}",
     "comparisonTitle": "City comparison",
     "cheapest": "Cheapest",
     "priciest": "Most expensive",
@@ -162,7 +163,9 @@
     "stipsSourceLabel": "STIPS",
     "jkpSourceLabel": "JKP Beogradske pijace",
     "noHistory": "No historical data for this product.",
-    "noComparison": "No data available for city comparison."
+    "noComparison": "No data available for city comparison.",
+    "noMarketComparison": "No data available to compare markets in this city.",
+    "singleMarketNote": "This is the only market in this city with current data."
   },
   "footer": {
     "tagline": "An independent market portal giving you a fast, clear view of agricultural price trends at green markets across Serbia.",

@@ -7,6 +7,7 @@ import { translateDataValue } from '../../utils/translateValue.js'
 import { resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketRoute, buildMarketCategoryRoute } from '../../utils/market.js'
 import { useProductAnalytics } from '../../hooks/useProductAnalytics.js'
 import PriceHistoryChart from '../../components/PriceHistoryChart/PriceHistoryChart.jsx'
+import MarketComparisonChart from '../../components/MarketComparisonChart/MarketComparisonChart.jsx'
 import CityComparisonChart from '../../components/CityComparisonChart/CityComparisonChart.jsx'
 import SEO from '../../components/SEO/SEO.jsx'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
@@ -135,6 +136,16 @@ function Analytics({ rows, loading, error }) {
         <Section>
           <SectionTitle>{t('analytics.historyTitle')}</SectionTitle>
           <PriceHistoryChart data={analytics.history} />
+        </Section>
+
+        <Section>
+          <SectionTitle>{t('analytics.marketComparisonTitle', { city: gradLabel })}</SectionTitle>
+          <MarketComparisonChart
+            data={analytics.marketComparison}
+            cheapest={analytics.cheapestMarket}
+            priciest={analytics.priciestMarket}
+            highlightPijaca={market?.pijaca}
+          />
         </Section>
 
         <Section>

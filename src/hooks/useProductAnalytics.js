@@ -91,11 +91,39 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
       .sort((a, b) => a.price - b.price)
   }, [itemRows])
 
+  // Same "each grouping's own latest record" convention as cityComparison
+  // above, but grouped by market instead of city and pre-scoped to
+  // selectedGrad - a market whose scraper ran even a day earlier than a
+  // sibling market in the same city shouldn't be dropped from the comparison.
+  const marketComparison = useMemo(() => {
+    if (!selectedGrad) return []
+    const byMarket = new Map()
+    itemRows.forEach((row) => {
+      const { grad, pijaca } = parseMesto(row.Mesto)
+      if (grad !== selectedGrad) return
+      const time = getRowTime(row)
+      if (time === null) return
+      const existing = byMarket.get(pijaca)
+      if (!existing || time > existing.time) {
+        byMarket.set(pijaca, { time, rows: [row] })
+      } else if (time === existing.time) {
+        existing.rows.push(row)
+      }
+    })
+    return Array.from(byMarket.entries())
+      .map(([pijaca, { rows: marketRows }]) => ({ pijaca, price: average(marketRows.map(getComparablePrice)) }))
+      .filter((entry) => entry.price !== null)
+      .sort((a, b) => a.price - b.price)
+  }, [itemRows, selectedGrad])
+
   return {
     identity,
     history,
     cityComparison,
     cheapest: cityComparison[0] ?? null,
     priciest: cityComparison[cityComparison.length - 1] ?? null,
+    marketComparison,
+    cheapestMarket: marketComparison[0] ?? null,
+    priciestMarket: marketComparison[marketComparison.length - 1] ?? null,
   }
 }
