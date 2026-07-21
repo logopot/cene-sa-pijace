@@ -36,15 +36,22 @@ export const MarketSubtitle = styled.p`
 
 // Sits inline to the right of the title block once there's room (desktop);
 // below 768px, PageHeader's own flex-wrap drops it onto its own full-width
-// line right under the title instead of squeezing beside it.
+// line right under the title instead of squeezing beside it. Price and
+// source badge stack (not side by side) so the badge always reads as
+// "provenance of the price above it," not a separate peer value - right-
+// aligned on desktop to match the block's own margin-left: auto push to the
+// header's right edge; left-aligned on mobile to match the title's own edge
+// once the block drops to its full-width line.
 export const PriceBlock = styled.div`
   display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing.sm};
+  flex-direction: column;
+  align-items: flex-start;
+  gap: ${({ theme }) => theme.spacing.xxs};
   flex-basis: 100%;
 
   @media (min-width: 768px) {
     flex-basis: auto;
+    align-items: flex-end;
     margin-left: auto;
   }
 `

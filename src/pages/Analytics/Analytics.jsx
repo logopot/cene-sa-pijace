@@ -31,11 +31,6 @@ function formatPrice(value) {
   return value === null || value === undefined ? '-' : value.toFixed(2)
 }
 
-const SOURCE_BADGE_KEYS = {
-  STIPS: 'analytics.sourceStips',
-  JKP: 'analytics.sourceJkp',
-}
-
 function Analytics({ rows, loading, error }) {
   const { t, i18n } = useTranslation()
   const { citySlug, marketSlug, categorySlug, productSlug } = useParams()
@@ -152,7 +147,7 @@ function Analytics({ rows, loading, error }) {
                 {formatPrice(analytics.currentMarket.price)}{' '}
                 {jedMereLabel ? t('productCard.priceUnit', { unit: jedMereLabel }) : t('productCard.priceNoUnit')}
               </PriceValue>
-              <SourceBadge>{t(SOURCE_BADGE_KEYS[analytics.currentMarket.source])}</SourceBadge>
+              <SourceBadge>{t('productCard.source', { source: analytics.currentMarket.sourceLabel })}</SourceBadge>
             </PriceBlock>
           )}
         </PageHeader>

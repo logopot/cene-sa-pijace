@@ -4,6 +4,7 @@ import { productMatchesSlug } from '../utils/productId.js'
 import { getRowLabel, getRowTime } from '../utils/week.js'
 import { getAveragePrice as getComparablePrice } from '../utils/price.js'
 import { resolveUnit } from '../utils/unit.js'
+import { getSourceLabel } from '../utils/marketTime.js'
 
 function average(values) {
   const valid = values.filter((value) => value !== null && value !== undefined)
@@ -150,8 +151,13 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
   // market in the city (marketComparison) and not aggregated across markets
   // (cityComparison) - so the product header's own price/unit/source badge
   // always match whatever this page's breadcrumb/title already say the user
-  // is looking at. Raw values only (unit/source untranslated) - the page
-  // component owns i18n formatting, same convention as `identity` above.
+  // is looking at. sourceLabel mirrors ProductCard.jsx's own `row.Source ||
+  // getSourceLabel(grad, pijaca)` exactly (the row's own attributed source
+  // text - e.g. "JKP Beogradske pijace" - when present, falling back to
+  // marketInfo.json's per-market institution name or the generic "STIPS"
+  // only when the row carries neither) rather than a generic STIPS/JKP
+  // category label, so both widgets always show the identical source string
+  // for the same row.
   const currentMarket = useMemo(() => {
     if (!selectedGrad || !selectedPijaca) return null
     const matches = itemRows.filter((row) => {
@@ -170,7 +176,7 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
     return {
       price,
       unit: resolveUnit(latestRows[0].JedMere, latestRows[0].Kategorija),
-      source: latestRows[0].Source ? 'JKP' : 'STIPS',
+      sourceLabel: latestRows[0].Source || getSourceLabel(selectedGrad, selectedPijaca),
     }
   }, [itemRows, selectedGrad, selectedPijaca])
 
