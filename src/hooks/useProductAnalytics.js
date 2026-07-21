@@ -3,6 +3,7 @@ import { parseMesto } from '../utils/market.js'
 import { productMatchesSlug } from '../utils/productId.js'
 import { getRowLabel, getRowTime } from '../utils/week.js'
 import { getAveragePrice as getComparablePrice } from '../utils/price.js'
+import { resolveUnit } from '../utils/unit.js'
 
 function average(values) {
   const valid = values.filter((value) => value !== null && value !== undefined)
@@ -52,7 +53,7 @@ function matchesIdentity(row, productSlug, categoryName, filters) {
   )
 }
 
-export function useProductAnalytics(rows, productSlug, filters, selectedGrad, categoryName) {
+export function useProductAnalytics(rows, productSlug, filters, selectedGrad, categoryName, selectedPijaca) {
   const itemRows = useMemo(
     () => rows.filter((row) => matchesIdentity(row, productSlug, categoryName, filters)),
     [rows, productSlug, categoryName, filters],
@@ -145,6 +146,34 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
       .sort((a, b) => a.price - b.price)
   }, [itemRows, selectedGrad])
 
+  // The exact row(s) for the market currently being viewed - not every
+  // market in the city (marketComparison) and not aggregated across markets
+  // (cityComparison) - so the product header's own price/unit/source badge
+  // always match whatever this page's breadcrumb/title already say the user
+  // is looking at. Raw values only (unit/source untranslated) - the page
+  // component owns i18n formatting, same convention as `identity` above.
+  const currentMarket = useMemo(() => {
+    if (!selectedGrad || !selectedPijaca) return null
+    const matches = itemRows.filter((row) => {
+      const parsed = parseMesto(row.Mesto)
+      return parsed.grad === selectedGrad && parsed.pijaca === selectedPijaca
+    })
+    let latestTime = null
+    for (const row of matches) {
+      const time = getRowTime(row)
+      if (time !== null && (latestTime === null || time > latestTime)) latestTime = time
+    }
+    if (latestTime === null) return null
+    const latestRows = matches.filter((row) => getRowTime(row) === latestTime)
+    const price = average(latestRows.map(getComparablePrice))
+    if (price === null) return null
+    return {
+      price,
+      unit: resolveUnit(latestRows[0].JedMere, latestRows[0].Kategorija),
+      source: latestRows[0].Source ? 'JKP' : 'STIPS',
+    }
+  }, [itemRows, selectedGrad, selectedPijaca])
+
   return {
     identity,
     history,
@@ -154,5 +183,6 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
     marketComparison,
     cheapestMarket: marketComparison[0] ?? null,
     priciestMarket: marketComparison[marketComparison.length - 1] ?? null,
+    currentMarket,
   }
 }

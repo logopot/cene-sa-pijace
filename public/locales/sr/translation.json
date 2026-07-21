@@ -165,7 +165,9 @@
     "noHistory": "Nema istorijskih podataka za ovaj proizvod.",
     "noComparison": "Nema podataka za poređenje gradova.",
     "noMarketComparison": "Nema podataka za poređenje pijaca u ovom gradu.",
-    "singleMarketNote": "Prikazana je jedina pijaca u ovom gradu sa trenutnim podacima."
+    "singleMarketNote": "Prikazana je jedina pijaca u ovom gradu sa trenutnim podacima.",
+    "sourceStips": "STIPS - Min poljoprivrede",
+    "sourceJkp": "JKP / Lokalna pijaca"
   },
   "footer": {
     "tagline": "Nezavisni pijačni portal koji omogućava brz i jasan uvid u kretanje cena poljoprivrednih proizvoda na pijacama širom Srbije.",

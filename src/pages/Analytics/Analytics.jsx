@@ -20,9 +20,21 @@ import {
   IconWrap,
   ProductTitle,
   MarketSubtitle,
+  PriceBlock,
+  PriceValue,
+  SourceBadge,
   Section,
   SectionTitle,
 } from './Analytics.styled.js'
+
+function formatPrice(value) {
+  return value === null || value === undefined ? '-' : value.toFixed(2)
+}
+
+const SOURCE_BADGE_KEYS = {
+  STIPS: 'analytics.sourceStips',
+  JKP: 'analytics.sourceJkp',
+}
 
 function Analytics({ rows, loading, error }) {
   const { t, i18n } = useTranslation()
@@ -36,7 +48,7 @@ function Analytics({ rows, loading, error }) {
   const categoryName = useMemo(() => resolveCategoryBySlug(categorySlug), [categorySlug])
   const market = grad && pijaca ? { grad, pijaca } : null
 
-  const analytics = useProductAnalytics(rows, productSlug, productFilters, grad, categoryName)
+  const analytics = useProductAnalytics(rows, productSlug, productFilters, grad, categoryName, pijaca)
   const { identity } = analytics
 
   // Deep-linked/shared URLs land here before the app shell's own fetch has a
@@ -69,6 +81,8 @@ function Analytics({ rows, loading, error }) {
   const productName = translateDataValue(t, 'proizvod', identity.proizvod)
   const gradLabel = market ? translateDataValue(t, 'grad', market.grad) : null
   const pijacaLabel = market ? translateDataValue(t, 'pijaca', market.pijaca) : null
+  const jedMereLabel =
+    analytics.currentMarket?.unit ? translateDataValue(t, 'jedMere', analytics.currentMarket.unit) : ''
 
   // Google's Product rich-result schema wants a single offers block, not a
   // per-city breakdown - cheapest/priciest (see useProductAnalytics) already
@@ -131,6 +145,16 @@ function Analytics({ rows, loading, error }) {
               </MarketSubtitle>
             )}
           </div>
+
+          {analytics.currentMarket && (
+            <PriceBlock>
+              <PriceValue>
+                {formatPrice(analytics.currentMarket.price)}{' '}
+                {jedMereLabel ? t('productCard.priceUnit', { unit: jedMereLabel }) : t('productCard.priceNoUnit')}
+              </PriceValue>
+              <SourceBadge>{t(SOURCE_BADGE_KEYS[analytics.currentMarket.source])}</SourceBadge>
+            </PriceBlock>
+          )}
         </PageHeader>
 
         <Section>
