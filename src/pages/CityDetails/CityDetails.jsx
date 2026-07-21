@@ -6,6 +6,7 @@ import { LuStore } from 'react-icons/lu'
 import { parseMesto, resolveGradBySlug, buildMarketRoute } from '../../utils/market.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
+import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
@@ -64,33 +65,37 @@ function CityDetails({ rows, loading, error }) {
   const gradLabel = translateDataValue(t, 'grad', grad)
 
   return (
-    <Container>
-      <Breadcrumbs
-        items={[
-          { label: t('breadcrumbs.home'), to: '/' },
-          { label: gradLabel },
-        ]}
-      />
+    <>
+      <GlobalFilterBar />
 
-      <PageHeader>
-        <IconWrap>
-          <LuStore />
-        </IconWrap>
-        <CityTitle>{gradLabel}</CityTitle>
-      </PageHeader>
+      <Container>
+        <Breadcrumbs
+          items={[
+            { label: t('breadcrumbs.home'), to: '/' },
+            { label: gradLabel },
+          ]}
+        />
 
-      <Row className="g-3">
-        {markets.map((pijaca) => (
-          <Col key={pijaca} xs={12} sm={6} md={4} lg={3}>
-            <MarketTileLink to={buildMarketRoute(grad, pijaca, i18n.language)}>
-              <MarketTileCard>
-                <MarketTileName>{translateDataValue(t, 'pijaca', pijaca)}</MarketTileName>
-              </MarketTileCard>
-            </MarketTileLink>
-          </Col>
-        ))}
-      </Row>
-    </Container>
+        <PageHeader>
+          <IconWrap>
+            <LuStore />
+          </IconWrap>
+          <CityTitle>{gradLabel}</CityTitle>
+        </PageHeader>
+
+        <Row className="g-3">
+          {markets.map((pijaca) => (
+            <Col key={pijaca} xs={12} sm={6} md={4} lg={3}>
+              <MarketTileLink to={buildMarketRoute(grad, pijaca, i18n.language)}>
+                <MarketTileCard>
+                  <MarketTileName>{translateDataValue(t, 'pijaca', pijaca)}</MarketTileName>
+                </MarketTileCard>
+              </MarketTileLink>
+            </Col>
+          ))}
+        </Row>
+      </Container>
+    </>
   )
 }
 

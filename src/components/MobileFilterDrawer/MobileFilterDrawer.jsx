@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { LuChevronDown, LuSearch, LuX } from 'react-icons/lu'
+import { Trans, useTranslation } from 'react-i18next'
+import { LuChevronDown, LuMapPin, LuSearch, LuX } from 'react-icons/lu'
 import LocationMenuItem from '../LocationDetectButton/LocationMenuItem.jsx'
 import { SubmitButton } from '../FilterBar/FilterBar.styled.js'
 import {
   TriggerBar,
+  TriggerLabel,
+  Highlight,
   Overlay,
   Header,
   CloseButton,
@@ -107,9 +109,17 @@ function MobileFilterDrawer({
 
   return (
     <>
-      <TriggerBar type="button" onClick={openDrawer}>
-        <LuSearch size={18} />
-        {t('filterBar.mobileTriggerLabel')}
+      <TriggerBar type="button" onClick={openDrawer} $isActive={Boolean(grad)}>
+        {grad ? <LuMapPin size={18} /> : <LuSearch size={18} />}
+        <TriggerLabel>
+          {grad ?
+            <Trans
+              i18nKey="filterBar.mobileActiveLabel"
+              values={{ grad: gradLabel, category: categoryLabel }}
+              components={{ strong: <Highlight /> }}
+            />
+          : t('filterBar.mobileTriggerLabel')}
+        </TriggerLabel>
       </TriggerBar>
 
       {isOpen && (

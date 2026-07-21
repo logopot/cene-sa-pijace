@@ -10,6 +10,7 @@ import PriceHistoryChart from '../../components/PriceHistoryChart/PriceHistoryCh
 import CityComparisonChart from '../../components/CityComparisonChart/CityComparisonChart.jsx'
 import SEO from '../../components/SEO/SEO.jsx'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
+import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
 import { SITE_URL, getProductOgImage } from '../../constants/seo.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
@@ -102,47 +103,51 @@ function Analytics({ rows, loading, error }) {
   ]
 
   return (
-    <Container>
-      <SEO
-        title={t('seo.product.title', { product: productName })}
-        description={t('seo.product.description', { product: productName })}
-        url={`${SITE_URL}${location.pathname}`}
-        image={getProductOgImage(identity.proizvod)}
-        jsonLd={jsonLd}
-      />
+    <>
+      <GlobalFilterBar />
 
-      <Breadcrumbs items={breadcrumbItems} />
-
-      <PageHeader>
-        <IconWrap>
-          {/* eslint-disable-next-line react-hooks/static-components -- Icon is a stable module-level reference, not created during render */}
-          <Icon />
-        </IconWrap>
-        <div>
-          <ProductTitle>{productName}</ProductTitle>
-          {market && (
-            <MarketSubtitle>
-              {pijacaLabel}, {gradLabel}
-            </MarketSubtitle>
-          )}
-        </div>
-      </PageHeader>
-
-      <Section>
-        <SectionTitle>{t('analytics.historyTitle')}</SectionTitle>
-        <PriceHistoryChart data={analytics.history} />
-      </Section>
-
-      <Section>
-        <SectionTitle>{t('analytics.comparisonTitle')}</SectionTitle>
-        <CityComparisonChart
-          data={analytics.cityComparison}
-          cheapest={analytics.cheapest}
-          priciest={analytics.priciest}
-          highlightGrad={market?.grad}
+      <Container>
+        <SEO
+          title={t('seo.product.title', { product: productName })}
+          description={t('seo.product.description', { product: productName })}
+          url={`${SITE_URL}${location.pathname}`}
+          image={getProductOgImage(identity.proizvod)}
+          jsonLd={jsonLd}
         />
-      </Section>
-    </Container>
+
+        <Breadcrumbs items={breadcrumbItems} />
+
+        <PageHeader>
+          <IconWrap>
+            {/* eslint-disable-next-line react-hooks/static-components -- Icon is a stable module-level reference, not created during render */}
+            <Icon />
+          </IconWrap>
+          <div>
+            <ProductTitle>{productName}</ProductTitle>
+            {market && (
+              <MarketSubtitle>
+                {pijacaLabel}, {gradLabel}
+              </MarketSubtitle>
+            )}
+          </div>
+        </PageHeader>
+
+        <Section>
+          <SectionTitle>{t('analytics.historyTitle')}</SectionTitle>
+          <PriceHistoryChart data={analytics.history} />
+        </Section>
+
+        <Section>
+          <SectionTitle>{t('analytics.comparisonTitle')}</SectionTitle>
+          <CityComparisonChart
+            data={analytics.cityComparison}
+            cheapest={analytics.cheapest}
+            priciest={analytics.priciest}
+            highlightGrad={market?.grad}
+          />
+        </Section>
+      </Container>
+    </>
   )
 }
 

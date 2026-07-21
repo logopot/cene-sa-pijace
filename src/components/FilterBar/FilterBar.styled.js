@@ -1,15 +1,27 @@
 import styled from "styled-components";
 import { Button } from "react-bootstrap";
 
-// Static, not sticky - this now lives inside the global Header (see
-// Header.jsx), which itself scrolls away normally; a sticky child under a
-// non-sticky ancestor would detach and float alone once the brand row above
-// it scrolled out of view.
+// Sticks to the viewport top once scrolled to (see FilterBar.jsx's Sentinel
+// + IntersectionObserver, which drives $isStuck) - the border/shadow only
+// render once actually stuck, so the bar reads as flush with the page while
+// inline (below Hero on the homepage, or immediately below Header on every
+// other page) and only visually "lifts" off the content once it's pinned.
 export const Bar = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 100;
   background-color: ${({ theme }) => theme.colors.surface};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
   padding: ${({ theme }) => theme.spacing.md} 0;
-  box-shadow: ${({ theme }) => theme.shadow.sm};
+  border-bottom: 1px solid ${({ $isStuck, theme }) => ($isStuck ? theme.colors.border : "transparent")};
+  box-shadow: ${({ $isStuck, theme }) => ($isStuck ? theme.shadow.sm : "none")};
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+`;
+
+// Zero-footprint marker placed immediately before Bar (see FilterBar.jsx) -
+// once it scrolls out of the viewport, Bar has necessarily reached its
+// sticky top:0 position, which is how $isStuck above is derived.
+export const Sentinel = styled.div`
+  height: 1px;
 `;
 
 // The segmented, pill-shaped unified bar - one continuous rounded container

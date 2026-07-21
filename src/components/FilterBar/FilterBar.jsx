@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Container } from 'react-bootstrap'
@@ -9,7 +10,7 @@ import { buildCityRoute, buildMarketRoute, buildMarketCategoryRoute } from '../.
 import CustomDropdown from '../CustomDropdown/CustomDropdown.jsx'
 import LocationMenuItem from '../LocationDetectButton/LocationMenuItem.jsx'
 import MobileFilterDrawer from '../MobileFilterDrawer/MobileFilterDrawer.jsx'
-import { Bar, PillBar, SegmentDivider, SubmitCircle } from './FilterBar.styled.js'
+import { Bar, Sentinel, PillBar, SegmentDivider, SubmitCircle } from './FilterBar.styled.js'
 
 function FilterBar({
   category,
@@ -24,6 +25,19 @@ function FilterBar({
 }) {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const sentinelRef = useRef(null)
+  const [isStuck, setIsStuck] = useState(false)
+
+  // Bar has reached its sticky top:0 position exactly when Sentinel (placed
+  // immediately before it) scrolls out of the viewport - drives the
+  // border/shadow that only appear once actually stuck (see FilterBar.styled.js).
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver(([entry]) => setIsStuck(!entry.isIntersecting), { threshold: 0 })
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [])
 
   const categoryOptions = [
     { value: ALL_CATEGORIES, label: t('filterBar.categoryAllOption') },
@@ -51,66 +65,69 @@ function FilterBar({
   }
 
   return (
-    <Bar>
-      <Container>
-        <MobileFilterDrawer
-          cities={cities}
-          cityOptions={cityOptions}
-          categoryOptions={categoryOptions}
-          marketOptions={marketOptions}
-          grad={grad}
-          category={category}
-          pijaca={pijaca}
-          onGradChange={onGradChange}
-          onCategoryChange={onCategoryChange}
-          onPijacaChange={onPijacaChange}
-          onSubmit={handleSubmit}
-        />
-
-        <PillBar>
-          <CustomDropdown
-            variant="segment"
-            segmentPosition="first"
-            label={t('filterBar.cityLabel')}
-            options={cityOptions}
-            value={grad}
-            onChange={onGradChange}
-            placeholder={t('filterBar.cityPlaceholder')}
-            leadingAction={({ onSelect }) => <LocationMenuItem cities={cities} onSelect={onSelect} />}
+    <>
+      <Sentinel ref={sentinelRef} aria-hidden="true" />
+      <Bar $isStuck={isStuck}>
+        <Container>
+          <MobileFilterDrawer
+            cities={cities}
+            cityOptions={cityOptions}
+            categoryOptions={categoryOptions}
+            marketOptions={marketOptions}
+            grad={grad}
+            category={category}
+            pijaca={pijaca}
+            onGradChange={onGradChange}
+            onCategoryChange={onCategoryChange}
+            onPijacaChange={onPijacaChange}
+            onSubmit={handleSubmit}
           />
 
-          <SegmentDivider aria-hidden="true" />
+          <PillBar>
+            <CustomDropdown
+              variant="segment"
+              segmentPosition="first"
+              label={t('filterBar.cityLabel')}
+              options={cityOptions}
+              value={grad}
+              onChange={onGradChange}
+              placeholder={t('filterBar.cityPlaceholder')}
+              leadingAction={({ onSelect }) => <LocationMenuItem cities={cities} onSelect={onSelect} />}
+            />
 
-          <CustomDropdown
-            variant="segment"
-            segmentPosition="middle"
-            label={t('filterBar.categoryLabel')}
-            options={categoryOptions}
-            value={category}
-            onChange={onCategoryChange}
-            placeholder={t('filterBar.categoryPlaceholder')}
-            disabled={!grad}
-          />
+            <SegmentDivider aria-hidden="true" />
 
-          <SegmentDivider aria-hidden="true" />
+            <CustomDropdown
+              variant="segment"
+              segmentPosition="middle"
+              label={t('filterBar.categoryLabel')}
+              options={categoryOptions}
+              value={category}
+              onChange={onCategoryChange}
+              placeholder={t('filterBar.categoryPlaceholder')}
+              disabled={!grad}
+            />
 
-          <CustomDropdown
-            variant="segment"
-            segmentPosition="last"
-            label={t('filterBar.marketLabel')}
-            options={marketOptions}
-            value={pijaca}
-            onChange={onPijacaChange}
-            placeholder={t('filterBar.marketAllOption')}
-            disabled={!grad}
-          />
+            <SegmentDivider aria-hidden="true" />
 
-          <SubmitCircle type="button" disabled={!grad} onClick={handleSubmit} aria-label={t('filterBar.submit')}>
-            <LuSearch />
-          </SubmitCircle>
-        </PillBar>
-      </Container>
-    </Bar>
+            <CustomDropdown
+              variant="segment"
+              segmentPosition="last"
+              label={t('filterBar.marketLabel')}
+              options={marketOptions}
+              value={pijaca}
+              onChange={onPijacaChange}
+              placeholder={t('filterBar.marketAllOption')}
+              disabled={!grad}
+            />
+
+            <SubmitCircle type="button" disabled={!grad} onClick={handleSubmit} aria-label={t('filterBar.submit')}>
+              <LuSearch />
+            </SubmitCircle>
+          </PillBar>
+        </Container>
+      </Bar>
+    </>
   )
 }
 

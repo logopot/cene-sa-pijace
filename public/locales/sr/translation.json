@@ -66,6 +66,7 @@
     "categoryAllOption": "Sve kategorije",
     "submit": "Prikaži cene",
     "mobileTriggerLabel": "Šta kupuješ i gde?",
+    "mobileActiveLabel": "<strong>{{grad}}</strong> • {{category}}",
     "close": "Zatvori"
   },
   "locationDetect": {

@@ -4,6 +4,7 @@ import { useMarketExplorer } from '../../hooks/useMarketExplorer.js'
 import SEO from '../SEO/SEO.jsx'
 import { SITE_URL } from '../../constants/seo.js'
 import Hero from '../Hero/Hero.jsx'
+import GlobalFilterBar from '../FilterBar/GlobalFilterBar.jsx'
 import WeeklyTrends from '../WeeklyTrends/WeeklyTrends.jsx'
 import MarketShowcase from '../MarketShowcase/MarketShowcase.jsx'
 import HowItWorks from '../HowItWorks/HowItWorks.jsx'
@@ -35,6 +36,7 @@ function MarketExplorer({ rows, loading, error }) {
     <>
       <SEO title={t('seo.home.title')} description={t('seo.home.description')} url={SITE_URL} />
       <Hero />
+      <GlobalFilterBar />
 
       <WeeklyTrends rows={explorer.weeklyDrops} />
       <MarketShowcase markets={explorer.showcaseMarkets} />

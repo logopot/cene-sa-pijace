@@ -11,23 +11,27 @@ const slideUp = keyframes`
   }
 `
 
-// The collapsed "Započnite pretragu" entry point - only ever visible below
-// the desktop breakpoint (PillBar, see FilterBar.styled.js, takes over
-// above it).
+// The collapsed mobile entry point - only ever visible below the desktop
+// breakpoint (PillBar, see FilterBar.styled.js, takes over above it).
+// $isActive (a grad is already selected) swaps the neutral placeholder
+// styling for a subtle green-tinted "active context" look, so a returning
+// user recognizes their current city/category at a glance without opening
+// the drawer.
 export const TriggerBar = styled.button`
   display: none;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
   width: 100%;
   padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1px solid ${({ $isActive, theme }) => ($isActive ? theme.colors.primaryGreen : theme.colors.border)};
   border-radius: ${({ theme }) => theme.radius.pill};
-  background-color: ${({ theme }) => theme.colors.surface};
+  background-color: ${({ $isActive, theme }) => ($isActive ? theme.colors.iconBg : theme.colors.surface)};
   box-shadow: ${({ theme }) => theme.shadow.sm};
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ $isActive, theme }) => ($isActive ? theme.colors.textDark : theme.colors.textSecondary)};
   font-family: inherit;
   font-size: 0.95rem;
   font-weight: ${({ theme }) => theme.font.weight.medium};
+  text-align: left;
   cursor: pointer;
 
   @media (max-width: 767px) {
@@ -38,6 +42,23 @@ export const TriggerBar = styled.button`
     flex-shrink: 0;
     color: ${({ theme }) => theme.colors.primaryGreen};
   }
+`
+
+// Truncates instead of wrapping/breaking the pill shape once the active
+// label (city + category) runs longer than the generic placeholder text.
+export const TriggerLabel = styled.span`
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`
+
+// The city name inside the active-state label (see filterBar.mobileActiveLabel) -
+// bolder and brand-colored so it reads as the "you are here" part of the sentence.
+export const Highlight = styled.strong`
+  color: ${({ theme }) => theme.colors.primaryGreen};
+  font-weight: ${({ theme }) => theme.font.weight.bold};
 `
 
 // Full-screen mobile overlay - Bar itself is a static block now (see

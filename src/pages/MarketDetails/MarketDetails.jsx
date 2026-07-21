@@ -10,6 +10,7 @@ import WeekStatus from '../../components/WeekStatus/WeekStatus.jsx'
 import ProductGrid from '../../components/ProductGrid/ProductGrid.jsx'
 import SEO from '../../components/SEO/SEO.jsx'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
+import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
 import { SITE_URL, getMarketOgImage } from '../../constants/seo.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
@@ -90,6 +91,7 @@ function MarketDetails({ rows, loading, error }) {
         url={`${SITE_URL}${buildMarketRoute(grad, pijaca, i18n.language)}`}
         image={getMarketOgImage(grad, pijaca)}
       />
+      <GlobalFilterBar />
 
       <Container>
         <Breadcrumbs

@@ -101,8 +101,8 @@ export function FilterProvider({ rows, children }) {
   }, [])
 
   const value = useMemo(
-    () => ({ ...selection, setGrad, setCategory, setPijaca }),
-    [selection, setGrad, setCategory, setPijaca],
+    () => ({ ...selection, setGrad, setCategory, setPijaca, rows }),
+    [selection, setGrad, setCategory, setPijaca, rows],
   )
 
   return <FilterContext.Provider value={value}>{children}</FilterContext.Provider>
