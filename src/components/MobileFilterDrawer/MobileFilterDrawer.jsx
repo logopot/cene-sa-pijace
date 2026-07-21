@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { LuChevronDown, LuMapPin, LuSearch, LuX } from 'react-icons/lu'
+import { useTranslation } from 'react-i18next'
+import { LuChevronDown, LuSearch, LuX } from 'react-icons/lu'
+import { ALL_MARKETS } from '../../constants/filters.js'
 import LocationMenuItem from '../LocationDetectButton/LocationMenuItem.jsx'
 import { SubmitButton } from '../FilterBar/FilterBar.styled.js'
 import {
   TriggerBar,
   TriggerLabel,
-  Highlight,
+  TriggerSearchIcon,
   Overlay,
   Header,
   CloseButton,
@@ -72,6 +73,11 @@ function MobileFilterDrawer({
   const gradLabel = cityOptions.find((option) => option.value === grad)?.label
   const categoryLabel = categoryOptions.find((option) => option.value === category)?.label
   const marketLabel = marketOptions.find((option) => option.value === pijaca)?.label
+  // The collapsed trigger wants the short "Sve pijace" form (see
+  // marketCategoryDetails.allMarketsShort) rather than the dropdown's own
+  // longer "Sve pijace u tom gradu" option label - the accordion row below
+  // still shows the full marketLabel.
+  const marketLabelShort = pijaca === ALL_MARKETS ? t('marketCategoryDetails.allMarketsShort') : marketLabel
 
   // Reopening after a city was already picked (a returning user, not a
   // first-time open) goes straight to the accordion summary view instead of
@@ -109,17 +115,15 @@ function MobileFilterDrawer({
 
   return (
     <>
-      <TriggerBar type="button" onClick={openDrawer} $isActive={Boolean(grad)}>
-        {grad ? <LuMapPin size={18} /> : <LuSearch size={18} />}
-        <TriggerLabel>
+      <TriggerBar type="button" onClick={openDrawer}>
+        <TriggerLabel $isPlaceholder={!grad}>
           {grad ?
-            <Trans
-              i18nKey="filterBar.mobileActiveLabel"
-              values={{ grad: gradLabel, category: categoryLabel }}
-              components={{ strong: <Highlight /> }}
-            />
+            t('filterBar.mobileActiveLabel', { grad: gradLabel, category: categoryLabel, pijaca: marketLabelShort })
           : t('filterBar.mobileTriggerLabel')}
         </TriggerLabel>
+        <TriggerSearchIcon aria-hidden="true">
+          <LuSearch size={16} />
+        </TriggerSearchIcon>
       </TriggerBar>
 
       {isOpen && (

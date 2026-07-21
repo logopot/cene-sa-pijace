@@ -12,22 +12,23 @@ const slideUp = keyframes`
 `
 
 // The collapsed mobile entry point - only ever visible below the desktop
-// breakpoint (PillBar, see FilterBar.styled.js, takes over above it).
-// $isActive (a grad is already selected) swaps the neutral placeholder
-// styling for a subtle green-tinted "active context" look, so a returning
-// user recognizes their current city/category at a glance without opening
-// the drawer.
+// breakpoint (PillBar, see FilterBar.styled.js, takes over above it). Always
+// a neutral white/gray surface (matches PillBar's own resting look) rather
+// than a green-tinted "active" state - the search icon circle on the right
+// is what signals "this is an interactive search field," not the container's
+// color. Right padding is reserved so TriggerLabel's ellipsis truncates
+// before it ever reaches TriggerSearchIcon, which is absolutely positioned
+// (see below) rather than a normal flex sibling.
 export const TriggerBar = styled.button`
   display: none;
+  position: relative;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing.sm};
   width: 100%;
-  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
-  border: 1px solid ${({ $isActive, theme }) => ($isActive ? theme.colors.primaryGreen : theme.colors.border)};
+  padding: ${({ theme }) => theme.spacing.sm} 52px ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radius.pill};
-  background-color: ${({ $isActive, theme }) => ($isActive ? theme.colors.iconBg : theme.colors.surface)};
+  background-color: ${({ theme }) => theme.colors.surface};
   box-shadow: ${({ theme }) => theme.shadow.sm};
-  color: ${({ $isActive, theme }) => ($isActive ? theme.colors.textDark : theme.colors.textSecondary)};
   font-family: inherit;
   font-size: 0.95rem;
   font-weight: ${({ theme }) => theme.font.weight.medium};
@@ -37,28 +38,46 @@ export const TriggerBar = styled.button`
   @media (max-width: 767px) {
     display: flex;
   }
-
-  svg {
-    flex-shrink: 0;
-    color: ${({ theme }) => theme.colors.primaryGreen};
-  }
 `
 
 // Truncates instead of wrapping/breaking the pill shape once the active
-// label (city + category) runs longer than the generic placeholder text.
+// label (grad - category - pijaca) runs longer than the generic placeholder
+// text. $isPlaceholder mirrors RowValue's own convention (muted vs. dark
+// text) so the collapsed trigger and the expanded accordion rows read
+// consistently.
 export const TriggerLabel = styled.span`
-  flex: 1;
+  display: block;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: ${({ $isPlaceholder, theme }) => ($isPlaceholder ? theme.colors.textMuted : theme.colors.textDark)};
 `
 
-// The city name inside the active-state label (see filterBar.mobileActiveLabel) -
-// bolder and brand-colored so it reads as the "you are here" part of the sentence.
-export const Highlight = styled.strong`
-  color: ${({ theme }) => theme.colors.primaryGreen};
-  font-weight: ${({ theme }) => theme.font.weight.bold};
+// Decorative search affordance, not a real control - TriggerBar itself is
+// the actual interactive element (a <button> can't contain a nested
+// <button>), so this is a plain span that visually mirrors FilterBar's own
+// SubmitCircle (same brand-green circle + white glass icon) purely to signal
+// "tap to search" at a glance. 36px (rather than SubmitCircle's 48px) matches
+// the collapsed trigger's smaller overall height.
+export const TriggerSearchIcon = styled.span`
+  position: absolute;
+  top: 50%;
+  right: ${({ theme }) => theme.spacing.xs};
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: ${({ theme }) => theme.colors.primaryGreen};
+  color: ${({ theme }) => theme.colors.surface};
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 `
 
 // Full-screen mobile overlay - Bar itself is a static block now (see

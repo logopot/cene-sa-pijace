@@ -66,7 +66,7 @@
     "categoryAllOption": "All categories",
     "submit": "Show Prices",
     "mobileTriggerLabel": "Find it local, check the price.",
-    "mobileActiveLabel": "<strong>{{grad}}</strong> • {{category}}",
+    "mobileActiveLabel": "{{grad}} - {{category}} - {{pijaca}}",
     "close": "Close"
   },
   "locationDetect": {
