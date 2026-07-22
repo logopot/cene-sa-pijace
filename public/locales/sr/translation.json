@@ -166,7 +166,9 @@
     "noComparison": "Nema podataka za poređenje gradova.",
     "noMarketComparison": "Nema podataka za poređenje pijaca u ovom gradu.",
     "singleMarketNote": "Prikazana je jedina pijaca u ovom gradu sa trenutnim podacima.",
-    "priceSourceLabel": "Najčešća cena · {{source}}"
+    "priceSourceLabel": "Najčešća cena · {{source}}",
+    "allVariations": "Sve varijacije",
+    "variationSelectorLabel": "Filter varijacija proizvoda"
   },
   "footer": {
     "tagline": "Nezavisni pijačni portal koji omogućava brz i jasan uvid u kretanje cena poljoprivrednih proizvoda na pijacama širom Srbije.",

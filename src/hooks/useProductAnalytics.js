@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { parseMesto } from '../utils/market.js'
-import { productMatchesSlug, normalizeProductName } from '../utils/productId.js'
+import { productMatchesSlug, normalizeProductName, extractVariation } from '../utils/productId.js'
 import { getRowLabel, getRowTime } from '../utils/week.js'
 import { getAveragePrice as getComparablePrice } from '../utils/price.js'
 import { resolveUnit } from '../utils/unit.js'
@@ -35,7 +35,7 @@ function matchesExactSlug(row, productSlug, categoryName) {
   return true
 }
 
-export function useProductAnalytics(rows, productSlug, selectedGrad, categoryName, selectedPijaca) {
+export function useProductAnalytics(rows, productSlug, selectedGrad, categoryName, selectedPijaca, selectedVariation) {
   // Two passes: first, the exact clicked variant/slug (e.g. "Krompir
   // (beli)") purely to discover which product *family* this page is about;
   // then every row anywhere - any market, any city, any source - whose name
@@ -77,6 +77,27 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
     }
   }, [exactRows])
 
+  // Sub-variety tabs above the Price History Chart (see VariationSelector) -
+  // first-seen order across itemRows so tab order stays stable between
+  // renders. A row with no qualifier at all (e.g. JKP's plain "Krompir")
+  // contributes no tab of its own - it's only ever visible under "all".
+  const availableVariations = useMemo(() => {
+    const seen = new Map()
+    for (const row of itemRows) {
+      const variation = extractVariation(row.Proizvod)
+      if (variation && !seen.has(variation.key)) seen.set(variation.key, variation.label)
+    }
+    return Array.from(seen, ([key, label]) => ({ key, label }))
+  }, [itemRows])
+
+  // Only the Price History Chart narrows by variation (see
+  // VariationSelector) - cityComparison/marketComparison/currentMarket stay
+  // at the whole-family level regardless of which tab is selected.
+  const historyRows = useMemo(() => {
+    if (!selectedVariation || selectedVariation === 'all') return itemRows
+    return itemRows.filter((row) => extractVariation(row.Proizvod)?.key === selectedVariation)
+  }, [itemRows, selectedVariation])
+
   // Grouped by the row's own literal Source text (see scripts/jkp-scraper's
   // SOURCE_LABEL) rather than a hardcoded STIPS/JKP binary, so a future
   // third scraper with its own distinct Source string becomes its own
@@ -84,7 +105,7 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
   // carry a Source at all, so they fall back to the generic "STIPS" bucket.
   const history = useMemo(() => {
     const byWeek = new Map()
-    itemRows
+    historyRows
       .filter((row) => parseMesto(row.Mesto).grad === selectedGrad)
       .forEach((row) => {
         const time = getRowTime(row)
@@ -102,7 +123,7 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
       weekLabel,
       ...Object.fromEntries(Array.from(bySource, ([source, prices]) => [source, average(prices)])),
     }))
-  }, [itemRows, selectedGrad])
+  }, [historyRows, selectedGrad])
 
   // Stable series order (first-seen chronologically across `history` above)
   // so the chart's legend/series list and their assigned colors don't
@@ -204,6 +225,7 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
 
   return {
     identity,
+    availableVariations,
     history,
     historySources,
     cityComparison,

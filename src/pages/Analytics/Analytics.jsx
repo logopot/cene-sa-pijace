@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useParams } from 'react-router-dom'
 import { Alert, Container, Spinner } from 'react-bootstrap'
@@ -7,6 +7,7 @@ import { translateDataValue } from '../../utils/translateValue.js'
 import { resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketRoute, buildMarketCategoryRoute } from '../../utils/market.js'
 import { useProductAnalytics } from '../../hooks/useProductAnalytics.js'
 import PriceHistoryChart from '../../components/PriceHistoryChart/PriceHistoryChart.jsx'
+import VariationSelector from '../../components/VariationSelector/VariationSelector.jsx'
 import MarketComparisonChart from '../../components/MarketComparisonChart/MarketComparisonChart.jsx'
 import CityComparisonChart from '../../components/CityComparisonChart/CityComparisonChart.jsx'
 import SEO from '../../components/SEO/SEO.jsx'
@@ -41,8 +42,12 @@ function Analytics({ rows, loading, error }) {
   const pijaca = useMemo(() => resolvePijacaBySlug(rows, grad, marketSlug), [rows, grad, marketSlug])
   const categoryName = useMemo(() => resolveCategoryBySlug(categorySlug), [categorySlug])
   const market = grad && pijaca ? { grad, pijaca } : null
+  // Resets to 'all' automatically on every navigation - Analytics remounts
+  // per route (see App.jsx's key={location.key}), so a fresh product page
+  // never inherits the previous product's selected variation.
+  const [selectedVariation, setSelectedVariation] = useState('all')
 
-  const analytics = useProductAnalytics(rows, productSlug, grad, categoryName, pijaca)
+  const analytics = useProductAnalytics(rows, productSlug, grad, categoryName, pijaca, selectedVariation)
   const { identity } = analytics
 
   // Deep-linked/shared URLs land here before the app shell's own fetch has a
@@ -159,6 +164,11 @@ function Analytics({ rows, loading, error }) {
 
         <Section>
           <SectionTitle>{t('analytics.historyTitle')}</SectionTitle>
+          <VariationSelector
+            variations={analytics.availableVariations}
+            selected={selectedVariation}
+            onSelect={setSelectedVariation}
+          />
           <PriceHistoryChart data={analytics.history} sources={analytics.historySources} />
         </Section>
 

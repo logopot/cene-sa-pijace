@@ -48,12 +48,12 @@ export function productMatchesSlug(proizvod, productSlug) {
 // (see routeLocales.js and getProductUrlSlug above). grad/pijaca are passed
 // in by the caller (already derived via parseMesto) rather than re-derived
 // here, since market.js imports slugify from this file and importing
-// parseMesto back would create a circular dependency.
-// The rest of STIPS's row-identity fields (see stips-scraper's KEY_COLUMNS,
-// minus Godina/Nedelja/Mesto) still travel as router state instead of query
-// params - many product names collide across packaging/origin within the
-// same category (e.g. "krastavac-salatar" spans Domaće/Uvoz(uvoz)/Uvoz(Grčka)
-// and both standardno/posebno packaging), so the slug alone can't disambiguate them.
+// parseMesto back would create a circular dependency. Several distinct rows
+// can still share the exact same slug (e.g. "krastavac-salatar" spans both
+// Domaće and Uvoz(Grčka) origins) - useProductAnalytics.js's exactRows just
+// takes whichever one matches first, since the URL alone can't disambiguate
+// further and every candidate belongs to the same product family anyway
+// (see normalizeProductName).
 export function buildProductRoute(grad, pijaca, row, language) {
   const marketSlug = getMarketTypeUrlSlug(pijaca, language) ?? slugify(pijaca)
   return `/${getCityPathPrefix(language)}/${slugify(grad)}/${marketSlug}/${getCategoryUrlSlug(row.Kategorija, language)}/${getProductUrlSlug(row.Proizvod, language)}`
@@ -70,4 +70,19 @@ export function buildProductRoute(grad, pijaca, row, language) {
 // so this can't accidentally eat a legitimate multi-word product name.
 export function normalizeProductName(proizvod) {
   return proizvod.replace(/\s*\([^)]*\)\s*$/, '').trim()
+}
+
+// The inverse of normalizeProductName above - extracts the trailing
+// qualifier itself ("Krompir (beli)" -> { key: 'beli', label: 'Beli' })
+// rather than stripping it, powering the variation filter tabs above the
+// Price History Chart (see useProductAnalytics.js's availableVariations).
+// Returns null for a name with no qualifier at all (e.g. JKP's plain
+// "Krompir"), which only ever counts toward the unfiltered "all" aggregate,
+// never getting its own tab.
+export function extractVariation(proizvod) {
+  const match = proizvod.match(/\(([^)]*)\)\s*$/)
+  if (!match) return null
+  const trimmed = match[1].trim()
+  if (trimmed === '') return null
+  return { key: trimmed.toLowerCase(), label: trimmed.charAt(0).toUpperCase() + trimmed.slice(1) }
 }
