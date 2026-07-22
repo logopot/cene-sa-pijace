@@ -26,7 +26,12 @@ function toRows(date, entries) {
 
 // JKP_DATE=latest (default) scrapes only the most recently published
 // barometar; JKP_DATE=all backfills every date bgpijace.rs still lists in
-// its dropdown (a rolling history, not the full site lifetime).
+// its dropdown; JKP_DATE_FROM/JKP_DATE_TO (either or both, inclusive,
+// YYYY-MM-DD) backfills just the dates in that window - bgpijace.rs's own
+// dropdown turned out to hold onto dates back to 2024-02-29 (verified
+// directly against the live site), far further back than a "recent rolling
+// window" - so a historical backfill can be pulled straight from the live
+// dropdown/table instead of needing any third-party archive.
 async function resolveTargetDates() {
   const dates = await listBarometarDates()
   if (process.env.JKP_DATE === 'all') return dates
@@ -34,6 +39,15 @@ async function resolveTargetDates() {
     const match = dates.find((d) => d.date === process.env.JKP_DATE)
     if (!match) throw new Error(`JKP_DATE=${process.env.JKP_DATE} not found in bgpijace.rs barometar history`)
     return [match]
+  }
+  if (process.env.JKP_DATE_FROM || process.env.JKP_DATE_TO) {
+    const from = process.env.JKP_DATE_FROM || '0000-00-00'
+    const to = process.env.JKP_DATE_TO || '9999-99-99'
+    const inRange = dates.filter((d) => d.date >= from && d.date <= to)
+    if (inRange.length === 0) {
+      throw new Error(`No barometar dates found between JKP_DATE_FROM=${from} and JKP_DATE_TO=${to}`)
+    }
+    return inRange
   }
   return [dates[0]]
 }
