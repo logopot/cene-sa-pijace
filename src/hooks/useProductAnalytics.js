@@ -54,15 +54,22 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
     [rows, productSlug, categoryName],
   )
 
+  // No categoryName filter here (unlike matchesExactSlug above) - STIPS
+  // itself files several identical product names under both "Povrće" and
+  // "Voće" (e.g. "Lubenica (sve sorte)"/"Paprika (Babura)"/"Tikvice (sve
+  // sorte)" each appear verbatim in both), and JKP disagrees with STIPS on
+  // a few others too ("Lubenica"/"Dinja" as Voće, "Breskva" as Povrće,
+  // where STIPS has the reverse) - a source-side classification
+  // inconsistency, not two different products. Requiring the URL's single
+  // resolved category to match every row was silently dropping the
+  // opposite-category half of a product's own data (e.g. Lubenica's STIPS
+  // rows were entirely invisible from a JKP-originated, "Voće"-categorized
+  // page). Name identity alone is the reliable signal here.
   const itemRows = useMemo(() => {
     if (exactRows.length === 0) return []
     const baseName = normalizeProductName(exactRows[0].Proizvod)
-    return rows.filter((row) => {
-      if (normalizeProductName(row.Proizvod) !== baseName) return false
-      if (categoryName && row.Kategorija !== categoryName) return false
-      return true
-    })
-  }, [rows, exactRows, categoryName])
+    return rows.filter((row) => normalizeProductName(row.Proizvod) === baseName)
+  }, [rows, exactRows])
 
   // Title/breadcrumb identity stays pinned to the exact variety that was
   // clicked (e.g. "Krompir (beli)", not whichever sibling variety happens
