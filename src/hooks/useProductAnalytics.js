@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { parseMesto } from '../utils/market.js'
-import { productMatchesSlug } from '../utils/productId.js'
+import { productMatchesSlug, normalizeProductName } from '../utils/productId.js'
 import { getRowLabel, getRowTime } from '../utils/week.js'
 import { getAveragePrice as getComparablePrice } from '../utils/price.js'
 import { resolveUnit } from '../utils/unit.js'
@@ -27,38 +27,55 @@ function highestMarketPrice(prices) {
   return Math.max(...prices)
 }
 
-// categoryName comes from the URL's :categorySlug segment and always applies
-// (works even for a direct/bookmarked visit with no router state). filters
-// disambiguates products whose names still collide within that category (see
-// buildProductRoute) - it travels via router state from the card that
-// triggered navigation, so it's only available for in-app navigation.
-function matchesIdentity(row, productSlug, categoryName, filters) {
+// categoryName comes from the URL's :categorySlug segment and always
+// applies (works even for a direct/bookmarked visit with no router state).
+function matchesExactSlug(row, productSlug, categoryName) {
   if (!productMatchesSlug(row.Proizvod, productSlug)) return false
   if (categoryName && row.Kategorija !== categoryName) return false
-  if (!filters) return true
-  return (
-    row.Velicina === filters.velicina &&
-    row.Pakovanje === filters.pakovanje &&
-    row.Poreklo === filters.poreklo
-  )
+  return true
 }
 
-export function useProductAnalytics(rows, productSlug, filters, selectedGrad, categoryName, selectedPijaca) {
-  const itemRows = useMemo(
-    () => rows.filter((row) => matchesIdentity(row, productSlug, categoryName, filters)),
-    [rows, productSlug, categoryName, filters],
+export function useProductAnalytics(rows, productSlug, selectedGrad, categoryName, selectedPijaca) {
+  // Two passes: first, the exact clicked variant/slug (e.g. "Krompir
+  // (beli)") purely to discover which product *family* this page is about;
+  // then every row anywhere - any market, any city, any source - whose name
+  // normalizes to that same base family (see normalizeProductName). STIPS
+  // often splits one generic product into several named varieties
+  // ("Krompir (beli)"/"Krompir (crveni)") while JKP never does (it's always
+  // just "Krompir") - matching on the exact name alone left JKP's data (and
+  // every STIPS sibling variety) invisible to a page opened from one
+  // specific variety's card. This also drops the old Velicina/Pakovanje/
+  // Poreklo attribute filter entirely: JKP rows never populate those fields
+  // (see sheetsService.js's normalizeJkpRow), so requiring an exact match
+  // silently excluded every JKP row from a STIPS-originated page (and vice
+  // versa) even when the base name lined up.
+  const exactRows = useMemo(
+    () => rows.filter((row) => matchesExactSlug(row, productSlug, categoryName)),
+    [rows, productSlug, categoryName],
   )
 
+  const itemRows = useMemo(() => {
+    if (exactRows.length === 0) return []
+    const baseName = normalizeProductName(exactRows[0].Proizvod)
+    return rows.filter((row) => {
+      if (normalizeProductName(row.Proizvod) !== baseName) return false
+      if (categoryName && row.Kategorija !== categoryName) return false
+      return true
+    })
+  }, [rows, exactRows, categoryName])
+
+  // Title/breadcrumb identity stays pinned to the exact variety that was
+  // clicked (e.g. "Krompir (beli)", not whichever sibling variety happens
+  // to be first in itemRows' broadened set) - only the aggregation widgets
+  // below (history, cityComparison, marketComparison, currentMarket) widen
+  // out to the whole product family.
   const identity = useMemo(() => {
-    const row = itemRows[0]
+    const row = exactRows[0]
     return {
       kategorija: row?.Kategorija ?? '',
       proizvod: (row?.Proizvod ?? '').trim(),
-      velicina: row?.Velicina ?? '',
-      pakovanje: row?.Pakovanje ?? '',
-      poreklo: row?.Poreklo ?? '',
     }
-  }, [itemRows])
+  }, [exactRows])
 
   // Grouped by the row's own literal Source text (see scripts/jkp-scraper's
   // SOURCE_LABEL) rather than a hardcoded STIPS/JKP binary, so a future

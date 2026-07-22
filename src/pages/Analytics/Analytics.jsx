@@ -37,14 +37,12 @@ function Analytics({ rows, loading, error }) {
   const { citySlug, marketSlug, categorySlug, productSlug } = useParams()
   const location = useLocation()
 
-  const productFilters = location.state?.productFilters
-
   const grad = useMemo(() => resolveGradBySlug(rows, citySlug), [rows, citySlug])
   const pijaca = useMemo(() => resolvePijacaBySlug(rows, grad, marketSlug), [rows, grad, marketSlug])
   const categoryName = useMemo(() => resolveCategoryBySlug(categorySlug), [categorySlug])
   const market = grad && pijaca ? { grad, pijaca } : null
 
-  const analytics = useProductAnalytics(rows, productSlug, productFilters, grad, categoryName, pijaca)
+  const analytics = useProductAnalytics(rows, productSlug, grad, categoryName, pijaca)
   const { identity } = analytics
 
   // Deep-linked/shared URLs land here before the app shell's own fetch has a

@@ -59,11 +59,15 @@ export function buildProductRoute(grad, pijaca, row, language) {
   return `/${getCityPathPrefix(language)}/${slugify(grad)}/${marketSlug}/${getCategoryUrlSlug(row.Kategorija, language)}/${getProductUrlSlug(row.Proizvod, language)}`
 }
 
-export function buildProductFilters(row) {
-  return {
-    kategorija: row.Kategorija,
-    velicina: row.Velicina,
-    pakovanje: row.Pakovanje,
-    poreklo: row.Poreklo,
-  }
+// Strips a trailing parenthetical variety/size qualifier - "Krompir (beli)"
+// and "Krompir (crveni)" both become "Krompir" - so STIPS's per-variety
+// naming and JKP's single generic name for the same product (JKP never
+// carries a variety suffix at all - see sheetsService.js's normalizeJkpRow)
+// are recognized as one product family instead of silently missing each
+// other (see useProductAnalytics.js's itemRows). Only ever strips a
+// TRAILING parenthetical, never one mid-string - every STIPS name observed
+// in the live sheet puts its qualifier at the end (e.g. "Paprika (šilja)"),
+// so this can't accidentally eat a legitimate multi-word product name.
+export function normalizeProductName(proizvod) {
+  return proizvod.replace(/\s*\([^)]*\)\s*$/, '').trim()
 }

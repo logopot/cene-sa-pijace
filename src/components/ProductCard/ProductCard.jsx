@@ -10,10 +10,7 @@ import { getDisplayPrice } from "../../utils/price.js";
 import { resolveUnit } from "../../utils/unit.js";
 import { getSourceLabel } from "../../utils/marketTime.js";
 
-import {
-  buildProductFilters,
-  buildProductRoute,
-} from "../../utils/productId.js";
+import { buildProductRoute } from "../../utils/productId.js";
 import {
   CardLink,
   StyledCard,
@@ -91,7 +88,6 @@ function ProductCard({ row, selection }) {
       state={{
         market: { grad, pijaca },
         returnTo: selection,
-        productFilters: buildProductFilters(row),
       }}
       aria-label={t("productCard.viewAnalytics", { product: productName })}
     >
