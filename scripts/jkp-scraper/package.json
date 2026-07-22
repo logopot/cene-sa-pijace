@@ -6,7 +6,8 @@
   "description": "Scrapes JKP Beogradske pijace's bgpijace.rs price barometar and appends historical rows to Google Sheets",
   "scripts": {
     "start": "node index.js",
-    "backfill": "node backfill.js"
+    "backfill": "node backfill.js",
+    "rename-products": "node rename-products.js"
   },
   "dependencies": {
     "cheerio": "^1.0.0",

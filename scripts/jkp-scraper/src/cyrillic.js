@@ -48,12 +48,28 @@ const PRODUCTS = {
   КУПУС: { name: 'Kupus', category: 'Povrće' },
   КАРФИОЛ: { name: 'Karfiol', category: 'Povrće' },
   ТИКВИЦЕ: { name: 'Tikvice', category: 'Povrće' },
-  'МЛАДИ ЦРНИ ЛУК': { name: 'Mladi crni luk', category: 'Povrće' },
-  'МЛАДИ БЕЛИ ЛУК': { name: 'Mladi beli luk', category: 'Povrće' },
+  // Named noun-first (matching STIPS's own "Luk crni"/"Luk beli" - see
+  // src/utils/productId.js's normalizeProductName in the main app), with
+  // the variety qualifier moved to a trailing "(mladi)" so it strips down
+  // to the same base family as STIPS's own "Luk crni (mladi)"/"Luk beli
+  // (mladi)" rows instead of forming its own disconnected "Mladi crni
+  // luk"/"Mladi beli luk" family.
+  'МЛАДИ ЦРНИ ЛУК': { name: 'Luk crni (mladi)', category: 'Povrće' },
+  'МЛАДИ БЕЛИ ЛУК': { name: 'Luk beli (mladi)', category: 'Povrće' },
   ПАРАДАЈЗ: { name: 'Paradajz', category: 'Povrće' },
   КРАСТАВАЦ: { name: 'Krastavac', category: 'Povrće' },
   ПАПРИКА: { name: 'Paprika', category: 'Povrće' },
   'ЗЕЛЕНА САЛАТА': { name: 'Zelena salata', category: 'Povrće' },
+  // STIPS has no "mladi"/"sve sorte" qualifier-free bare name for these two
+  // either, but its own qualified variants ("Luk crni (mladi)", "Luk crni
+  // (sve sorte)") share the same "Luk crni" base once normalized - this
+  // bare name normalizes to that identical base with nothing to strip.
+  'ЦРНИ ЛУК': { name: 'Luk crni', category: 'Povrće' },
+  // STIPS's family for this vegetable is the generic "Patlidžan (sve
+  // sorte)" (base "Patlidžan") - dropping "Plavi" (the specific purple
+  // variety JKP's own header names) aligns with that same family instead of
+  // forming its own disconnected "Plavi Patlidžan" one.
+  'ПЛАВИ ПАТЛИЏАН': { name: 'Patlidžan', category: 'Povrće' },
   КАЈСИЈА: { name: 'Kajsija', category: 'Voće' },
   МАЛИНА: { name: 'Malina', category: 'Voće' },
   ДИЊА: { name: 'Dinja', category: 'Voće' },
