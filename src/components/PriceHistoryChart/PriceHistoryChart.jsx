@@ -5,6 +5,7 @@ import { ROTATED_AXIS_HEIGHT, ROTATED_AXIS_MARGIN_BOTTOM, RotatedAxisTick } from
 import {
   ChartWrap,
   EmptyState,
+  Note,
   TooltipCard,
   TooltipDate,
   TooltipDot,
@@ -74,7 +75,7 @@ function CustomTooltip({ active, payload, label, series }) {
   )
 }
 
-function PriceHistoryChart({ data, sources }) {
+function PriceHistoryChart({ data, sources, missingSources = [] }) {
   const { t } = useTranslation()
 
   if (data.length === 0) {
@@ -135,6 +136,14 @@ function PriceHistoryChart({ data, sources }) {
           ))}
         </AreaChart>
       </ResponsiveContainer>
+
+      {missingSources.length > 0 && (
+        <Note>
+          {t('analytics.variationSourceGap', {
+            sources: missingSources.map((source) => getSourceDisplayLabel(t, source)).join(', '),
+          })}
+        </Note>
+      )}
     </ChartWrap>
   )
 }

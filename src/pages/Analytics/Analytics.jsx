@@ -169,7 +169,11 @@ function Analytics({ rows, loading, error }) {
             selected={selectedVariation}
             onSelect={setSelectedVariation}
           />
-          <PriceHistoryChart data={analytics.history} sources={analytics.historySources} />
+          <PriceHistoryChart
+            data={analytics.history}
+            sources={analytics.historySources}
+            missingSources={analytics.missingHistorySources}
+          />
         </Section>
 
         <Section>

@@ -12,6 +12,13 @@ export const EmptyState = styled.p`
   font-style: italic;
 `
 
+export const Note = styled.p`
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-style: italic;
+  font-size: 0.85rem;
+  margin: 0.75rem 0 0;
+`
+
 export const TooltipCard = styled.div`
   min-width: 160px;
   background: ${({ theme }) => theme.colors.surface};

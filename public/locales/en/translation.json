@@ -168,7 +168,8 @@
     "singleMarketNote": "This is the only market in this city with current data.",
     "priceSourceLabel": "Most common price · {{source}}",
     "allVariations": "All variations",
-    "variationSelectorLabel": "Product variation filter"
+    "variationSelectorLabel": "Product variation filter",
+    "variationSourceGap": "No data from {{sources}} for this variation."
   },
   "footer": {
     "tagline": "An independent market portal giving you a fast, clear view of agricultural price trends at green markets across Serbia.",

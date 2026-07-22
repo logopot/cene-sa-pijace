@@ -97,13 +97,22 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
     return Array.from(seen, ([key, label]) => ({ key, label }))
   }, [itemRows])
 
+  // City-scoped, unfiltered-by-variation - the baseline historyRows narrows
+  // further from (see below), and also what missingHistorySources compares
+  // against to tell "this source has no data for the selected city" apart
+  // from "this source has no data for this specific variety".
+  const cityRows = useMemo(
+    () => itemRows.filter((row) => parseMesto(row.Mesto).grad === selectedGrad),
+    [itemRows, selectedGrad],
+  )
+
   // Only the Price History Chart narrows by variation (see
   // VariationSelector) - cityComparison/marketComparison/currentMarket stay
   // at the whole-family level regardless of which tab is selected.
   const historyRows = useMemo(() => {
-    if (!selectedVariation || selectedVariation === 'all') return itemRows
-    return itemRows.filter((row) => extractVariation(row.Proizvod)?.key === selectedVariation)
-  }, [itemRows, selectedVariation])
+    if (!selectedVariation || selectedVariation === 'all') return cityRows
+    return cityRows.filter((row) => extractVariation(row.Proizvod)?.key === selectedVariation)
+  }, [cityRows, selectedVariation])
 
   // Grouped by the row's own literal Source text (see scripts/jkp-scraper's
   // SOURCE_LABEL) rather than a hardcoded STIPS/JKP binary, so a future
@@ -112,17 +121,15 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
   // carry a Source at all, so they fall back to the generic "STIPS" bucket.
   const history = useMemo(() => {
     const byWeek = new Map()
-    historyRows
-      .filter((row) => parseMesto(row.Mesto).grad === selectedGrad)
-      .forEach((row) => {
-        const time = getRowTime(row)
-        if (time === null) return
-        if (!byWeek.has(time)) byWeek.set(time, { time, weekLabel: getRowLabel(row), bySource: new Map() })
-        const bucket = byWeek.get(time)
-        const source = row.Source || 'STIPS'
-        if (!bucket.bySource.has(source)) bucket.bySource.set(source, [])
-        bucket.bySource.get(source).push(row.CenaDom)
-      })
+    historyRows.forEach((row) => {
+      const time = getRowTime(row)
+      if (time === null) return
+      if (!byWeek.has(time)) byWeek.set(time, { time, weekLabel: getRowLabel(row), bySource: new Map() })
+      const bucket = byWeek.get(time)
+      const source = row.Source || 'STIPS'
+      if (!bucket.bySource.has(source)) bucket.bySource.set(source, [])
+      bucket.bySource.get(source).push(row.CenaDom)
+    })
 
     const sortedWeeks = Array.from(byWeek.values()).sort((a, b) => a.time - b.time)
     return sortedWeeks.map(({ time, weekLabel, bySource }) => ({
@@ -130,7 +137,7 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
       weekLabel,
       ...Object.fromEntries(Array.from(bySource, ([source, prices]) => [source, average(prices)])),
     }))
-  }, [historyRows, selectedGrad])
+  }, [historyRows])
 
   // Stable series order (first-seen chronologically across `history` above)
   // so the chart's legend/series list and their assigned colors don't
@@ -145,6 +152,22 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
     }
     return sources
   }, [history])
+
+  // Sources present for this city at the whole-family level (cityRows,
+  // ignoring the variation filter) but absent once narrowed to the selected
+  // variation - e.g. JKP only ever reports generic "Krompir" with no
+  // Beli/Crveni/Mladi breakdown at all, so those three tabs correctly drop
+  // its line, but the chart should say why rather than silently rendering
+  // one fewer series with no explanation. Empty for "all" (nothing was
+  // narrowed away yet) and empty whenever every source the city has still
+  // shows up under the selected variation (e.g. Luk crni's "Mladi" tab,
+  // where JKP does report a "(mladi)"-qualified row).
+  const missingHistorySources = useMemo(() => {
+    if (!selectedVariation || selectedVariation === 'all') return []
+    const fullFamilySources = new Set(cityRows.map((row) => row.Source || 'STIPS'))
+    const filteredSources = new Set(historySources)
+    return [...fullFamilySources].filter((source) => !filteredSources.has(source))
+  }, [cityRows, historySources, selectedVariation])
 
   // Each city's own latest record for this product, not a single global
   // latest timestamp - a city whose scraper ran even a day/week earlier than
@@ -235,6 +258,7 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
     availableVariations,
     history,
     historySources,
+    missingHistorySources,
     cityComparison,
     cheapest: cityComparison[0] ?? null,
     priciest: cityComparison[cityComparison.length - 1] ?? null,
