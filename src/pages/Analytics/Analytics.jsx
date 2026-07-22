@@ -161,7 +161,7 @@ function Analytics({ rows, loading, error }) {
 
         <Section>
           <SectionTitle>{t('analytics.historyTitle')}</SectionTitle>
-          <PriceHistoryChart data={analytics.history} />
+          <PriceHistoryChart data={analytics.history} sources={analytics.historySources} />
         </Section>
 
         <Section>

@@ -20,6 +20,11 @@ export const theme = {
     dangerTint: "#fbe4e1",
     jkpBlue: "#2563eb",
     jkpBlueTint: "#dbeafe",
+    // Fallback palette for any data source beyond STIPS/JKP (see
+    // PriceHistoryChart.jsx's getSourceColor) - cycled through in the order
+    // new, unrecognized sources first appear in the data.
+    chartSourceOrange: "#ea580c",
+    chartSourcePurple: "#9333ea",
     tertiary: "#b45309",
     tertiaryTint: "#fef3c7",
     leafOrange: "#e75a24",

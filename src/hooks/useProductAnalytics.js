@@ -60,6 +60,11 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
     }
   }, [itemRows])
 
+  // Grouped by the row's own literal Source text (see scripts/jkp-scraper's
+  // SOURCE_LABEL) rather than a hardcoded STIPS/JKP binary, so a future
+  // third scraper with its own distinct Source string becomes its own
+  // series automatically, with no change needed here - STIPS rows never
+  // carry a Source at all, so they fall back to the generic "STIPS" bucket.
   const history = useMemo(() => {
     const byWeek = new Map()
     itemRows
@@ -67,23 +72,34 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
       .forEach((row) => {
         const time = getRowTime(row)
         if (time === null) return
-        if (!byWeek.has(time))
-          byWeek.set(time, { time, weekLabel: getRowLabel(row), stipsPrices: [], jkpPrices: [] })
+        if (!byWeek.has(time)) byWeek.set(time, { time, weekLabel: getRowLabel(row), bySource: new Map() })
         const bucket = byWeek.get(time)
-        // row.Source is only populated for JKP archive rows (see
-        // scripts/jkp-scraper) - STIPS rows never carry it.
-        if (row.Source) bucket.jkpPrices.push(row.CenaDom)
-        else bucket.stipsPrices.push(row.CenaDom)
+        const source = row.Source || 'STIPS'
+        if (!bucket.bySource.has(source)) bucket.bySource.set(source, [])
+        bucket.bySource.get(source).push(row.CenaDom)
       })
-    return Array.from(byWeek.values())
-      .sort((a, b) => a.time - b.time)
-      .map(({ time, weekLabel, stipsPrices, jkpPrices }) => ({
-        time,
-        weekLabel,
-        stipsPrice: average(stipsPrices),
-        jkpPrice: average(jkpPrices),
-      }))
+
+    const sortedWeeks = Array.from(byWeek.values()).sort((a, b) => a.time - b.time)
+    return sortedWeeks.map(({ time, weekLabel, bySource }) => ({
+      time,
+      weekLabel,
+      ...Object.fromEntries(Array.from(bySource, ([source, prices]) => [source, average(prices)])),
+    }))
   }, [itemRows, selectedGrad])
+
+  // Stable series order (first-seen chronologically across `history` above)
+  // so the chart's legend/series list and their assigned colors don't
+  // reshuffle between renders - a product with only one source for the
+  // selected city naturally ends up with a single-entry array here.
+  const historySources = useMemo(() => {
+    const sources = []
+    for (const week of history) {
+      for (const key of Object.keys(week)) {
+        if (key !== 'time' && key !== 'weekLabel' && !sources.includes(key)) sources.push(key)
+      }
+    }
+    return sources
+  }, [history])
 
   // Each city's own latest record for this product, not a single global
   // latest timestamp - a city whose scraper ran even a day/week earlier than
@@ -172,6 +188,7 @@ export function useProductAnalytics(rows, productSlug, filters, selectedGrad, ca
   return {
     identity,
     history,
+    historySources,
     cityComparison,
     cheapest: cityComparison[0] ?? null,
     priciest: cityComparison[cityComparison.length - 1] ?? null,
