@@ -28,6 +28,19 @@ export const Subtitle = styled.p`
   color: ${({ theme }) => theme.colors.textSecondary};
 `
 
+export const LastUpdated = styled.p`
+  display: inline-flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.xxs};
+  margin: 0 auto;
+  padding: ${({ theme }) => theme.spacing.xxs} ${({ theme }) => theme.spacing.sm};
+  border-radius: ${({ theme }) => theme.radius.pill};
+  background-color: ${({ theme }) => theme.colors.borderLight};
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-size: 0.8rem;
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+`
+
 export const ValueGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;

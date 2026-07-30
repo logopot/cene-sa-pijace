@@ -35,7 +35,7 @@ function MarketExplorer({ rows, loading, error }) {
   return (
     <>
       <SEO title={t('seo.home.title')} description={t('seo.home.description')} url={SITE_URL} />
-      <Hero />
+      <Hero rows={rows} />
       <GlobalFilterBar />
 
       <WeeklyTrends rows={explorer.weeklyDrops} />

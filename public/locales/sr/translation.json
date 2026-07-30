@@ -10,6 +10,10 @@
   "hero": {
     "headline": "Najbolje pijačne cene u Srbiji",
     "subtitle": "Uporedite cene voća, povrća i drugih namirnica na pijacama širom zemlje i uštedite na svakoj kupovini.",
+    "lastUpdated": {
+      "combined": "Poslednje ažuriranje baze: {{value}}",
+      "bySource": "STIPS: {{stips}} | JKP: {{jkp}}"
+    },
     "values": {
       "freshPrices": {
         "title": "Sveže cene, svake nedelje",

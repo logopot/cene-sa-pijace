@@ -10,6 +10,10 @@
   "hero": {
     "headline": "The Best Market Prices in Serbia",
     "subtitle": "Compare prices for fruit, vegetables, and other goods across markets nationwide and save on every purchase.",
+    "lastUpdated": {
+      "combined": "Database last updated: {{value}}",
+      "bySource": "STIPS: {{stips}} | JKP: {{jkp}}"
+    },
     "values": {
       "freshPrices": {
         "title": "Fresh prices, every day",
