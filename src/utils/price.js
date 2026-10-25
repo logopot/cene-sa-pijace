@@ -39,3 +39,21 @@ export function getAveragePrice(row) {
   if (hasPrice(row.CenaMax)) return row.CenaMax
   return null
 }
+
+// Whole prices read as "80", fractional ones keep two decimals ("80.50") -
+// the sheet's own values are never rounded, only presented without a
+// meaningless ".00".
+export function formatPriceValue(value) {
+  if (!hasPrice(value)) return '-'
+  return Number.isInteger(value) ? String(value) : value.toFixed(2)
+}
+
+// The numeric part of a card's headline price from getDisplayPrice's result:
+// "60 - 70" for a real range, a single number when min and max are the same
+// (or the row only has one figure at all).
+export function formatDisplayPrice(displayPrice) {
+  if (!displayPrice) return ''
+  if (displayPrice.type === 'single') return formatPriceValue(displayPrice.value)
+  if (displayPrice.min === displayPrice.max) return formatPriceValue(displayPrice.min)
+  return `${formatPriceValue(displayPrice.min)} - ${formatPriceValue(displayPrice.max)}`
+}

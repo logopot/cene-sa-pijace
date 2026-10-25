@@ -6,7 +6,8 @@ import { translateDataValue } from "../../utils/translateValue.js";
 import { classifyComment } from "../../utils/comment.js";
 import { spaceBeforeParens } from "../../utils/formatText.js";
 import { getTrendIcon } from "../../utils/trend.js";
-import { getDisplayPrice } from "../../utils/price.js";
+import { getDisplayPrice, formatDisplayPrice, formatPriceValue, hasPrice } from "../../utils/price.js";
+import { isBlank } from "../../utils/blank.js";
 import { resolveUnit } from "../../utils/unit.js";
 import { getSourceLabel } from "../../utils/marketTime.js";
 
@@ -34,10 +35,6 @@ import {
 } from "./ProductCard.styled.js";
 
 const KNOWN_TRENDS = new Set(["rast", "pad", "bez promene"]);
-
-function formatPrice(value) {
-  return value === null || value === undefined ? "-" : value.toFixed(2);
-}
 
 function capitalize(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
@@ -69,18 +66,37 @@ function ProductCard({ row, selection }) {
   // JKP archive rows already carry their own attributed Source (see
   // scripts/jkp-scraper); only STIPS rows need the marketInfo.json lookup.
   const sourceLabel = row.Source || getSourceLabel(grad, pijaca);
-  // STIPS uses "-" as a placeholder for animals/products with no comparable
-  // prior price - this still gets its own "no trend" indicator rather than an
-  // empty one, since historical data may exist even without a trend.
+  // No trend data (STIPS writes "-", JKP rows have none at all) means no
+  // badge at all - never a made-up "no trend" label.
   const hasTrendData = KNOWN_TRENDS.has(row.Trend);
-  const trend =
-    hasTrendData ?
-      translateDataValue(t, "trend", row.Trend)
-    : t("productCard.noTrend");
+  const trend = hasTrendData ? translateDataValue(t, "trend", row.Trend) : "";
   const TrendIcon = getTrendIcon(row.Trend);
-  const trendVariant = hasTrendData ? row.Trend : "none";
   const comment = classifyComment(row.Komentar);
   const displayPrice = getDisplayPrice(row);
+
+  // Tag rows: price + packaging, then origin + offer. Only fields the source
+  // actually reports (not empty, not a placeholder like "-"/"n/a") become
+  // elements; an empty field leaves nothing in the DOM. A tag that is alone in
+  // its row spans the full width, a pair splits it. Nothing is ever
+  // substituted for a missing value.
+  const metaTags = [
+    [
+      {
+        key: "avgPrice",
+        label: t("productCard.avgPrice"),
+        value: hasPrice(row.CenaDom) ? t("productCard.avgPriceValue", { price: formatPriceValue(row.CenaDom) }) : "",
+      },
+      { key: "packaging", label: t("productCard.packaging"), value: pakovanje },
+    ],
+    [
+      { key: "origin", label: t("productCard.origin"), value: poreklo },
+      { key: "offer", label: t("productCard.offer"), value: ponuda },
+    ],
+  ].flatMap((slots) => {
+    const filled = slots.filter((slot) => !isBlank(slot.value));
+    return filled.map((slot) => ({ ...slot, fullWidth: filled.length === 1 }));
+  });
+  const locationLabel = `${pijacaLabel}, ${gradLabel}`;
 
   return (
     <CardLink
@@ -103,36 +119,22 @@ function ProductCard({ row, selection }) {
                 className="product-title-container"
                 data-testid="product-title-container"
               >
-                <ProductTitle>{productName}</ProductTitle>
-                <MarketSubtitle>
-                  {pijacaLabel}, {gradLabel}
-                </MarketSubtitle>
+                <ProductTitle title={productName}>{productName}</ProductTitle>
+                <MarketSubtitle title={locationLabel}>{locationLabel}</MarketSubtitle>
               </div>
             </TitleBlock>
           </CardHeader>
 
-          <MetaGrid>
-            <MetaBadge>
-              <MetaLabel>{t("productCard.avgPrice")}</MetaLabel>
-              <MetaValue>
-                {t("productCard.avgPriceValue", {
-                  price: formatPrice(row.CenaDom),
-                })}
-              </MetaValue>
-            </MetaBadge>
-            <MetaBadge>
-              <MetaLabel>{t("productCard.packaging")}</MetaLabel>
-              <MetaValue>{pakovanje || "-"}</MetaValue>
-            </MetaBadge>
-            <MetaBadge>
-              <MetaLabel>{t("productCard.origin")}</MetaLabel>
-              <MetaValue>{poreklo || "-"}</MetaValue>
-            </MetaBadge>
-            <MetaBadge>
-              <MetaLabel>{t("productCard.offer")}</MetaLabel>
-              <MetaValue>{ponuda || "-"}</MetaValue>
-            </MetaBadge>
-          </MetaGrid>
+          {metaTags.length > 0 && (
+            <MetaGrid>
+              {metaTags.map(({ key, label, value, fullWidth }) => (
+                <MetaBadge key={key} $fullWidth={fullWidth}>
+                  <MetaLabel title={label}>{label}</MetaLabel>
+                  <MetaValue title={value}>{value}</MetaValue>
+                </MetaBadge>
+              ))}
+            </MetaGrid>
+          )}
 
           {comment?.type === "country" && (
             <FieldRow>
@@ -149,14 +151,12 @@ function ProductCard({ row, selection }) {
             </FieldRow>
           )}
           {comment?.type === "text" && (
-            <CommentText>{comment.value}</CommentText>
+            <CommentText title={comment.value}>{comment.value}</CommentText>
           )}
 
           {displayPrice && (
             <PriceValue>
-              {displayPrice.type === "range" ?
-                `${formatPrice(displayPrice.min)} - ${formatPrice(displayPrice.max)}`
-              : formatPrice(displayPrice.value)}{" "}
+              {formatDisplayPrice(displayPrice)}{" "}
               {jedMere ?
                 t("productCard.priceUnit", { unit: jedMere })
               : t("productCard.priceNoUnit")}
@@ -167,16 +167,13 @@ function ProductCard({ row, selection }) {
             <SourceTag>
               {t("productCard.source", { source: sourceLabel })}
             </SourceTag>
-            <TrendIndicator
-              $trend={trendVariant}
-              title={hasTrendData ? undefined : t("productCard.noTrendTitle")}
-            >
-              {TrendIcon ?
-                // eslint-disable-next-line react-hooks/static-components -- TrendIcon is a stable module-level reference, not created during render
+            {hasTrendData && (
+              <TrendIndicator $trend={row.Trend}>
+                {/* eslint-disable-next-line react-hooks/static-components -- TrendIcon is a stable module-level reference, not created during render */}
                 <TrendIcon />
-              : <span>-</span>}
-              {trend}
-            </TrendIndicator>
+                {trend}
+              </TrendIndicator>
+            )}
           </CardFooter>
         </Card.Body>
       </StyledCard>

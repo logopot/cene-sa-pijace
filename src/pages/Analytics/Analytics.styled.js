@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { SkeletonBlock } from '../../styles/Skeleton.styled.js'
 import { AppIconWrapper } from '../../styles/Card.styled.js'
 
 export const StatusSection = styled.div`
@@ -115,4 +116,8 @@ export const SectionTitle = styled.h2`
   font-weight: ${({ theme }) => theme.font.weight.bold};
   color: ${({ theme }) => theme.colors.textDark};
   margin-bottom: 1rem;
+`
+
+export const ChartSkeleton = styled(SkeletonBlock)`
+  height: 320px;
 `

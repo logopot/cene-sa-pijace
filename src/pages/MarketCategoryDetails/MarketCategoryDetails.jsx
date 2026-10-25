@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
-import { Alert, Container, Spinner } from 'react-bootstrap'
+import { Alert, Container } from 'react-bootstrap'
+import PageSkeleton from '../../components/PageSkeleton/PageSkeleton.jsx'
 import { ALL_MARKETS } from '../../constants/filters.js'
 import {
   parseMesto,
@@ -99,9 +100,7 @@ function MarketCategoryDetails({ rows, loading, error }) {
 
   if (loading) {
     return (
-      <StatusSection>
-        <Spinner animation="border" role="status" aria-label={t('results.loading')} />
-      </StatusSection>
+      <PageSkeleton />
     )
   }
 

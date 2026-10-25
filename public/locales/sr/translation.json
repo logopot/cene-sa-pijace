@@ -1,4 +1,9 @@
 {
+  "404": {
+    "title": "Ova tezga je trenutno prazna",
+    "description": "Možda je stranica koju tražite u pripremi, premeštena ili je završen pijačni dan. Proverite adresu ili se vratite na pregled aktivnih ponuda.",
+    "button": "Nazad na početnu"
+  },
   "app": {
     "name": "Cene sa pijace"
   },
@@ -49,6 +54,10 @@
     "category": {
       "title": "{{category}} - Cene na pijaci {{market}} ({{city}})",
       "description": "Aktuelne cene za {{category}} na pijaci {{market}} u gradu {{city}}."
+    },
+    "city": {
+      "title": "Cene na pijacama - {{city}} | Aktuelne cene",
+      "description": "Aktuelne cene voća, povrća i drugih namirnica na pijacama u gradu {{city}}. Izaberite pijacu i uporedite ponudu."
     }
   },
   "categories": {
@@ -183,11 +192,6 @@
     "nav": {
       "aboutHeading": "O projektu"
     }
-  },
-  "404": {
-    "title": "Ova tezga je trenutno prazna",
-    "description": "Možda je stranica koju tražite u pripremi, premeštena ili je završen pijačni dan. Proverite adresu ili se vratite na pregled aktivnih ponuda.",
-    "button": "Nazad na početnu"
   },
   "disclaimer": {
     "title": "Odricanje od odgovornosti",

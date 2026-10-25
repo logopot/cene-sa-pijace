@@ -18,6 +18,8 @@ export const StyledCard = styled(Card)`
     box-shadow 0.2s ease;
 
   .card-body {
+    display: flex;
+    flex-direction: column;
     padding: ${({ theme }) => theme.spacing.lg};
   }
 
@@ -77,28 +79,45 @@ export const TitleBlock = styled.div`
   text-align: left;
 `;
 
+// Two-line clamp: a very long name is cut with an ellipsis (full text in the
+// title attribute) so one unusually long card cannot inflate the others.
+const clampLines = (lines) => `
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: ${lines};
+  line-clamp: ${lines};
+  overflow: hidden;
+  overflow-wrap: anywhere;
+`;
+
 export const ProductTitle = styled(Card.Title)`
+  ${clampLines(2)}
   font-size: 1.15rem;
+  line-height: 1.25;
   font-weight: ${({ theme }) => theme.font.weight.medium};
   letter-spacing: -0.01em;
   color: ${({ theme }) => theme.colors.titleDark};
   margin-bottom: 0;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 `;
 
 export const MarketSubtitle = styled(Card.Subtitle)`
+  ${clampLines(2)}
   font-size: 0.875rem;
+  line-height: 1.3;
   font-weight: ${({ theme }) => theme.font.weight.regular};
   color: ${({ theme }) => theme.colors.textMuted};
   margin: 0;
   text-align: left;
 `;
 
+// Footer items share one row height (the trend badge's), so the divider above
+// sits at the same place whether or not a badge is rendered.
+const FOOTER_ITEM_HEIGHT = "1.75rem";
+
 export const SourceTag = styled.span`
   min-width: 0;
+  line-height: ${FOOTER_ITEM_HEIGHT};
   font-size: 0.75rem;
   font-weight: ${({ theme }) => theme.font.weight.regular};
   color: ${({ theme }) => theme.colors.textMuted};
@@ -107,6 +126,9 @@ export const SourceTag = styled.span`
   text-overflow: ellipsis;
 `;
 
+// Tags flow into two columns; a tag that is alone in its row spans both.
+// Sized by content only - equal card heights come from the list/carousel
+// container, not from reserving space here.
 export const MetaGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -115,8 +137,11 @@ export const MetaGrid = styled.div`
 `;
 
 export const MetaBadge = styled.div`
+  grid-column: ${({ $fullWidth }) => ($fullWidth ? "1 / -1" : "auto")};
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   gap: 0.15rem;
   background: ${({ theme }) => theme.colors.borderLight};
   border-radius: ${({ theme }) => theme.radius.lg};
@@ -125,14 +150,20 @@ export const MetaBadge = styled.div`
 `;
 
 export const MetaLabel = styled.span`
+  max-width: 100%;
   font-size: 0.68rem;
   font-weight: ${({ theme }) => theme.font.weight.regular};
   color: ${({ theme }) => theme.colors.textMuted};
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const MetaValue = styled.span`
+  max-width: 100%;
   font-size: 0.85rem;
   font-weight: ${({ theme }) => theme.font.weight.medium};
   color: ${({ theme }) => theme.colors.textDark};
@@ -161,7 +192,9 @@ export const FieldValue = styled.span`
 `;
 
 export const PriceValue = styled.div`
-  margin-top: 0.5rem;
+  margin-top: auto;
+  padding-top: ${({ theme }) => theme.spacing.xs};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
   font-size: 1.5rem;
   font-weight: ${({ theme }) => theme.font.weight.bold};
   color: ${({ theme }) => theme.colors.titleDark};
@@ -186,7 +219,7 @@ export const CardFooter = styled.div`
   align-items: center;
   width: 100%;
   gap: 0.75rem;
-  margin-top: 16px;
+  margin-top: 0;
   padding-top: 12px;
   border-top: 1px solid ${({ theme }) => theme.colors.borderLight};
 `;
@@ -222,9 +255,10 @@ export const TrendIndicator = styled.span`
   align-items: center;
   gap: 0.2rem;
   font-size: 0.8rem;
+  height: ${FOOTER_ITEM_HEIGHT};
   font-weight: ${({ theme }) => theme.font.weight.bold};
   border-radius: ${({ theme }) => theme.radius.lg};
-  padding: 0.25rem 0.6rem;
+  padding: 0 0.6rem;
   background-color: ${(props) => trendVariant(props.$trend).bg(props)};
   color: ${(props) => trendVariant(props.$trend).fg(props)};
 
@@ -239,7 +273,10 @@ export const CommentText = styled.p`
   font-size: 0.8rem;
   font-style: italic;
   color: ${({ theme }) => theme.colors.textMuted};
-  margin: 0.5rem 0 0;
+  margin: 0;
   padding-top: 0.5rem;
   border-top: 1px solid ${({ theme }) => theme.colors.borderLight};
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;

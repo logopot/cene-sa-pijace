@@ -1,4 +1,4 @@
-import { Fragment, useState, useSyncExternalStore } from 'react'
+import { Fragment, lazy, Suspense, useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Header from './components/Header/Header.jsx'
 import Footer from './components/Footer/Footer.jsx'
@@ -6,81 +6,35 @@ import MarketExplorer from './components/MarketExplorer/MarketExplorer.jsx'
 import DisclaimerPage from './components/DisclaimerPage/DisclaimerPage.jsx'
 import ScrollToTop from './components/ScrollToTop/ScrollToTop.jsx'
 import ScrollToTopButton from './components/ScrollToTopButton/ScrollToTopButton.jsx'
-import FullScreenLoader from './components/FullScreenLoader/FullScreenLoader.jsx'
+import PageSkeleton from './components/PageSkeleton/PageSkeleton.jsx'
 import CityDetails from './pages/CityDetails/CityDetails.jsx'
 import MarketDetails from './pages/MarketDetails/MarketDetails.jsx'
 import MarketCategoryDetails from './pages/MarketCategoryDetails/MarketCategoryDetails.jsx'
-import Analytics from './pages/Analytics/Analytics.jsx'
 import NotFound from './pages/NotFound/NotFound.jsx'
 import { useMarketPrices } from './hooks/useMarketPrices.js'
 import { CITY_PATH_PREFIX, DISCLAIMER_PATH } from './constants/routeLocales.js'
 import { FilterProvider } from './context/FilterContext.jsx'
-import i18n from './i18n.js'
+import { hasSnapshot, removeSnapshot } from './utils/snapshot.js'
 import { GlobalStyle } from './styles/globalStyle.js'
 import { AppShell, Main } from './App.styled.js'
 
-// Reactively tracks i18n's own async init (resource preload, see i18n.js) -
-// read directly off the singleton via useSyncExternalStore rather than
-// useTranslation(), so this check itself never triggers react-i18next's
-// Suspense integration (which would bypass this gate and fall through to
-// main.jsx's Suspense fallback instead).
-function subscribeToI18nInit(callback) {
-  i18n.on('initialized', callback)
-  return () => i18n.off('initialized', callback)
-}
-
-function getI18nReady() {
-  return i18n.isInitialized
-}
-
-function useI18nReady() {
-  return useSyncExternalStore(subscribeToI18nInit, getI18nReady)
-}
-
-// Real, step-based boot progress (no fake timer) - derived purely from the
-// two actual async boot signals (i18n resource load, market data fetch) at
-// render time, so the value can never stall or overflow past 100. This repo's
-// lint config forbids calling setState from inside an effect (see the
-// useSyncExternalStore gate above), so progress can't be sequenced via
-// separate "did this just happen" effects; instead it's a pure function of
-// which promises have resolved so far. i18n typically resolves first (small
-// static JSON) while the Sheets fetch is still in flight, hence 40 before 65.
-const PROGRESS_MOUNTED = 15
-const PROGRESS_I18N_READY = 40
-const PROGRESS_DATA_FETCHED = 65
-const PROGRESS_ALL_READY = 100
-
-function getInitializationProgress(i18nReady, dataLoaded) {
-  if (i18nReady && dataLoaded) return PROGRESS_ALL_READY
-  if (i18nReady) return PROGRESS_I18N_READY
-  if (dataLoaded) return PROGRESS_DATA_FETCHED
-  return PROGRESS_MOUNTED
-}
+// The product page is the only one that pulls in the charting library, so
+// it's split out of the entry bundle and fetched on demand.
+const Analytics = lazy(() => import('./pages/Analytics/Analytics.jsx'))
 
 function App() {
   const { rows, loading, error } = useMarketPrices()
   const location = useLocation()
-  const i18nReady = useI18nReady()
-  const initializationProgress = getInitializationProgress(i18nReady, !loading)
-  // The loader's own visualProgress animation may still be catching up to
-  // initializationProgress even after the real boot signals finish (see
-  // FullScreenLoader.jsx) - onComplete fires once that visual chase reaches
-  // 100, which is what actually gates unmounting, not the raw real value.
-  const [loaderFinished, setLoaderFinished] = useState(false)
 
-  // Keeps the full-screen loader mounted until both the price data and i18n
-  // are ready AND its own perceptual animation has finished, so the header/
-  // routes never render with untranslated keys, an empty product grid, or an
-  // abrupt mid-animation cut (e.g. right after a language switch's hard
-  // reload).
-  if (!loaderFinished) {
-    return (
-      <>
-        <GlobalStyle />
-        <FullScreenLoader realProgress={initializationProgress} onComplete={() => setLoaderFinished(true)} />
-      </>
-    )
-  }
+  // The edge-injected HTML snapshot (see functions/_middleware.js) keeps the
+  // real prices on screen until the app has its own data to render the same
+  // content; removing it any earlier would leave a blank gap, any later a
+  // duplicate page.
+  useEffect(() => {
+    if (!loading) removeSnapshot()
+  }, [loading])
+
+  if (loading && hasSnapshot()) return <GlobalStyle />
 
   return (
     <FilterProvider rows={rows}>
@@ -89,6 +43,7 @@ function App() {
         <ScrollToTop />
         <Header rows={rows} />
         <Main>
+          <Suspense fallback={<PageSkeleton />}>
           <Routes>
             <Route
               path="/"
@@ -127,6 +82,7 @@ function App() {
             ))}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </Main>
         <Footer />
         <ScrollToTopButton />

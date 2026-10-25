@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import './index.css'
 import './i18n.js'
 import App from './App.jsx'
-import FullScreenLoader from './components/FullScreenLoader/FullScreenLoader.jsx'
+import PageSkeleton from './components/PageSkeleton/PageSkeleton.jsx'
 import { theme } from './styles/theme.js'
 
 createRoot(document.getElementById('root')).render(
@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')).render(
     <HelmetProvider>
       <ThemeProvider theme={theme}>
         <BrowserRouter>
-          <Suspense fallback={<FullScreenLoader />}>
+          <Suspense fallback={<PageSkeleton />}>
             <App />
           </Suspense>
         </BrowserRouter>

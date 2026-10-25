@@ -1,9 +1,12 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
-import { Alert, Col, Container, Row, Spinner } from 'react-bootstrap'
+import { Alert, Col, Container, Row } from 'react-bootstrap'
+import PageSkeleton from '../../components/PageSkeleton/PageSkeleton.jsx'
 import { LuStore } from 'react-icons/lu'
-import { parseMesto, resolveGradBySlug, buildMarketRoute } from '../../utils/market.js'
+import SEO from '../../components/SEO/SEO.jsx'
+import { SITE_URL, getCityOgImage } from '../../constants/seo.js'
+import { parseMesto, resolveGradBySlug, buildCityRoute, buildMarketRoute } from '../../utils/market.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
@@ -42,9 +45,7 @@ function CityDetails({ rows, loading, error }) {
 
   if (loading) {
     return (
-      <StatusSection>
-        <Spinner animation="border" role="status" aria-label={t('results.loading')} />
-      </StatusSection>
+      <PageSkeleton />
     )
   }
 
@@ -66,6 +67,12 @@ function CityDetails({ rows, loading, error }) {
 
   return (
     <>
+      <SEO
+        title={t('seo.city.title', { city: gradLabel })}
+        description={t('seo.city.description', { city: gradLabel })}
+        url={`${SITE_URL}${buildCityRoute(grad, i18n.language)}`}
+        image={getCityOgImage(grad)}
+      />
       <GlobalFilterBar />
 
       <Container>

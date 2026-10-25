@@ -1,4 +1,9 @@
 {
+  "404": {
+    "title": "This stall is currently empty",
+    "description": "Maybe the page you are looking for is still in a draft state, moved, or the market day has ended. Please check the URL or go back to browse active prices.",
+    "button": "Back to Home"
+  },
   "app": {
     "name": "Cene sa pijace"
   },
@@ -49,6 +54,10 @@
     "category": {
       "title": "{{category}} Prices at {{market}} Market ({{city}})",
       "description": "Current prices for {{category}} at {{market}} market in {{city}}."
+    },
+    "city": {
+      "title": "Market Prices in {{city}} | Current Prices",
+      "description": "Current prices of fruit, vegetables and other goods at the markets in {{city}}. Pick a market and compare the offer."
     }
   },
   "categories": {
@@ -183,11 +192,6 @@
     "nav": {
       "aboutHeading": "About the project"
     }
-  },
-  "404": {
-    "title": "This stall is currently empty",
-    "description": "Maybe the page you are looking for is still in a draft state, moved, or the market day has ended. Please check the URL or go back to browse active prices.",
-    "button": "Back to Home"
   },
   "disclaimer": {
     "title": "Disclaimer",

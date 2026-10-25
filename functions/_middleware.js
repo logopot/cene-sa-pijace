@@ -43,11 +43,8 @@ const DISCLAIMER = {
   },
 }
 
-// City and market pages share one brand-forward title ("Cene sa pijace") -
-// the specific location lives in the description instead, matching what the
-// OG image itself renders for these two route types (see
-// scripts/generate-og-images.mjs). Product pages keep a per-product title,
-// since the product name is the one thing worth a distinct headline.
+// City, market and product pages each get a distinct title built from their
+// own name, mirroring the seo.* templates in the locale files.
 function productCopy(name, lang) {
   return lang === 'en'
     ? {
@@ -63,8 +60,16 @@ function productCopy(name, lang) {
 // City and market names are already resolved to the right language by the
 // manifest (see scripts/generate-seo-map.mjs's translateDataValue calls), so
 // this format itself doesn't need a per-language branch.
-function marketCopy(market, city) {
-  return { title: 'Cene sa pijace', description: `${city} • ${market}` }
+function marketCopy(market, city, lang) {
+  return lang === 'en'
+    ? {
+        title: `${market} Market (${city}) - Current Price Overview`,
+        description: `Fresh product prices at ${market} market in ${city}. Check the offer before you go shopping.`,
+      }
+    : {
+        title: `Pijaca ${market} (${city}) - Pregled aktuelnih cena`,
+        description: `Sveže cene proizvoda na pijaci ${market} u gradu ${city}. Proverite ponudu pre odlaska u kupovinu.`,
+      }
 }
 
 function categoryCopy(category, market, city, lang) {
@@ -75,8 +80,14 @@ function categoryCopy(category, market, city, lang) {
 
 function cityCopy(city, lang) {
   return lang === 'en'
-    ? { title: 'Cene sa pijace', description: `${city} • Current Prices at Green Markets` }
-    : { title: 'Cene sa pijace', description: `${city} • Aktuelne cene na pijacama` }
+    ? {
+        title: `Market Prices in ${city} | Current Prices`,
+        description: `Current prices of fruit, vegetables and other goods at the markets in ${city}. Pick a market and compare the offer.`,
+      }
+    : {
+        title: `Cene na pijacama - ${city} | Aktuelne cene`,
+        description: `Aktuelne cene voća, povrća i drugih namirnica na pijacama u gradu ${city}. Izaberite pijacu i uporedite ponudu.`,
+      }
 }
 
 function resolveMeta(pathname) {
@@ -106,7 +117,7 @@ function resolveMeta(pathname) {
 
     case 'market':
       return {
-        ...marketCopy(entry.market, entry.city),
+        ...marketCopy(entry.market, entry.city, entry.lang),
         lang: entry.lang,
         image: `${SITE_URL}/og/markets/${entry.slug}.png`,
         url,
@@ -158,8 +169,36 @@ class SetTextContent {
   }
 }
 
-function rewriteHtml(response, meta) {
-  return new HTMLRewriter()
+// Static HTML copy of the page (written at build time by
+// scripts/generate-data.mjs into /snap/**) - injected into the shell's empty
+// #snapshot container so crawlers and no-JS visitors get real prices in the
+// first response. The React app removes the container once it has rendered
+// the same content (see src/App.jsx). Best effort: any failure just means
+// the plain SPA shell, exactly as before.
+async function loadSnapshot(context, pathname) {
+  const entry = SEO_MANIFEST[pathname]
+  if (!entry || entry.type === 'disclaimer') return ''
+  const file = pathname === '/' ? '/snap/index.html' : `/snap${pathname}.html`
+  try {
+    const res = await context.env.ASSETS.fetch(new URL(file, context.request.url))
+    return res.ok ? await res.text() : ''
+  } catch {
+    return ''
+  }
+}
+
+class SetInnerHtml {
+  constructor(html) {
+    this.html = html
+  }
+
+  element(element) {
+    element.setInnerContent(this.html, { html: true })
+  }
+}
+
+function rewriteHtml(response, meta, snapshotHtml) {
+  const rewriter = new HTMLRewriter()
     .on('html', new SetAttribute('lang', meta.lang))
     .on('title', new SetTextContent(meta.title))
     .on('meta[name="description"]', new SetAttribute('content', meta.description))
@@ -172,7 +211,9 @@ function rewriteHtml(response, meta) {
     .on('meta[name="twitter:description"]', new SetAttribute('content', meta.description))
     .on('meta[name="twitter:image"]', new SetAttribute('content', meta.image))
     .on('link[rel="canonical"]', new SetAttribute('href', meta.url))
-    .transform(response)
+
+  if (snapshotHtml) rewriter.on('div#snapshot', new SetInnerHtml(snapshotHtml))
+  return rewriter.transform(response)
 }
 
 export async function onRequest(context) {
@@ -184,5 +225,6 @@ export async function onRequest(context) {
 
   const url = new URL(request.url)
   const meta = resolveMeta(url.pathname)
-  return rewriteHtml(response, meta)
+  const snapshotHtml = await loadSnapshot(context, url.pathname)
+  return rewriteHtml(response, meta, snapshotHtml)
 }

@@ -48,13 +48,9 @@ An independent green market portal providing a fast, clear, and visually optimiz
 
 The application relies on external data integration using two distinct access levels, requiring configuration in your deployment pipeline:
 
-### 1. Client-Side Runtime Settings
+### 1. Sheet Identifiers
 
-These values configure the frontend application at runtime to read data securely via public web entry points:
-
-- **Public Data API Key:** A client-facing token configured with strict HTTP-referrer restrictions to prevent unauthorized external usage.
-- **Target Source Identifier:** The unique alphanumeric ID pointing to the master data repository.
-- **Data Nodes:** Environmental variables mapping the exact internal database sheet names used for primary price tracking and secondary utility metrics.
+The browser no longer talks to Google Sheets. The build reads the sheet (see Data Pipeline below), so `VITE_GOOGLE_SHEETS_SPREADSHEET_ID`, `VITE_GOOGLE_SHEETS_SHEET_NAME` and `VITE_GOOGLE_SHEETS_JKP_SHEET_NAME` are needed at build time only; `VITE_GOOGLE_SHEETS_API_KEY` is no longer used.
 
 ### 2. Build-Time Automation Credentials
 
@@ -91,3 +87,33 @@ Because referrer-restricted public tokens reject automated scripts running in no
 
    bash
    npm run lint
+
+---
+
+## 📦 Data Pipeline
+
+Google Sheets (filled by the STIPS and JKP scrapers) stays the single source of truth. `npm run generate:data` (run automatically by `prebuild`) reads it with the service account and writes static files; values are never altered, only filtered/grouped:
+
+- `public/data/latest.json` - the two most recent datapoints per product/market/source (homepage, city, market and category pages).
+- `public/data/products/{family}.json` - full history of one product family, lazy-loaded by the product page's chart.
+- `public/data/meta.json` - data version and generation time.
+- `public/snap/**/*.html` - per-route HTML snapshots; `functions/_middleware.js` injects them into `#snapshot` so crawlers and no-JS visitors see real prices. The React app removes the container once it has rendered the same content.
+
+**Refreshing data:** run the "Weekly Market Scrape to Sheets" workflow manually (Actions -> Run workflow) or wait for the Monday schedule; its last step calls the Cloudflare Pages deploy hook (secret `CLOUDFLARE_DEPLOY_HOOK`), which rebuilds the site with the new data. Locally: `npm run generate:data`.
+
+## 📈 GA4 Events
+
+All events go through `trackEvent` in `src/utils/analytics.js` (values trimmed + lowercased, no personal data):
+
+| Event | Parameters | Fired when |
+|---|---|---|
+| `filter_city` | `city` | user picks a city |
+| `filter_category` | `category` | user picks a category (`all` = every category) |
+| `filter_market` | `market` | user picks a market (`all` = every market) |
+| `search_submit` | `city`, `category`, `market` | search button clicked |
+| `view_market` | `market_name`, `city` | market page opened |
+| `view_product` | `product_name`, `category`, `market_name` | product page opened |
+| `view_price_history` | `product_name` | history chart shown with data |
+| `language_switch` | `from`, `to` | language switched |
+
+Not wired (nothing in the UI to attach them to): `click_source_link` (the source is plain text, no link) and `share_click` (no share control). Scroll depth comes from GA4 Enhanced Measurement.

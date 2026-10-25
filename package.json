@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "generate:data": "node scripts/generate-data.mjs",
     "generate:seo-map": "node scripts/generate-seo-map.mjs",
     "generate:og-images": "node scripts/generate-og-images.mjs",
-    "prebuild": "npm run generate:seo-map && npm run generate:og-images",
+    "prebuild": "npm run generate:data && npm run generate:seo-map && npm run generate:og-images",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

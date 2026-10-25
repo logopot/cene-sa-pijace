@@ -1,9 +1,11 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
-import { Alert, Container, Spinner } from 'react-bootstrap'
+import { Alert, Container } from 'react-bootstrap'
+import PageSkeleton from '../../components/PageSkeleton/PageSkeleton.jsx'
 import { LuStore } from 'react-icons/lu'
 import { parseMesto, resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketRoute } from '../../utils/market.js'
+import { trackPageEvent } from '../../utils/analytics.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getRowTime, getRowRangeLabel, getLatestWeekTime } from '../../utils/week.js'
 import WeekStatus from '../../components/WeekStatus/WeekStatus.jsx'
@@ -58,11 +60,13 @@ function MarketDetails({ rows, loading, error }) {
   const pijaca = useMemo(() => resolvePijacaBySlug(rows, grad, marketSlug), [rows, grad, marketSlug])
   const { filteredRows, weekLabel, isFallbackWeek, source } = useMarketData(rows, grad, pijaca)
 
+  useEffect(() => {
+    if (grad && pijaca) trackPageEvent('view_market', { market_name: pijaca, city: grad })
+  }, [grad, pijaca])
+
   if (loading) {
     return (
-      <StatusSection>
-        <Spinner animation="border" role="status" aria-label={t('results.loading')} />
-      </StatusSection>
+      <PageSkeleton />
     )
   }
 

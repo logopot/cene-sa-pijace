@@ -5,6 +5,28 @@ export const Section = styled.section`
   padding: 1.5rem 0 2.5rem;
 `
 
+// Same 4 / 3 / 2 / 1 columns (xl / lg / md / below) and 1rem gap as the old
+// bootstrap row, but every row takes the height of the tallest one, so all
+// cards in the list are equally tall.
+export const CardGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: 1fr;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 992px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+`
+
 export const EmptyState = styled.div`
   display: flex;
   flex-direction: column;

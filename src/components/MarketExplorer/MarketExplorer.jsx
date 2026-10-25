@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { Alert, Container, Spinner } from 'react-bootstrap'
+import { Alert, Container } from 'react-bootstrap'
+import PageSkeleton from '../PageSkeleton/PageSkeleton.jsx'
 import { useMarketExplorer } from '../../hooks/useMarketExplorer.js'
 import SEO from '../SEO/SEO.jsx'
 import { SITE_URL } from '../../constants/seo.js'
@@ -16,9 +17,7 @@ function MarketExplorer({ rows, loading, error }) {
 
   if (loading) {
     return (
-      <StatusSection>
-        <Spinner animation="border" role="status" aria-label={t('results.loading')} />
-      </StatusSection>
+      <PageSkeleton />
     )
   }
 

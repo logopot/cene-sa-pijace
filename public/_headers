@@ -1,0 +1,22 @@
+# Cloudflare Pages response headers. Compression (brotli/gzip) is applied by
+# Pages automatically to text assets, JSON included.
+
+# Generated datasets: short browser cache, then serve stale while the edge
+# revalidates in the background, so repeat visits are instant yet a deploy
+# with fresh prices shows up within minutes.
+/data/*
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+# HTML snapshots are only fetched by the edge middleware, never by browsers.
+/snap/*
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+# Vite fingerprints everything in /assets, so it can be cached forever.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/locales/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/og/*
+  Cache-Control: public, max-age=86400

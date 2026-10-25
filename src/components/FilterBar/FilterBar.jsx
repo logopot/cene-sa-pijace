@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Container } from 'react-bootstrap'
 import { LuSearch } from 'react-icons/lu'
 import { ALL_MARKETS, ALL_CATEGORIES } from '../../constants/filters.js'
+import { trackEvent, filterParam } from '../../utils/analytics.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getCategoryUrlSlug } from '../../utils/categoryIcons.js'
 import { buildCityRoute, buildMarketRoute, buildMarketCategoryRoute } from '../../utils/market.js'
@@ -55,6 +56,7 @@ function FilterBar({
   // or the whole city if no specific market was picked either.
   const handleSubmit = () => {
     if (!grad) return
+    trackEvent('search_submit', { city: grad, category: filterParam(category), market: filterParam(pijaca) })
     if (category && category !== ALL_CATEGORIES) {
       navigate(buildMarketCategoryRoute(grad, pijaca, getCategoryUrlSlug(category, i18n.language), i18n.language))
     } else if (pijaca && pijaca !== ALL_MARKETS) {

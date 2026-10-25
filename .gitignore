@@ -32,6 +32,12 @@ credentials.json
 functions/lib/seo-manifest.mjs
 public/og/
 public/og-fallback.png
+public/sitemap.xml
+
+# Podaci i HTML snapshot-ovi generisani iz Google Sheets-a (scripts/generate-data.mjs,
+# regenerisu se u svakom "npm run build" preko prebuild hook-a)
+public/data/
+public/snap/
 
 # 7. Blokiranje operativnih sistema, logova i keša
 logs

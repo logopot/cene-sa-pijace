@@ -22,3 +22,7 @@ export function getProductOgImage(proizvod) {
 export function getMarketOgImage(grad, pijaca) {
   return `${SITE_URL}/og/markets/${slugify(grad)}-${slugify(pijaca)}.png`
 }
+
+export function getCityOgImage(grad) {
+  return `${SITE_URL}/og/cities/${slugify(grad)}.png`
+}

@@ -55,6 +55,19 @@ jobs:
           JKP_DATE: latest
         run: npm start
 
+      # Sheets stays the source of truth; the site serves static JSON generated
+      # from it at build time, so a rebuild is what publishes fresh prices.
+      # CLOUDFLARE_DEPLOY_HOOK is a Cloudflare Pages deploy-hook URL (secret).
+      - name: Trigger site rebuild
+        env:
+          DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}
+        run: |
+          if [ -n "$DEPLOY_HOOK" ]; then
+            curl -fsS -X POST "$DEPLOY_HOOK"
+          else
+            echo "CLOUDFLARE_DEPLOY_HOOK not set - skipping rebuild"
+          fi
+
       - name: Remove service account credentials
         if: always()
         run: rm -f "$RUNNER_TEMP/service-account.json"

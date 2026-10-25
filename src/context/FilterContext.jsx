@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { ALL_MARKETS, ALL_CATEGORIES } from '../constants/filters.js'
 import { resolveSelectionFromPath } from '../utils/urlFilterSync.js'
+import { trackEvent, filterParam } from '../utils/analytics.js'
 import { FilterContext } from './filterContextInstance.js'
 
 const STORAGE_KEY = 'cene-sa-pijace:filters'
@@ -78,6 +79,7 @@ export function FilterProvider({ rows, children }) {
   // the user to also pick a category/market first. Same cascade
   // useMarketExplorer.js used before this state moved here.
   const setGrad = useCallback((value) => {
+    if (value) trackEvent('filter_city', { city: value })
     setSelection({
       grad: value,
       category: value ? ALL_CATEGORIES : '',
@@ -89,6 +91,7 @@ export function FilterProvider({ rows, children }) {
   // grad above it - defaults back to "every market in this city" rather
   // than clearing the field, same as a fresh grad selection does.
   const setCategory = useCallback((value) => {
+    if (value) trackEvent('filter_category', { category: filterParam(value) })
     setSelection((current) => ({
       ...current,
       category: value,
@@ -97,6 +100,7 @@ export function FilterProvider({ rows, children }) {
   }, [])
 
   const setPijaca = useCallback((value) => {
+    if (value) trackEvent('filter_market', { market: filterParam(value) })
     setSelection((current) => ({ ...current, pijaca: value }))
   }, [])
 
