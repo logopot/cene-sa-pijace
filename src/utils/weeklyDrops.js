@@ -92,7 +92,7 @@ function rowsByTrend(rows, trendValue, globalLatestTime) {
 // Every tier is gated to each row's own market being currently active (see
 // isCurrentlyActive) so a product that stopped being reported at a market
 // weeks or months ago can never resurface here as a "ghost" drop.
-export function pickWeeklyDrops(rows) {
+export function pickWeeklyDrops(rows, seed) {
   const globalLatestTime = getLatestWeekTime(rows)
   const tiers = [
     () => directDrops(rows, globalLatestTime),
@@ -101,7 +101,7 @@ export function pickWeeklyDrops(rows) {
   ]
   for (const tier of tiers) {
     const pool = tier()
-    if (pool.length > 0) return shuffleArray(pool).slice(0, 8)
+    if (pool.length > 0) return shuffleArray(pool, seed).slice(0, 8)
   }
   return []
 }

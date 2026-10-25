@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Alert, Container } from 'react-bootstrap'
 import PageSkeleton from '../PageSkeleton/PageSkeleton.jsx'
 import { useMarketExplorer } from '../../hooks/useMarketExplorer.js'
+import { useRemoveSnapshotWhenReady } from '../../utils/snapshot.js'
 import SEO from '../SEO/SEO.jsx'
 import { SITE_URL } from '../../constants/seo.js'
 import Hero from '../Hero/Hero.jsx'
@@ -11,9 +12,10 @@ import MarketShowcase from '../MarketShowcase/MarketShowcase.jsx'
 import HowItWorks from '../HowItWorks/HowItWorks.jsx'
 import { StatusSection } from './MarketExplorer.styled.js'
 
-function MarketExplorer({ rows, loading, error }) {
+function MarketExplorer({ rows, loading, error, seed }) {
   const { t } = useTranslation()
-  const explorer = useMarketExplorer(rows)
+  const explorer = useMarketExplorer(rows, seed)
+  useRemoveSnapshotWhenReady()
 
   if (loading) {
     return (

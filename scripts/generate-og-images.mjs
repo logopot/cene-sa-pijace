@@ -234,8 +234,11 @@ async function main() {
     const rows = await fetchAllMarketRows()
     ;({ cities, markets, products } = collectItems(rows))
   } catch (error) {
-    console.warn('[generate-og-images] could not fetch sheet data, only the fallback image was generated:', error.message)
-    return
+    // Fail the build: shipping the new manifest without the per-route images it
+    // points at would break every link preview. The previous deployment stays
+    // live until the next build succeeds.
+    console.error('[generate-og-images] could not read the sheet, failing the build:', error.message)
+    process.exit(1)
   }
 
   // City and market images share the same brand-forward title ("Cene sa

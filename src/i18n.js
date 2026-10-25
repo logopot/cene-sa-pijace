@@ -23,9 +23,15 @@ try {
   // Storage inaccessible - fall through to normal detection/fallbackLng.
 }
 
+// The build-time homepage prerender (src/prerender.jsx) runs in Node: there is
+// no fetch origin for the http backend and no browser to detect a language
+// from, so it hands over both translation bundles up front and picks the
+// language itself. In the browser this is undefined and nothing changes.
+const prerender = globalThis.__PRERENDER_I18N__
+
+if (!prerender) i18n.use(Backend).use(LanguageDetector)
+
 i18n
-  .use(Backend)
-  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     fallbackLng: 'sr',
@@ -40,6 +46,7 @@ i18n
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
+    ...(prerender ? { resources: prerender.resources, lng: prerender.lng, initAsync: false, initImmediate: false } : {}),
     // Serbian is the site's primary language (promoted only in Serbia);
     // English exists for foreigners looking up Serbian market prices, so it
     // must be an explicit user choice (via LanguageSwitcher) rather than

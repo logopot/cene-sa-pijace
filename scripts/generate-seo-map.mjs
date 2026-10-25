@@ -144,17 +144,18 @@ ${urls.join('\n')}
 }
 
 async function main() {
-  let entries = buildStaticEntries()
-
+  let entries
   try {
     const rows = await fetchAllMarketRows()
+    if (rows.length === 0) throw new Error('sheet returned no rows')
     entries = buildManifest(rows)
     console.log(`[generate-seo-map] built ${Object.keys(entries).length} route entries from ${rows.length} rows`)
   } catch (error) {
-    // Never fail the build over this - a missing/stale manifest just means
-    // dynamic routes fall back to the sitewide default tags (see
-    // functions/_middleware.js) until the next successful build.
-    console.warn('[generate-seo-map] could not fetch sheet data, writing static-only manifest:', error.message)
+    // Fail the build rather than publish a static-only manifest and a
+    // 3-URL sitemap: the previous deployment, which has the full ones, stays
+    // live until the next build succeeds.
+    console.error('[generate-seo-map] could not read the sheet, failing the build:', error.message)
+    process.exit(1)
   }
 
   mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true })

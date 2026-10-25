@@ -67,9 +67,11 @@ export const theme = {
   font: {
     // Pairing: 'Plus Jakarta Sans' for headings/branding (character, warmth),
     // 'Inter' for body/data (readability, tabular figures for prices). Both
-    // are loaded via the Google Fonts <link> in index.html.
-    heading: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    body: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    // are self-hosted (see the @font-face rules in index.html); the "Fallback"
+    // families there are Arial scaled to each font's metrics so the swap
+    // doesn't shift the layout.
+    heading: "'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    body: "'Inter', 'Inter Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     weight: {
       regular: 400,
       medium: 500,

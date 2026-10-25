@@ -20,3 +20,7 @@
 
 /og/*
   Cache-Control: public, max-age=86400
+
+# Self-hosted fonts never change under the same name.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -3,9 +3,9 @@ import { useLocation } from 'react-router-dom'
 import { ALL_MARKETS, ALL_CATEGORIES } from '../constants/filters.js'
 import { resolveSelectionFromPath } from '../utils/urlFilterSync.js'
 import { trackEvent, filterParam } from '../utils/analytics.js'
+import { STORAGE_KEY } from '../utils/storedSelection.js'
 import { FilterContext } from './filterContextInstance.js'
 
-const STORAGE_KEY = 'cene-sa-pijace:filters'
 const EMPTY_SELECTION = { grad: '', category: '', pijaca: '' }
 
 // Guarded exactly like i18n.js's own localStorage access (Safari private

@@ -11,7 +11,7 @@ const OMITTED_DEFAULTS = { Godina: null, Nedelja: null, RBr: null, ScrapedAt: ''
 
 let dataVersion = ''
 
-function expandRows({ columns, rows }) {
+export function expandRows({ columns, rows }) {
   return rows.map((values) => {
     const record = { ...OMITTED_DEFAULTS }
     columns.forEach((column, index) => {
@@ -33,7 +33,7 @@ async function getJson(url) {
 export async function fetchLatestPrices() {
   const json = await getJson('/data/latest.json')
   dataVersion = json.version ?? ''
-  return { rows: expandRows(json), generatedAt: json.generatedAt }
+  return { rows: expandRows(json), generatedAt: json.generatedAt, version: dataVersion }
 }
 
 // Full history of one product family (see getFamilySlug in

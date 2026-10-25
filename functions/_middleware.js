@@ -175,16 +175,30 @@ class SetTextContent {
 // first response. The React app removes the container once it has rendered
 // the same content (see src/App.jsx). Best effort: any failure just means
 // the plain SPA shell, exactly as before.
-async function loadSnapshot(context, pathname) {
-  const entry = SEO_MANIFEST[pathname]
-  if (!entry || entry.type === 'disclaimer') return ''
-  const file = pathname === '/' ? '/snap/index.html' : `/snap${pathname}.html`
+async function fetchAsset(context, file) {
   try {
     const res = await context.env.ASSETS.fetch(new URL(file, context.request.url))
     return res.ok ? await res.text() : ''
   } catch {
     return ''
   }
+}
+
+// Returns { helpers, root }. Every route gets a text snapshot in #snapshot. The
+// homepage additionally gets the real prerendered page (scripts/prerender-home.mjs):
+// the Serbian markup goes INTO #root (the app hydrates it), and #snapshot holds
+// the CSS it needs plus the English copy. If the prerender wasn't produced
+// (root is empty), the homepage just keeps its text snapshot.
+async function loadSnapshot(context, pathname) {
+  const entry = SEO_MANIFEST[pathname]
+  if (!entry || entry.type === 'disclaimer') return { helpers: '', root: '' }
+  if (pathname !== '/') return { helpers: await fetchAsset(context, `/snap${pathname}.html`), root: '' }
+
+  const [helpers, root] = await Promise.all([
+    fetchAsset(context, '/snap/index.html'),
+    fetchAsset(context, '/snap/index.root.html'),
+  ])
+  return { helpers, root }
 }
 
 class SetInnerHtml {
@@ -197,7 +211,18 @@ class SetInnerHtml {
   }
 }
 
-function rewriteHtml(response, meta, snapshotHtml) {
+class FillPrerenderedRoot {
+  constructor(html) {
+    this.html = html
+  }
+
+  element(element) {
+    element.setAttribute('data-prerendered', 'sr')
+    element.setInnerContent(this.html, { html: true })
+  }
+}
+
+function rewriteHtml(response, meta, snapshot) {
   const rewriter = new HTMLRewriter()
     .on('html', new SetAttribute('lang', meta.lang))
     .on('title', new SetTextContent(meta.title))
@@ -212,7 +237,8 @@ function rewriteHtml(response, meta, snapshotHtml) {
     .on('meta[name="twitter:image"]', new SetAttribute('content', meta.image))
     .on('link[rel="canonical"]', new SetAttribute('href', meta.url))
 
-  if (snapshotHtml) rewriter.on('div#snapshot', new SetInnerHtml(snapshotHtml))
+  if (snapshot.helpers) rewriter.on('div#snapshot', new SetInnerHtml(snapshot.helpers))
+  if (snapshot.root) rewriter.on('div#root', new FillPrerenderedRoot(snapshot.root))
   return rewriter.transform(response)
 }
 
@@ -225,6 +251,6 @@ export async function onRequest(context) {
 
   const url = new URL(request.url)
   const meta = resolveMeta(url.pathname)
-  const snapshotHtml = await loadSnapshot(context, url.pathname)
-  return rewriteHtml(response, meta, snapshotHtml)
+  const snapshot = await loadSnapshot(context, url.pathname)
+  return rewriteHtml(response, meta, snapshot)
 }

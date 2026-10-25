@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fonts are self-hosted (same origin, no extra connection or render-
+         blocking stylesheet); the two Latin files used above the fold are preloaded. -->
+    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-sr.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/plus-jakarta-sans-sr.woff2" as="font" type="font/woff2" crossorigin />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
@@ -55,16 +55,68 @@
          middleware injects for crawlers and no-JS visitors (see
          functions/_middleware.js). The app removes it as soon as it has
          rendered the same content itself. -->
+    <!-- Which language of the prerendered homepage to show: the one the visitor
+         saved (same localStorage key as src/i18n.js), Serbian otherwise. The
+         "forced sr" migration flag mirrors i18n.js - until it ran, a stored
+         "en" is ignored there too. -->
+    <script>
+      try {
+        var l = localStorage.getItem("i18nextLng");
+        if (l && l.indexOf("en") === 0 && localStorage.getItem("i18n_forced_sr_v1")) {
+          document.documentElement.setAttribute("data-lng", "en");
+          // Only English visitors need the English prerender; everyone else
+          // (and every crawler) is spared its weight.
+          fetch("/snap/index.en.html")
+            .then(function (r) { return r.ok ? r.text() : "" })
+            .then(function (html) {
+              function put() {
+                var s = document.getElementById("snapshot");
+                if (s && html) s.insertAdjacentHTML("beforeend", html);
+              }
+              if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", put);
+              else put();
+            })
+            .catch(function () {});
+        }
+      } catch (e) {}
+    </script>
     <style>
-      #snapshot { background: #f8fafc; color: #212529; font-family: "Inter", system-ui, sans-serif; line-height: 1.5; }
-      #snapshot a { color: inherit; text-decoration: none; }
+      #snapshot .snap-lang[lang="en"], html[data-lng="en"] #snapshot .snap-lang[lang="sr"] { display: none; }
+      html[data-lng="en"] #snapshot .snap-lang[lang="en"] { display: block; }
+      html[data-lng="en"] #root[data-prerendered] { display: none; }
+      /* Variable fonts (weights 400-700). The sr files hold just the Serbian
+         Latin letters (č ć š đ ž) plus typographic punctuation - a few KB instead
+         of the 22-85 KB full latin-ext files, which remain as a lazy fallback for
+         any other extended character. Declared last so they win for overlapping
+         ranges. */
+      @font-face { font-family: "Inter"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(/fonts/inter-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+      @font-face { font-family: "Inter"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(/fonts/inter-latin-ext.woff2) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+      @font-face { font-family: "Inter"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(/fonts/inter-sr.woff2) format("woff2"); unicode-range: U+010C-010D,U+0106-0107,U+0160-0161,U+0110-0111,U+017D-017E,U+2013-2014,U+2018-2019,U+201C-201E,U+2026,U+2022,U+20AC,U+2116; }
+      @font-face { font-family: "Plus Jakarta Sans"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(/fonts/plus-jakarta-sans-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+      @font-face { font-family: "Plus Jakarta Sans"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(/fonts/plus-jakarta-sans-latin-ext.woff2) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+      @font-face { font-family: "Plus Jakarta Sans"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(/fonts/plus-jakarta-sans-sr.woff2) format("woff2"); unicode-range: U+010C-010D,U+0106-0107,U+0160-0161,U+0110-0111,U+017D-017E,U+2013-2014,U+2018-2019,U+201C-201E,U+2026,U+2022,U+20AC,U+2116; }
+      /* Local fallbacks scaled to the web fonts' metrics, so swapping the real
+         font in changes neither line breaks nor line heights. */
+      @font-face { font-family: "Inter Fallback"; src: local("Arial"); size-adjust: 107.12%; ascent-override: 90.44%; descent-override: 22.52%; line-gap-override: 0%; }
+      @font-face { font-family: "Plus Jakarta Sans Fallback"; src: local("Arial"); size-adjust: 104.98%; ascent-override: 98.88%; descent-override: 21.15%; line-gap-override: 0%; }
+      /* Same base rules bootstrap's reboot applies, so the snapshot looks identical
+         before and after that (non-blocking) stylesheet arrives. */
+      body { margin: 0; background: #f8fafc; }
+      #snapshot .snap-head, #snapshot .snap-head *, #snapshot .snap-main, #snapshot .snap-main * { box-sizing: border-box; }
+      /* The rules below style only the lightweight text snapshots (markets,
+         products), which sit inside .snap-head / .snap-main. They are scoped on
+         purpose: the homepage prerender is the real app markup with its own
+         styles, and an unscoped "#snapshot h1" would outrank those. */
+      #snapshot .snap-head, #snapshot .snap-main { background: #f8fafc; color: #212529; font-family: "Inter", "Inter Fallback", system-ui, sans-serif; line-height: 1.5; }
+      #snapshot .snap-head a, #snapshot .snap-main a { color: inherit; text-decoration: none; }
       #snapshot .snap-head { background: #1f6f43; padding: 16px 24px; }
       #snapshot .snap-logo { color: #fff; font-weight: 700; font-size: 1.25rem; }
       #snapshot .snap-main { max-width: 1140px; margin: 0 auto; padding: 24px 16px 48px; }
-      #snapshot h1 { font-size: 2rem; font-weight: 700; margin: 16px 0 8px; color: #0f172a; }
-      #snapshot h2 { font-size: 1.25rem; font-weight: 700; margin: 32px 0 12px; color: #0f172a; }
+      #snapshot .snap-main h1, #snapshot .snap-main h2, #snapshot .snap-logo { font-family: "Plus Jakarta Sans", "Plus Jakarta Sans Fallback", sans-serif; }
+      #snapshot .snap-main h1 { line-height: 1.2; font-size: 2rem; font-weight: 700; margin: 16px 0 8px; color: #0f172a; }
+      #snapshot .snap-main h2 { line-height: 1.2; font-size: 1.25rem; font-weight: 700; margin: 32px 0 12px; color: #0f172a; }
       #snapshot .snap-intro, #snapshot .snap-updated { color: #495057; margin: 0 0 8px; }
-      #snapshot ul { list-style: none; margin: 0; padding: 0; }
+      #snapshot .snap-main ul { list-style: none; margin: 0; padding: 0; }
       #snapshot .snap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
       #snapshot .snap-card { display: flex; flex-direction: column; gap: 4px; background: #fff; border: 1px solid #dee2e6; border-radius: 24px; padding: 24px; }
       #snapshot .snap-name { font-size: 1.05rem; color: #0f172a; }
@@ -75,6 +127,11 @@
       #snapshot .snap-trend-rast { color: #c0392b; }
       #snapshot .snap-links { display: flex; flex-wrap: wrap; gap: 8px; }
       #snapshot .snap-links a { display: block; background: #fff; border: 1px solid #dee2e6; border-radius: 12px; padding: 8px 16px; }
+      #boot { position: fixed; top: 45vh; left: 50%; width: 32px; height: 32px; margin-left: -16px; border: 3px solid #d8f0e0; border-top-color: #1f6f43; border-radius: 50%; opacity: 0; animation: boot-in 0.2s ease 0.4s forwards, boot-spin 0.8s linear infinite; pointer-events: none; }
+      #snapshot:not(:empty) ~ #boot, #root:not(:empty) ~ #boot { display: none; }
+      @keyframes boot-in { to { opacity: 1; } }
+      @keyframes boot-spin { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) { #boot { animation: boot-in 0.2s ease 0.4s forwards; } }
     </style>
     <!-- Google tag (gtag.js) -->
     <script
@@ -94,6 +151,11 @@
   <body>
     <div id="snapshot"></div>
     <div id="root"></div>
+    <!-- Last-resort loading hint, pure HTML + CSS (no JS needed): invisible for
+         the first 400 ms, then fades in only if nothing else has appeared -
+         i.e. no server-side snapshot and the app hasn't rendered yet. It hides
+         itself the moment either #snapshot or #root gets content. -->
+    <div id="boot" aria-hidden="true"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

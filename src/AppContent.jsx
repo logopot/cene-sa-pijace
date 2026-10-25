@@ -1,0 +1,85 @@
+import { Fragment, lazy, Suspense } from 'react'
+import { Route, Routes, useLocation } from 'react-router-dom'
+import Header from './components/Header/Header.jsx'
+import Footer from './components/Footer/Footer.jsx'
+import MarketExplorer from './components/MarketExplorer/MarketExplorer.jsx'
+import DisclaimerPage from './components/DisclaimerPage/DisclaimerPage.jsx'
+import ScrollToTop from './components/ScrollToTop/ScrollToTop.jsx'
+import ScrollToTopButton from './components/ScrollToTopButton/ScrollToTopButton.jsx'
+import PageSkeleton from './components/PageSkeleton/PageSkeleton.jsx'
+import CityDetails from './pages/CityDetails/CityDetails.jsx'
+import MarketDetails from './pages/MarketDetails/MarketDetails.jsx'
+import MarketCategoryDetails from './pages/MarketCategoryDetails/MarketCategoryDetails.jsx'
+import NotFound from './pages/NotFound/NotFound.jsx'
+import { CITY_PATH_PREFIX, DISCLAIMER_PATH } from './constants/routeLocales.js'
+import { FilterProvider } from './context/FilterContext.jsx'
+import { GlobalStyle } from './styles/globalStyle.js'
+import { AppShell, Main } from './App.styled.js'
+
+// The product page is the only one that pulls in the charting library, so
+// it's split out of the entry bundle and fetched on demand.
+const Analytics = lazy(() => import('./pages/Analytics/Analytics.jsx'))
+
+// The whole page tree for already-loaded data. Kept free of data fetching so
+// the exact same component renders both in the browser (see App.jsx) and at
+// build time for the homepage prerender (see src/prerender.jsx and
+// scripts/prerender-home.mjs).
+function AppContent({ rows, loading, error, seed }) {
+  const location = useLocation()
+
+  return (
+    <FilterProvider rows={rows}>
+      <AppShell>
+        <GlobalStyle />
+        <ScrollToTop />
+        <Header rows={rows} />
+        <Main>
+          <Suspense fallback={<PageSkeleton />}>
+          <Routes>
+            <Route
+              path="/"
+              element={<MarketExplorer key={location.key} rows={rows} loading={loading} error={error} seed={seed} />}
+            />
+
+            {/* One route tree per language's city-path prefix (/grad/... for
+                sr, /city/... for en, see routeLocales.js) - both shapes share
+                the same param names and page components, so a URL built under
+                either language always resolves. */}
+            {Object.values(CITY_PATH_PREFIX).map((prefix) => (
+              <Fragment key={prefix}>
+                <Route
+                  path={`/${prefix}/:citySlug`}
+                  element={<CityDetails key={location.key} rows={rows} loading={loading} error={error} />}
+                />
+                <Route
+                  path={`/${prefix}/:citySlug/:marketSlug`}
+                  element={<MarketDetails key={location.key} rows={rows} loading={loading} error={error} />}
+                />
+                <Route
+                  path={`/${prefix}/:citySlug/:marketSlug/:categorySlug`}
+                  element={<MarketCategoryDetails key={location.key} rows={rows} loading={loading} error={error} />}
+                />
+                <Route
+                  path={`/${prefix}/:citySlug/:marketSlug/:categorySlug/:productSlug`}
+                  element={<Analytics key={location.key} rows={rows} loading={loading} error={error} />}
+                />
+              </Fragment>
+            ))}
+
+            {/* One route per language's disclaimer path (see routeLocales.js),
+                all rendering the same DisclaimerPage component. */}
+            {Object.values(DISCLAIMER_PATH).map((path) => (
+              <Route key={path} path={path} element={<DisclaimerPage />} />
+            ))}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          </Suspense>
+        </Main>
+        <Footer />
+        <ScrollToTopButton />
+      </AppShell>
+    </FilterProvider>
+  )
+}
+
+export default AppContent

@@ -65,7 +65,7 @@ jobs:
           if [ -n "$DEPLOY_HOOK" ]; then
             curl -fsS -X POST "$DEPLOY_HOOK"
           else
-            echo "CLOUDFLARE_DEPLOY_HOOK not set - skipping rebuild"
+            echo "::warning::CLOUDFLARE_DEPLOY_HOOK secret is not set - the sheet was updated but the site was NOT rebuilt"
           fi
 
       - name: Remove service account credentials

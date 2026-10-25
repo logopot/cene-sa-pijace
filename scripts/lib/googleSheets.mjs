@@ -6,11 +6,10 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '../..')
 
-// The client-side VITE_GOOGLE_SHEETS_API_KEY (see src/services/sheetsService.js)
-// is HTTP-referrer restricted for browser use and returns 403 from a
-// server/build context (no Referer header). Build scripts authenticate as the
-// same service account the STIPS/JKP scrapers already use instead - it
-// already has editor access to the sheet, which covers read.
+// Build scripts authenticate as the same service account the STIPS/JKP
+// scrapers use - it already has editor access to the sheet, which covers read.
+// The browser never talks to Google Sheets: everything it shows comes from the
+// static files generated from this fetch (see scripts/generate-data.mjs).
 //
 // Locally that account's key file lives at scripts/stips-scraper/service-account.json
 // (gitignored, never committed - see .gitignore). CI/Cloudflare Pages has no
@@ -105,9 +104,9 @@ function parseJkpRows(values) {
   })
 }
 
-// Fetches every price row (STIPS + JKP archive, same union src/hooks/useMarketPrices.js
-// builds client-side) so the SEO manifest and OG images are generated from
-// the exact same market/product universe the live site renders.
+// Fetches every price row (STIPS + JKP archive) - the single read every build
+// step (data files, SEO manifest, OG images) shares the shape of, so they all
+// describe the same market/product universe. Throws on any failure.
 export async function fetchAllMarketRows() {
   const { spreadsheetId, sheetName, jkpSheetName } = getSpreadsheetConfig()
   if (!spreadsheetId) {
@@ -130,10 +129,14 @@ export async function fetchAllMarketRows() {
       range: `${jkpSheetName}!A:K`,
     })
     jkpRows = parseJkpRows(jkpResult.data.values)
-  } catch {
-    // Same as sheetsService.js's fetchJkpPrices: the JKP tab only exists
-    // once that scraper has run at least once - absence just means no JKP
-    // data yet, not a failure.
+  } catch (error) {
+    // The JKP tab only exists once that scraper has run at least once, so a
+    // *missing tab* (the Sheets API answers 400 "Unable to parse range") just
+    // means no JKP data yet. Anything else - auth, quota, network, a 5xx - is
+    // a real failure and must stop the build: swallowing it would publish a
+    // site silently missing every JKP price.
+    const isMissingTab = error?.code === 400 && /unable to parse range/i.test(String(error?.message ?? ''))
+    if (!isMissingTab) throw error
   }
 
   return [...stipsRows, ...jkpRows]
