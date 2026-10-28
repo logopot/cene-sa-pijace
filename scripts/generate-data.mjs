@@ -25,6 +25,7 @@ import { getCategoryUrlSlug } from '../src/utils/categoryIcons.js'
 import { getRowTime, getRowRangeLabel } from '../src/utils/week.js'
 import { normalizeProductName } from '../src/utils/productId.js'
 import { getAveragePrice } from '../src/utils/price.js'
+import { computeCityComparison, buildProductJsonLd } from '../src/utils/productJsonLd.js'
 import { translateDataValue, translateCategory, getProductUrlSlug, SUPPORTED_LANGUAGES } from './lib/productLabels.mjs'
 import { fetchAllMarketRows, readLocalEnvFile, ROOT } from './lib/googleSheets.mjs'
 import {
@@ -186,7 +187,25 @@ function buildSnapshots(latestRows) {
     return rows
   }
 
+  // Rows of one product family (same normalized name), the set the product
+  // page's own comparison widgets work from (see useProductAnalytics).
+  const rowsByBase = new Map()
+  for (const row of latestRows) {
+    const base = normalizeProductName(row.Proizvod)
+    if (!rowsByBase.has(base)) rowsByBase.set(base, [])
+    rowsByBase.get(base).push(row)
+  }
+  const cityComparisonByBase = new Map()
+  const cityComparisonFor = (base) => {
+    if (!cityComparisonByBase.has(base)) cityComparisonByBase.set(base, computeCityComparison(rowsByBase.get(base) ?? []))
+    return cityComparisonByBase.get(base)
+  }
+
   for (const lang of SUPPORTED_LANGUAGES) {
+    // Routes that several rows resolve to (e.g. one slug shared by two origins)
+    // take the markup of the first of them - the row the live page picks too.
+    const jsonLdByPath = new Map()
+
     for (const grad of cities.values()) {
       const marketLinks = Array.from(markets.values())
         .filter((market) => market.grad === grad)
@@ -253,13 +272,20 @@ function buildSnapshots(latestRows) {
           })
         })
 
+      const route = productPath(grad, pijaca, kategorija, proizvod, lang)
+      const name = translateDataValue(lang, 'proizvod', proizvod.trim())
+      if (!jsonLdByPath.has(route)) {
+        jsonLdByPath.set(route, buildProductJsonLd({ name, category: kategorija, cityComparison: cityComparisonFor(base) }))
+      }
+
       emit(
-        productPath(grad, pijaca, kategorija, proizvod, lang),
+        route,
         renderProduct({
           lang,
           product: translateDataValue(lang, 'proizvod', proizvod),
           current: here[0] ? renderCard(here[0], lang, null, { compact: true }) : '',
           cards,
+          jsonLd: jsonLdByPath.get(route),
         }),
       )
     }

@@ -140,8 +140,19 @@ export function renderCategory({ lang, category, market, city, cards }) {
   return page({ lang, heading: `${category} - ${market}`, intro: city, sections: [{ html: cardList(cards) }] })
 }
 
-export function renderProduct({ lang, product, current, cards }) {
-  return page({
+// The product's Product JSON-LD travels at the very start of its snapshot; the
+// edge middleware lifts it out into <head> (see functions/_middleware.js) so it
+// is part of the HTML the server returns. "<" is escaped so no text in a
+// product name can close the script element.
+export const PRODUCT_JSON_LD_ID = 'ld-product'
+
+export function renderJsonLd(jsonLd) {
+  const json = JSON.stringify(jsonLd).replaceAll('<', '\\u003c')
+  return `<script type="application/ld+json" id="${PRODUCT_JSON_LD_ID}">${json}</script>`
+}
+
+export function renderProduct({ lang, product, current, cards, jsonLd }) {
+  return (jsonLd ? renderJsonLd(jsonLd) : '') + page({
     lang,
     heading: product,
     sections: [{ html: cardList([current, ...cards].filter(Boolean)) }],

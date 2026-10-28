@@ -11,6 +11,13 @@
 import { SEO_MANIFEST } from './lib/seo-manifest.mjs'
 
 const SITE_URL = 'https://cenesapijace.org'
+
+// The city-path prefixes the app routes on (CITY_PATH_PREFIX in
+// src/constants/routeLocales.js: /grad/... for sr, /city/... for en). Every
+// real page under them is in SEO_MANIFEST - the same map the sitemap is
+// written from - so a path here that the manifest doesn't know is a page that
+// doesn't exist.
+const CITY_ROUTE = /^\/(?:grad|city)(?:\/|$)/
 const OG_LOCALE = { sr: 'sr_RS', en: 'en_US' }
 
 // Mirrors public/locales/{sr,en}/translation.json's `seo.*` keys (see
@@ -184,21 +191,34 @@ async function fetchAsset(context, file) {
   }
 }
 
-// Returns { helpers, root }. Every route gets a text snapshot in #snapshot. The
+// The product page's Product JSON-LD rides at the start of its snapshot (see
+// renderProduct in scripts/lib/snapshot.mjs) and is lifted out of it here, so it
+// ends up in <head> of the served HTML instead of inside the #snapshot
+// container the app deletes.
+const PRODUCT_JSON_LD = /^<script type="application\/ld\+json" id="ld-product">[\s\S]*?<\/script>/
+
+function splitJsonLd(html) {
+  const jsonLd = html.match(PRODUCT_JSON_LD)?.[0] ?? ''
+  return { helpers: jsonLd ? html.slice(jsonLd.length) : html, jsonLd }
+}
+
+// Returns { helpers, root, jsonLd }. Every route gets a text snapshot in #snapshot. The
 // homepage additionally gets the real prerendered page (scripts/prerender-home.mjs):
 // the Serbian markup goes INTO #root (the app hydrates it), and #snapshot holds
 // the CSS it needs plus the English copy. If the prerender wasn't produced
 // (root is empty), the homepage just keeps its text snapshot.
 async function loadSnapshot(context, pathname) {
   const entry = SEO_MANIFEST[pathname]
-  if (!entry || entry.type === 'disclaimer') return { helpers: '', root: '' }
-  if (pathname !== '/') return { helpers: await fetchAsset(context, `/snap${pathname}.html`), root: '' }
+  if (!entry || entry.type === 'disclaimer') return { helpers: '', root: '', jsonLd: '' }
+  if (pathname !== '/') {
+    return { ...splitJsonLd(await fetchAsset(context, `/snap${pathname}.html`)), root: '' }
+  }
 
   const [helpers, root] = await Promise.all([
     fetchAsset(context, '/snap/index.html'),
     fetchAsset(context, '/snap/index.root.html'),
   ])
-  return { helpers, root }
+  return { helpers, root, jsonLd: '' }
 }
 
 class SetInnerHtml {
@@ -222,6 +242,39 @@ class FillPrerenderedRoot {
   }
 }
 
+class AppendToHead {
+  constructor(html) {
+    this.html = html
+  }
+
+  element(element) {
+    element.append(this.html, { html: true })
+  }
+}
+
+class RemoveElement {
+  element(element) {
+    element.remove()
+  }
+}
+
+// A path that isn't in the manifest: same shell and generic title as before,
+// but marked noindex and with no canonical, so it can never be indexed as a
+// page of its own. og:url is left at the shell's default for the same reason.
+function rewriteNotFoundHtml(response, meta) {
+  return new HTMLRewriter()
+    .on('html', new SetAttribute('lang', meta.lang))
+    .on('title', new SetTextContent(meta.title))
+    .on('meta[name="description"]', new SetAttribute('content', meta.description))
+    .on('meta[property="og:title"]', new SetAttribute('content', meta.title))
+    .on('meta[property="og:description"]', new SetAttribute('content', meta.description))
+    .on('meta[name="twitter:title"]', new SetAttribute('content', meta.title))
+    .on('meta[name="twitter:description"]', new SetAttribute('content', meta.description))
+    .on('link[rel="canonical"]', new RemoveElement())
+    .on('head', new AppendToHead('<meta name="robots" content="noindex">'))
+    .transform(response)
+}
+
 function rewriteHtml(response, meta, snapshot) {
   const rewriter = new HTMLRewriter()
     .on('html', new SetAttribute('lang', meta.lang))
@@ -239,6 +292,7 @@ function rewriteHtml(response, meta, snapshot) {
 
   if (snapshot.helpers) rewriter.on('div#snapshot', new SetInnerHtml(snapshot.helpers))
   if (snapshot.root) rewriter.on('div#root', new FillPrerenderedRoot(snapshot.root))
+  if (snapshot.jsonLd) rewriter.on('head', new AppendToHead(snapshot.jsonLd))
   return rewriter.transform(response)
 }
 
@@ -250,6 +304,14 @@ export async function onRequest(context) {
   if (!contentType.includes('text/html')) return response
 
   const url = new URL(request.url)
+
+  if (CITY_ROUTE.test(url.pathname) && !SEO_MANIFEST[url.pathname]) {
+    const page = rewriteNotFoundHtml(response, { ...FALLBACK_SR, lang: 'sr' })
+    const headers = new Headers(page.headers)
+    headers.set('X-Robots-Tag', 'noindex')
+    return new Response(page.body, { status: 404, statusText: 'Not Found', headers })
+  }
+
   const meta = resolveMeta(url.pathname)
   const snapshot = await loadSnapshot(context, url.pathname)
   return rewriteHtml(response, meta, snapshot)

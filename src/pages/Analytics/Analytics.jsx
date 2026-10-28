@@ -9,6 +9,7 @@ import { resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketRout
 import { trackPageEvent } from '../../utils/analytics.js'
 import { formatPriceValue } from '../../utils/price.js'
 import { useProductAnalytics } from '../../hooks/useProductAnalytics.js'
+import { buildProductJsonLd } from '../../utils/productJsonLd.js'
 import { useProductHistory } from '../../hooks/useProductHistory.js'
 import { productMatchesSlug, normalizeProductName, slugify } from '../../utils/productId.js'
 import PriceHistoryChart from '../../components/PriceHistoryChart/PriceHistoryChart.jsx'
@@ -114,26 +115,11 @@ function Analytics({ rows, loading, error }) {
   const jedMereLabel =
     analytics.currentMarket?.unit ? translateDataValue(t, 'jedMere', analytics.currentMarket.unit) : ''
 
-  // Google's Product rich-result schema wants a single offers block, not a
-  // per-city breakdown - cheapest/priciest (see useProductAnalytics) already
-  // give the low/high bound across cities for the product's latest week, so
-  // they map directly to AggregateOffer without recomputing anything.
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
+  const jsonLd = buildProductJsonLd({
     name: productName,
     category: identity.kategorija,
-    ...(analytics.cheapest &&
-      analytics.priciest && {
-        offers: {
-          '@type': 'AggregateOffer',
-          priceCurrency: 'RSD',
-          lowPrice: analytics.cheapest.price,
-          highPrice: analytics.priciest.price,
-          offerCount: analytics.cityComparison.length,
-        },
-      }),
-  }
+    cityComparison: analytics.cityComparison,
+  })
 
   const categoryLabel = t(`categories.${getCategorySlug(categoryName)}`)
   const breadcrumbItems = [

@@ -5,26 +5,12 @@ import { getRowLabel, getRowTime } from '../utils/week.js'
 import { getAveragePrice as getComparablePrice } from '../utils/price.js'
 import { resolveUnit } from '../utils/unit.js'
 import { getSourceLabel } from '../utils/marketTime.js'
+import { computeCityComparison } from '../utils/productJsonLd.js'
 
 function average(values) {
   const valid = values.filter((value) => value !== null && value !== undefined)
   if (valid.length === 0) return null
   return valid.reduce((sum, value) => sum + value, 0) / valid.length
-}
-
-// Picks a single representative price for a city out of its markets' own
-// CenaDom-preferring prices (see getComparablePrice) - the highest price any
-// market in that city actually charges. Averaging (625 for Kvantaš at 500 +
-// Skadarlija at 750) invented a figure no market ever charged; picking the
-// mode broke just as badly the moment a city's markets didn't repeat a price
-// (Kvantaš 500 / Kalenić 700 / Skadarlija 750, no two alike, tie-broke down
-// to the lowest at 500) - it let Belgrade's true 750 RSD market get
-// undercounted below cheaper cities like Leskovac at 600, which is never
-// correct: a city's aggregate can't be lower than one of its own markets. A
-// single-market city trivially returns that market's own price.
-function highestMarketPrice(prices) {
-  if (prices.length === 0) return null
-  return Math.max(...prices)
 }
 
 // categoryName comes from the URL's :categorySlug segment and always
@@ -169,31 +155,8 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
     return [...fullFamilySources].filter((source) => !filteredSources.has(source))
   }, [cityRows, historySources, selectedVariation])
 
-  // Each city's own latest record for this product, not a single global
-  // latest timestamp - a city whose scraper ran even a day/week earlier than
-  // the overall max would otherwise be silently dropped from the comparison
-  // (see the STIPS/JKP note on useMarketExplorer.js for the same class of bug).
-  const cityComparison = useMemo(() => {
-    const byCity = new Map()
-    itemRows.forEach((row) => {
-      const time = getRowTime(row)
-      if (time === null) return
-      const { grad } = parseMesto(row.Mesto)
-      const existing = byCity.get(grad)
-      if (!existing || time > existing.time) {
-        byCity.set(grad, { time, rows: [row] })
-      } else if (time === existing.time) {
-        existing.rows.push(row)
-      }
-    })
-    return Array.from(byCity.entries())
-      .map(([grad, { rows: cityRows }]) => ({
-        grad,
-        price: highestMarketPrice(cityRows.map(getComparablePrice).filter((price) => price !== null)),
-      }))
-      .filter((entry) => entry.price !== null)
-      .sort((a, b) => a.price - b.price)
-  }, [itemRows])
+  // Each city's own latest record for this product (see computeCityComparison).
+  const cityComparison = useMemo(() => computeCityComparison(itemRows), [itemRows])
 
   // Same "each grouping's own latest record" convention as cityComparison
   // above, but grouped by market instead of city and pre-scoped to
