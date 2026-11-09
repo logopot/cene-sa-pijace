@@ -4,7 +4,14 @@ import { useParams } from 'react-router-dom'
 import { Alert, Container } from 'react-bootstrap'
 import PageSkeleton from '../../components/PageSkeleton/PageSkeleton.jsx'
 import { LuStore } from 'react-icons/lu'
-import { parseMesto, resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketRoute } from '../../utils/market.js'
+import {
+  parseMesto,
+  resolveGradBySlug,
+  resolvePijacaBySlug,
+  buildCityRoute,
+  buildMarketRoute,
+  getMarketSeoKey,
+} from '../../utils/market.js'
 import { trackPageEvent } from '../../utils/analytics.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { getRowTime, getRowRangeLabel, getLatestWeekTime } from '../../utils/week.js'
@@ -86,12 +93,13 @@ function MarketDetails({ rows, loading, error }) {
 
   const pijacaLabel = translateDataValue(t, 'pijaca', pijaca)
   const gradLabel = translateDataValue(t, 'grad', grad)
+  const seoKey = getMarketSeoKey('market', pijacaLabel, i18n.language)
 
   return (
     <>
       <SEO
-        title={t('seo.market.title', { market: pijacaLabel, city: gradLabel })}
-        description={t('seo.market.description', { market: pijacaLabel, city: gradLabel })}
+        title={t(`${seoKey}.title`, { market: pijacaLabel, city: gradLabel })}
+        description={t(`${seoKey}.description`, { market: pijacaLabel, city: gradLabel })}
         url={`${SITE_URL}${buildMarketRoute(grad, pijaca, i18n.language)}`}
         image={getMarketOgImage(grad, pijaca)}
       />

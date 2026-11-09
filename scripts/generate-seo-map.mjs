@@ -34,8 +34,51 @@ function buildStaticEntries() {
   return entries
 }
 
+// Pairs every route with its other-language versions (hreflang). `groups` maps
+// a language-independent page identity to { lang -> path }; a page only gets
+// `alt` ({ otherLang -> path }) when every other language really has an entry
+// in the manifest and that entry points straight back, so the links are always
+// reciprocal and never guessed. A route whose canonical is a different path
+// (a single-category market's category page) is skipped: hreflang belongs on
+// the canonical URL only.
+function attachAlternates(entries, groups) {
+  let linked = 0
+  let dropped = 0
+  const owners = new Map()
+  for (const byLang of groups.values()) {
+    for (const routePath of Object.values(byLang)) owners.set(routePath, (owners.get(routePath) ?? 0) + 1)
+  }
+  for (const byLang of groups.values()) {
+    const langs = Object.keys(byLang)
+    const complete = SUPPORTED_LANGUAGES.every((lang) => {
+      const routePath = byLang[lang]
+      const entry = routePath && entries[routePath]
+      return entry && entry.lang === lang && (!entry.canonicalPath || entry.canonicalPath === routePath)
+    })
+    // Two sheet rows can collapse onto one URL (same translated product slug);
+    // then the path no longer identifies a single page and is left unlinked.
+    const unique = Object.values(byLang).every((routePath) => owners.get(routePath) === 1)
+    if (!complete || !unique || langs.length !== SUPPORTED_LANGUAGES.length) {
+      dropped += langs.length
+      continue
+    }
+    for (const lang of langs) {
+      entries[byLang[lang]].alt = Object.fromEntries(langs.filter((other) => other !== lang).map((other) => [other, byLang[other]]))
+      linked += 1
+    }
+  }
+  return { linked, dropped }
+}
+
 function buildManifest(rows) {
   const entries = buildStaticEntries()
+  const groups = new Map()
+  const addToGroup = (key, lang, routePath) => {
+    if (!groups.has(key)) groups.set(key, {})
+    groups.get(key)[lang] = routePath
+  }
+  addToGroup('disclaimer', 'sr', DISCLAIMER_PATH.sr)
+  addToGroup('disclaimer', 'en', DISCLAIMER_PATH.en)
 
   // Keyed so repeat rows (every week's price snapshot re-lists the same
   // market/product) collapse to one manifest entry each.
@@ -74,6 +117,7 @@ function buildManifest(rows) {
 
   for (const lang of SUPPORTED_LANGUAGES) {
     for (const grad of cities.values()) {
+      addToGroup(`city|${grad}`, lang, buildCityRoute(grad, lang))
       entries[buildCityRoute(grad, lang)] = {
         type: 'city',
         lang,
@@ -84,6 +128,7 @@ function buildManifest(rows) {
 
     for (const { grad, pijaca } of markets.values()) {
       const marketPath = buildMarketRoute(grad, pijaca, lang)
+      addToGroup(`market|${grad}|${pijaca}`, lang, marketPath)
       entries[marketPath] = {
         type: 'market',
         lang,
@@ -98,6 +143,7 @@ function buildManifest(rows) {
       const categoryUrlSlug = getCategoryUrlSlug(kategorija, lang)
       const categoryPath = buildMarketCategoryRoute(grad, pijaca, categoryUrlSlug, lang)
       const isOnlyCategory = categoriesByMarket.get(`${grad}|${pijaca}`)?.size === 1
+      addToGroup(`category|${grad}|${pijaca}|${kategorija}`, lang, categoryPath)
       entries[categoryPath] = {
         type: 'category',
         lang,
@@ -113,6 +159,7 @@ function buildManifest(rows) {
       const categoryUrlSlug = getCategoryUrlSlug(kategorija, lang)
       const marketPath = buildMarketCategoryRoute(grad, pijaca, categoryUrlSlug, lang)
       const productPath = `${marketPath}/${getProductUrlSlug(proizvod, lang)}`
+      addToGroup(`product|${grad}|${pijaca}|${kategorija}|${proizvod}`, lang, productPath)
       entries[productPath] = {
         type: 'product',
         lang,
@@ -121,6 +168,9 @@ function buildManifest(rows) {
       }
     }
   }
+
+  const { linked, dropped } = attachAlternates(entries, groups)
+  console.log(`[generate-seo-map] hreflang: ${linked} routes linked sr<->en, ${dropped} left without alternates`)
 
   return entries
 }

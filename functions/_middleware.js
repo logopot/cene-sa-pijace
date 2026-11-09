@@ -67,11 +67,30 @@ function productCopy(name, lang) {
 // City and market names are already resolved to the right language by the
 // manifest (see scripts/generate-seo-map.mjs's translateDataValue calls), so
 // this format itself doesn't need a per-language branch.
+// A market whose name already holds the generic word ("Green Market", "Market",
+// "Zelena pijaca", "Pijaca") must not get it added again by the template. Same
+// patterns as hasMarketWord in src/utils/market.js.
+function hasMarketWord(name, lang) {
+  return lang === 'en' ? /\bmarket\b/i.test(name) : /pijac/i.test(name)
+}
+
 function marketCopy(market, city, lang) {
-  return lang === 'en'
+  const generic = hasMarketWord(market, lang)
+  if (lang === 'en') {
+    return generic
+      ? {
+          title: `${market} (${city}) - Current Price Overview`,
+          description: `Fresh product prices at ${market} in ${city}. Check the offer before you go shopping.`,
+        }
+      : {
+          title: `${market} Market (${city}) - Current Price Overview`,
+          description: `Fresh product prices at ${market} market in ${city}. Check the offer before you go shopping.`,
+        }
+  }
+  return generic
     ? {
-        title: `${market} Market (${city}) - Current Price Overview`,
-        description: `Fresh product prices at ${market} market in ${city}. Check the offer before you go shopping.`,
+        title: `${market} (${city}) - Pregled aktuelnih cena`,
+        description: `Sveže cene proizvoda: ${market}, ${city}. Proverite ponudu pre odlaska u kupovinu.`,
       }
     : {
         title: `Pijaca ${market} (${city}) - Pregled aktuelnih cena`,
@@ -80,9 +99,12 @@ function marketCopy(market, city, lang) {
 }
 
 function categoryCopy(category, market, city, lang) {
-  return lang === 'en'
-    ? { title: `${category} Prices at ${market} Market (${city})`, description: `${city} • ${market} • ${category}` }
-    : { title: `${category} - Cene na pijaci ${market} (${city})`, description: `${city} • ${market} • ${category}` }
+  const generic = hasMarketWord(market, lang)
+  const description = `${city} • ${market} • ${category}`
+  if (lang === 'en') {
+    return { title: `${category} Prices at ${market}${generic ? '' : ' Market'} (${city})`, description }
+  }
+  return { title: generic ? `${category} - Cene: ${market} (${city})` : `${category} - Cene na pijaci ${market} (${city})`, description }
 }
 
 function cityCopy(city, lang) {
@@ -252,6 +274,18 @@ class AppendToHead {
   }
 }
 
+// hreflang alternates for a route whose other-language version exists. The
+// manifest's `alt` ({ lang -> path }, written by scripts/generate-seo-map.mjs
+// only for verified, reciprocal pairs) lists the other versions; the page links
+// to itself too, and x-default is the Serbian version.
+function renderHreflang(pathname, entry) {
+  if (!entry?.alt) return ''
+  const byLang = { ...entry.alt, [entry.lang]: pathname }
+  const link = (hreflang, routePath) => `<link rel="alternate" hreflang="${hreflang}" href="${SITE_URL}${routePath}" data-ssr-hreflang>`
+  const langs = Object.keys(byLang).sort((a, b) => (a === 'sr' ? -1 : b === 'sr' ? 1 : a.localeCompare(b)))
+  return [...langs.map((lang) => link(lang, byLang[lang])), link('x-default', byLang.sr ?? pathname)].join('')
+}
+
 class RemoveElement {
   element(element) {
     element.remove()
@@ -275,7 +309,7 @@ function rewriteNotFoundHtml(response, meta) {
     .transform(response)
 }
 
-function rewriteHtml(response, meta, snapshot) {
+function rewriteHtml(response, meta, snapshot, hreflang) {
   const rewriter = new HTMLRewriter()
     .on('html', new SetAttribute('lang', meta.lang))
     .on('title', new SetTextContent(meta.title))
@@ -293,6 +327,7 @@ function rewriteHtml(response, meta, snapshot) {
   if (snapshot.helpers) rewriter.on('div#snapshot', new SetInnerHtml(snapshot.helpers))
   if (snapshot.root) rewriter.on('div#root', new FillPrerenderedRoot(snapshot.root))
   if (snapshot.jsonLd) rewriter.on('head', new AppendToHead(snapshot.jsonLd))
+  if (hreflang) rewriter.on('head', new AppendToHead(hreflang))
   return rewriter.transform(response)
 }
 
@@ -314,5 +349,5 @@ export async function onRequest(context) {
 
   const meta = resolveMeta(url.pathname)
   const snapshot = await loadSnapshot(context, url.pathname)
-  return rewriteHtml(response, meta, snapshot)
+  return rewriteHtml(response, meta, snapshot, renderHreflang(url.pathname, SEO_MANIFEST[url.pathname]))
 }

@@ -11,6 +11,7 @@ import {
   buildCityRoute,
   buildMarketRoute,
   buildMarketCategoryRoute,
+  getMarketSeoKey,
 } from '../../utils/market.js'
 import { getCategoryIcon, getCategorySlug, getCategoryUrlSlug, resolveCategoryBySlug } from '../../utils/categoryIcons.js'
 import { translateDataValue } from '../../utils/translateValue.js'
@@ -136,6 +137,8 @@ function MarketCategoryDetails({ rows, loading, error }) {
   // "Sve pijace" (isAllMarkets) has no route of its own distinct from the
   // city page itself, so its trail skips straight from city to category
   // rather than inserting a non-clickable "Sve pijace" crumb.
+  const seoKey = getMarketSeoKey('category', marketLabel, i18n.language)
+
   const breadcrumbItems = [
     { label: t('breadcrumbs.home'), to: '/' },
     { label: gradLabel, to: buildCityRoute(grad, i18n.language) },
@@ -146,8 +149,8 @@ function MarketCategoryDetails({ rows, loading, error }) {
   return (
     <>
       <SEO
-        title={t('seo.category.title', { category: categoryLabel, market: marketLabel, city: gradLabel })}
-        description={t('seo.category.description', { category: categoryLabel, market: marketLabel, city: gradLabel })}
+        title={t(`${seoKey}.title`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
+        description={t(`${seoKey}.description`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
         url={canonicalUrl}
         image={isAllMarkets ? undefined : getMarketOgImage(grad, pijaca)}
       />

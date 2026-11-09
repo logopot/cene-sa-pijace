@@ -51,9 +51,17 @@
       "title": "Pijaca {{market}} ({{city}}) - Pregled aktuelnih cena",
       "description": "Sveže cene proizvoda na pijaci {{market}} u gradu {{city}}. Proverite ponudu pre odlaska u kupovinu."
     },
+    "marketGeneric": {
+      "title": "{{market}} ({{city}}) - Pregled aktuelnih cena",
+      "description": "Sveže cene proizvoda: {{market}}, {{city}}. Proverite ponudu pre odlaska u kupovinu."
+    },
     "category": {
       "title": "{{category}} - Cene na pijaci {{market}} ({{city}})",
       "description": "Aktuelne cene za {{category}} na pijaci {{market}} u gradu {{city}}."
+    },
+    "categoryGeneric": {
+      "title": "{{category}} - Cene: {{market}} ({{city}})",
+      "description": "Aktuelne cene za {{category}}: {{market}}, {{city}}."
     },
     "city": {
       "title": "Cene na pijacama - {{city}} | Aktuelne cene",

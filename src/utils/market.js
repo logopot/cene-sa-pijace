@@ -149,6 +149,22 @@ function getMarketUrlSlug(pijaca, language) {
   return getMarketTypeUrlSlug(pijaca, language) ?? slugify(pijaca)
 }
 
+// True when a market's display name already contains the generic "market"
+// word of `language` ("Green Market", "Market", "Zelena pijaca", "Pijaca") -
+// the SEO title templates prepend/append that word themselves, so for such
+// names they must use the seo.marketGeneric / seo.categoryGeneric variants
+// or the title reads "Green Market Market" / "Pijaca Zelena pijaca".
+// functions/_middleware.js carries the same two patterns.
+export function hasMarketWord(name, language) {
+  if (!name) return false
+  return language === 'en' ? /\bmarket\b/i.test(name) : /pijac/i.test(name)
+}
+
+// i18n key prefix for a market/category page's SEO copy (see hasMarketWord).
+export function getMarketSeoKey(kind, marketLabel, language) {
+  return `seo.${kind}${hasMarketWord(marketLabel, language) ? 'Generic' : ''}`
+}
+
 // City-level URL for the /grad|city/:citySlug route (see CityDetails) - keyed
 // on grad alone, listing every named market within that city as its own
 // card. language picks the /grad vs /city prefix (see routeLocales.js).

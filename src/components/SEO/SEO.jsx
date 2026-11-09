@@ -45,6 +45,16 @@ function SEO({ title, description, image = DEFAULT_OG_IMAGE, url = SITE_URL, jso
     if (!alreadyInHtml) getPrerenderedJsonLd()?.remove()
   }, [alreadyInHtml])
 
+  // The hreflang links the edge middleware wrote describe the page that was
+  // loaded from the server. Once the app shows a different page (client-side
+  // navigation) they would point at the wrong pair, so they are dropped.
+  useEffect(() => {
+    const links = Array.from(document.querySelectorAll('link[rel="alternate"][data-ssr-hreflang]'))
+    if (links.length > 0 && !links.some((link) => link.getAttribute('href') === url)) {
+      links.forEach((link) => link.remove())
+    }
+  }, [url])
+
   return (
     <Helmet>
       <html lang={i18n.language} />
