@@ -12,12 +12,6 @@ import { SEO_MANIFEST } from './lib/seo-manifest.mjs'
 
 const SITE_URL = 'https://cenesapijace.org'
 
-// The city-path prefixes the app routes on (CITY_PATH_PREFIX in
-// src/constants/routeLocales.js: /grad/... for sr, /city/... for en). Every
-// real page under them is in SEO_MANIFEST - the same map the sitemap is
-// written from - so a path here that the manifest doesn't know is a page that
-// doesn't exist.
-const CITY_ROUTE = /^\/(?:grad|city)(?:\/|$)/
 const OG_LOCALE = { sr: 'sr_RS', en: 'en_US' }
 
 // Mirrors public/locales/{sr,en}/translation.json's `seo.*` keys (see
@@ -340,7 +334,11 @@ export async function onRequest(context) {
 
   const url = new URL(request.url)
 
-  if (CITY_ROUTE.test(url.pathname) && !SEO_MANIFEST[url.pathname]) {
+  // The SPA fallback (public/_redirects) serves index.html with 200 for every
+  // path, so any HTML request the manifest doesn't know is a page that doesn't
+  // exist - under /grad|/city and anywhere else (/xyz, /en). Real files
+  // (/sitemap.xml, /robots.txt, assets) aren't HTML and returned above.
+  if (!SEO_MANIFEST[url.pathname]) {
     const page = rewriteNotFoundHtml(response, { ...FALLBACK_SR, lang: 'sr' })
     const headers = new Headers(page.headers)
     headers.set('X-Robots-Tag', 'noindex')
