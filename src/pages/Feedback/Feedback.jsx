@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSearchParams } from 'react-router-dom'
 import { Container } from 'react-bootstrap'
 import { LuMessageSquareText } from 'react-icons/lu'
 import SEO from '../../components/SEO/SEO.jsx'
@@ -8,12 +7,12 @@ import { SITE_URL } from '../../constants/seo.js'
 import { getFeedbackPath } from '../../constants/routeLocales.js'
 import { trackEvent, trackPageEvent } from '../../utils/analytics.js'
 import { withFallback } from '../../utils/feedbackText.js'
+import { readLastRoute } from '../../utils/lastRoute.js'
 import {
   NAME_MAX,
   MESSAGE_MIN,
   MESSAGE_MAX,
   validateFeedback,
-  sanitizeFromPath,
   pageTypeFromPath,
   textLength,
 } from '../../utils/feedbackRules.js'
@@ -69,8 +68,9 @@ function loadTurnstile() {
 
 function Feedback() {
   const { t, i18n } = useTranslation()
-  const [searchParams] = useSearchParams()
-  const from = sanitizeFromPath(searchParams.get('from') ?? '')
+  // The page the visitor was on before opening the form (see lastRoute.js);
+  // empty after a direct visit.
+  const [page] = useState(() => readLastRoute())
   const language = i18n.resolvedLanguage ?? i18n.language
   const tx = (key, vars) => withFallback(t, language, key, vars)
 
@@ -87,8 +87,8 @@ function Feedback() {
   const done = status === 'success'
 
   useEffect(() => {
-    trackPageEvent('feedback_open', { from_page_type: pageTypeFromPath(from) })
-  }, [from])
+    trackPageEvent('feedback_open', { from_page_type: pageTypeFromPath(page) })
+  }, [page])
 
   // Explicit render: the widget is created here, once the script has loaded,
   // and removed again when the form goes away.
@@ -100,6 +100,10 @@ function Feedback() {
         if (cancelled || !slotRef.current || widgetIdRef.current !== null) return
         widgetIdRef.current = turnstile.render(slotRef.current, {
           sitekey: TURNSTILE_SITE_KEY,
+          // Fixed light look (not "auto"): the widget must not follow the
+          // visitor's dark mode, the form around it is white.
+          theme: 'light',
+          size: 'normal',
           language,
           callback: (value) => setToken(value),
           'expired-callback': () => setToken(''),
@@ -129,7 +133,7 @@ function Feedback() {
     event.preventDefault()
     if (status === 'sending') return
 
-    const checked = validateFeedback({ name, message, path: from, lang: language })
+    const checked = validateFeedback({ name, message, page, lang: language })
     if (!checked.ok) {
       const next = {}
       if (checked.errors.some((code) => code.startsWith('name_'))) next.name = 'feedback.errors.nameLong'
@@ -192,6 +196,11 @@ function Feedback() {
           </IconWrap>
           <Title>{tx('feedback.title')}</Title>
         </PageHeader>
+
+        <Notes>
+          <Note>{tx('feedback.notePrivacy')}</Note>
+          <Note>{tx('feedback.noteSources')}</Note>
+        </Notes>
 
         {done ? (
           <Success ref={successRef} tabIndex={-1} role="status">
@@ -262,11 +271,6 @@ function Feedback() {
             </SubmitButton>
           </Form>
         )}
-
-        <Notes>
-          <Note>{tx('feedback.notePrivacy')}</Note>
-          <Note>{tx('feedback.noteSources')}</Note>
-        </Notes>
       </Page>
     </Container>
   )

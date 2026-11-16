@@ -275,7 +275,7 @@ async function getAccessToken(account, fetchImpl, now, { forceRefresh = false } 
 // Row layout: Datum | Ime | Poruka | Strana | Jezik | Status. The date is the
 // server's; no IP address and no User-Agent are ever part of it.
 export function buildSheetRow(fields, nowIso) {
-  return [nowIso, fields.name, fields.message, fields.path, fields.lang, 'novo']
+  return [nowIso, fields.name, fields.message, fields.page, fields.lang, 'novo']
 }
 
 export function buildAppendRequest(env, row) {
@@ -357,9 +357,9 @@ export async function handleFeedback(request, env, { fetchImpl = defaultFetch, n
     phase = 'turnstile_fetch'
     if (!(await verifyTurnstile(token, ip, env, fetchImpl))) return failure(400, 'verification_failed')
 
-    const { name, message, path, lang } = checked.value
+    const { name, message, page, lang } = checked.value
     const row = buildSheetRow(
-      { name: protectFromFormula(name), message: protectFromFormula(message), path, lang },
+      { name: protectFromFormula(name), message: protectFromFormula(message), page, lang },
       new Date(now).toISOString(),
     )
     phase = 'sheets_append'

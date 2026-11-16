@@ -1,4 +1,4 @@
-import { Fragment, lazy, Suspense } from 'react'
+import { Fragment, lazy, Suspense, useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Header from './components/Header/Header.jsx'
 import Footer from './components/Footer/Footer.jsx'
@@ -13,6 +13,7 @@ import MarketDetails from './pages/MarketDetails/MarketDetails.jsx'
 import MarketCategoryDetails from './pages/MarketCategoryDetails/MarketCategoryDetails.jsx'
 import NotFound from './pages/NotFound/NotFound.jsx'
 import { CITY_PATH_PREFIX, DISCLAIMER_PATH, FEEDBACK_PATH } from './constants/routeLocales.js'
+import { rememberRoute } from './utils/lastRoute.js'
 import { FilterProvider } from './context/FilterContext.jsx'
 import { GlobalStyle } from './styles/globalStyle.js'
 import { AppShell, Main } from './App.styled.js'
@@ -27,6 +28,12 @@ const Analytics = lazy(() => import('./pages/Analytics/Analytics.jsx'))
 // scripts/prerender-home.mjs).
 function AppContent({ rows, loading, error, seed }) {
   const location = useLocation()
+
+  // Remember the last page that is not the suggestions form, for the form
+  // to send along (see utils/lastRoute.js).
+  useEffect(() => {
+    rememberRoute(location.pathname)
+  }, [location.pathname])
 
   return (
     <FilterProvider rows={rows}>

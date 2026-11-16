@@ -1,10 +1,8 @@
 import { Trans, useTranslation } from "react-i18next";
 import { Container } from "react-bootstrap";
 import LogopotLogo from "../LogopotLogo/LogopotLogo.jsx";
-import { useLocation } from "react-router-dom";
-import { getDisclaimerPath, getFeedbackPath, isFeedbackPath } from "../../constants/routeLocales.js";
+import { getDisclaimerPath, getFeedbackPath } from "../../constants/routeLocales.js";
 import { withFallback } from "../../utils/feedbackText.js";
-import { isValidFromPath } from "../../utils/feedbackRules.js";
 import {
   StyledFooter,
   TopSection,
@@ -39,14 +37,9 @@ function Footer() {
   const { t, i18n } = useTranslation();
   const year = new Date().getFullYear();
   const disclaimerPath = getDisclaimerPath(i18n.language);
-  const { pathname } = useLocation();
-  // The only entry point to the suggestions form: it remembers the page the
-  // visitor was on (see pages/Feedback). Left off when already on the form.
+  // The only entry point to the suggestions form. A plain URL: the form learns
+  // the page the visitor came from by itself (see utils/lastRoute.js).
   const feedbackPath = getFeedbackPath(i18n.language);
-  const feedbackLink =
-    isFeedbackPath(pathname) || !isValidFromPath(pathname)
-      ? feedbackPath
-      : `${feedbackPath}?${new URLSearchParams({ from: pathname })}`;
 
   return (
     <StyledFooter>
@@ -65,7 +58,7 @@ function Footer() {
                   </FooterRouteLink>
                 </li>
                 <li>
-                  <FooterRouteLink to={feedbackLink}>
+                  <FooterRouteLink to={feedbackPath}>
                     {withFallback(t, i18n.language, "footer.feedbackLink")}
                   </FooterRouteLink>
                 </li>

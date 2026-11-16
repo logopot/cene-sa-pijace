@@ -99,7 +99,7 @@ const fetchImpl = async (url, init) => {
 const request = new Request('https://cenesapijace.org/api/feedback', {
   method: 'POST',
   headers: { 'content-type': 'application/json', origin: 'https://cenesapijace.org', 'CF-Connecting-IP': '203.0.113.9' },
-  body: JSON.stringify({ name: 'Ana', message: 'Poruka iz Workers simulacije', path: '/grad/beograd', lang: 'sr', website: '', token: 'XXXX.DUMMY.TOKEN.XXXX' }),
+  body: JSON.stringify({ name: 'Ana', message: 'Poruka iz Workers simulacije', page: '/grad/beograd', lang: 'sr', website: '', token: 'XXXX.DUMMY.TOKEN.XXXX' }),
 })
 const response = await handleFeedback(request, env, { fetchImpl, now: Date.parse('2026-11-16T10:20:30.000Z') })
 

@@ -135,7 +135,7 @@ Parts: `src/pages/Feedback` (form), `src/utils/feedbackRules.js` (validation sha
    |---|---|---|---|---|---|
    | Datum | Ime | Poruka | Strana | Jezik | Status |
 
-   `Datum` is ISO UTC set by the server, `Strana` is the page path the visitor came from (may be empty), `Jezik` is `sr`/`en`, `Status` starts as `novo`. No IP address and no User-Agent are stored.
+   `Datum` is ISO UTC set by the server, `Strana` is the pathname of the page the visitor was on before opening the form (kept in `sessionStorage` by `src/utils/lastRoute.js`, sent as `page`; empty after a direct visit; never from `document.referrer`), `Jezik` is `sr`/`en`, `Status` starts as `novo`. No IP address and no User-Agent are stored.
 2. **Service account.** Use a service account whose key you can paste as JSON. It must be **Editor** on the spreadsheet file (needed to append rows). Because Editor access covers the whole file, **protect the price tabs** (Data -> Protect sheets and ranges -> only the scrapers' account may edit), so the form's account can write only to `Feedback`. The scope used is `https://www.googleapis.com/auth/spreadsheets`. Using a separate account from the scrapers is recommended.
 3. **Turnstile.** In the Cloudflare dashboard create a Turnstile widget for `cenesapijace.org` (managed mode). You get a site key (public) and a secret key.
 4. **Environment variables** (Cloudflare Pages -> the project -> Settings -> Variables and Secrets; set them for Production, and for Preview if you test there). Values are never written to the repo:

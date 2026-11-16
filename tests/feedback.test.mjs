@@ -58,7 +58,7 @@ const post = (body, { headers = {}, method = 'POST', raw } = {}) =>
 const valid = (over = {}) => ({
   name: 'Ana',
   message: 'Predlog za sajt, hvala',
-  path: '/grad/beograd',
+  page: '/grad/beograd',
   lang: 'sr',
   website: '',
   token: 'XXXX.DUMMY.TOKEN.XXXX',
@@ -136,7 +136,7 @@ test('Turnstile siteverify gets the secret, the token and the CF-Connecting-IP',
 })
 
 test('Sheets append: range, RAW, INSERT_ROWS, column order, no IP / User-Agent', async () => {
-  const request = post(valid({ name: 'Ana', message: 'Poruka za test', path: '/city/beograd', lang: 'en' }), {
+  const request = post(valid({ name: 'Ana', message: 'Poruka za test', page: '/city/beograd', lang: 'en' }), {
     headers: { 'user-agent': 'TestBrowser/1.0' },
   })
   const { response, mock } = await run(request)
@@ -170,8 +170,8 @@ test('formula injection: = + - @ get a leading apostrophe; control characters ar
   assert.deepEqual(second.mock.calls.append[0].body.values[0].slice(1, 3), ["'-1", "'+cmd|calc"])
 })
 
-test('invalid path is ignored, not an error', async () => {
-  const { response, mock } = await run(post(valid({ path: 'javascript:alert(1)' })))
+test('invalid page is ignored (stored empty), not an error', async () => {
+  const { response, mock } = await run(post(valid({ page: 'javascript:alert(1)' })))
   assert.equal(response.status, 200)
   assert.equal(mock.calls.append[0].body.values[0][3], '')
 })

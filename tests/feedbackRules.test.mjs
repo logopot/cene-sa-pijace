@@ -37,7 +37,7 @@ test('language must be sr or en', () => {
   assert.equal(ok({ lang: undefined }).ok, false)
 })
 
-test('path rule: starts with /, <= 200 chars, path characters only; otherwise ignored', () => {
+test('page rule: starts with /, <= 200 chars, path characters only; otherwise ignored', () => {
   assert.equal(isValidFromPath('/grad/novi-sad/kvantaska-pijaca'), true)
   assert.equal(isValidFromPath('/'), true)
   assert.equal(isValidFromPath('grad/x'), false)
@@ -49,9 +49,12 @@ test('path rule: starts with /, <= 200 chars, path characters only; otherwise ig
   assert.equal(isValidFromPath('/' + 'a'.repeat(199)), true)
   assert.equal(isValidFromPath('/' + 'a'.repeat(200)), false)
   assert.equal(sanitizeFromPath('javascript:alert(1)'), '')
-  assert.equal(ok({ path: '/grad/beograd' }).value.path, '/grad/beograd')
-  assert.equal(ok({ path: 'nope' }).value.path, '')
-  assert.equal(ok({}).value.path, '')
+  assert.equal(ok({ page: '/grad/beograd' }).value.page, '/grad/beograd')
+  assert.equal(ok({ page: 'nope' }).value.page, '')
+  assert.equal(ok({ page: '/' + 'a'.repeat(200) }).value.page, '')
+  assert.equal(ok({ page: 42 }).value.page, '')
+  assert.equal(ok({}).value.page, '')
+  assert.equal(ok({ path: '/grad/beograd' }).value.page, '', 'the old "path" field is not read')
 })
 
 test('control characters are removed, spaces collapsed', () => {
@@ -73,6 +76,7 @@ test('page type for the GA4 event never exposes the path', () => {
   assert.equal(pageTypeFromPath('/grad/beograd/kalenic'), 'market')
   assert.equal(pageTypeFromPath('/city/beograd/green-market/vegetables'), 'category')
   assert.equal(pageTypeFromPath('/grad/a/b/c/d'), 'product')
-  assert.equal(pageTypeFromPath('/disclaimer'), 'disclaimer')
-  assert.equal(pageTypeFromPath('nope'), 'unknown')
+  assert.equal(pageTypeFromPath('/disclaimer'), 'other')
+  assert.equal(pageTypeFromPath('nope'), 'other')
+  assert.equal(pageTypeFromPath(''), 'other')
 })

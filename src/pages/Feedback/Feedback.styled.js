@@ -113,8 +113,13 @@ export const Honeypot = styled.div`
   overflow: hidden;
 `
 
+// The page declares "color-scheme: light dark" (index.css); an iframe inherits it
+// and the widget would get a dark backdrop in a dark OS theme. Pinned to light
+// here, together with the widget's own fixed light theme.
 export const TurnstileSlot = styled.div`
   min-height: 65px;
+  color-scheme: light;
+  background: #fff;
 `
 
 export const FormError = styled.div`
@@ -178,11 +183,12 @@ export const SuccessText = styled.p`
   color: ${({ theme }) => theme.colors.textSecondary};
 `
 
+// Under the heading, above the form: plain grey text, no frame.
 export const Notes = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.xs};
-  margin-top: ${({ theme }) => theme.spacing.md};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
 `
 
 export const Note = styled.p`

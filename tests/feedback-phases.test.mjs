@@ -49,7 +49,7 @@ function services(broken = {}) {
 const valid = (over = {}) => ({
   name: 'Tajno Ime',
   message: 'tajna poruka sadrzaj',
-  path: '/grad/beograd',
+  page: '/grad/beograd',
   lang: 'sr',
   website: '',
   token: 'XXXX.DUMMY.TOKEN.XXXX',

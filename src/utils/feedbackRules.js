@@ -13,7 +13,7 @@ export const FEEDBACK_LANGUAGES = ['sr', 'en']
 // no backslash, no angle brackets or quotes.
 const PATH_PATTERN = /^\/[A-Za-z0-9\-._~!$&'()*+,;=:@%/]*$/
 
-// A page path the form may remember as "where the visitor came from": starts
+// A page path the form may send as "the page the visitor came from": starts
 // with "/", at most FROM_MAX characters, only path characters. "//..." is out
 // (it would read as a protocol-relative URL). Anything else is ignored by the
 // callers, never an error.
@@ -91,17 +91,16 @@ export function validateFeedback(input) {
   if (!FEEDBACK_LANGUAGES.includes(lang)) errors.push('lang')
   if (errors.length > 0) return { ok: false, errors }
 
-  return { ok: true, value: { name, message, path: sanitizeFromPath(raw.path), lang } }
+  return { ok: true, value: { name, message, page: sanitizeFromPath(raw.page), lang } }
 }
 
-// Coarse kind of page the visitor came from, for the GA4 "feedback_open" event
-// - never the path itself, so no product or market name leaves the site.
+// Coarse kind of page the visitor came from, for the GA4 "feedback_open" event:
+// home, city, market, category, product or other (also when there is no page).
+// Never the path itself, so no product or market name leaves the site.
 export function pageTypeFromPath(path) {
-  if (!isValidFromPath(path)) return 'unknown'
+  if (!isValidFromPath(path)) return 'other'
   if (path === '/') return 'home'
   const segments = path.split('/').filter(Boolean)
-  if (segments[0] === 'odricanje-od-odgovornosti' || segments[0] === 'disclaimer') return 'disclaimer'
-  if (segments[0] === 'predlozi' || segments[0] === 'feedback') return 'feedback'
   if (segments[0] === 'grad' || segments[0] === 'city') {
     return ['city', 'market', 'category', 'product'][segments.length - 2] ?? 'other'
   }
