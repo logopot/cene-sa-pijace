@@ -15,7 +15,10 @@ import {
   getCanonicalCitySlug,
   SUPPORTED_LANGUAGES,
 } from './lib/productLabels.mjs'
-import { fetchAllMarketRows, readLocalEnvFile, ROOT } from './lib/googleSheets.mjs'
+import { fetchAllMarketRows, readLocalEnvFile, ROOT, readJsonFile } from './lib/googleSheets.mjs'
+import { keepPricedRows, selectLatestRows } from './lib/dataset.mjs'
+import { latestRowsForMarket, rowsForMarket, listingFacts, productFacts, productVariant } from '../src/utils/seoFacts.js'
+import { manifestEntryCopy, isKvantaskaMarket } from '../src/utils/seoCopy.js'
 import { writeFileSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
 
@@ -24,6 +27,17 @@ readLocalEnvFile()
 const OUTPUT_PATH = path.join(ROOT, 'functions/lib/seo-manifest.mjs')
 const SITEMAP_PATH = path.join(ROOT, 'public/sitemap.xml')
 const SITE_URL = 'https://cenesapijace.org'
+const MARKET_INFO = readJsonFile('src/data/marketInfo.json')
+
+// Safety valve for the "no prices" noindex rule: if it would hit more than this
+// share of the sitemap's routes, something is wrong with the data (a failed
+// scrape, a half-empty sheet) rather than with a few pages - so nothing is
+// marked and the build says so loudly instead of de-indexing the site.
+const NOINDEX_MAX_SHARE = 0.05
+
+// Is this route its own canonical (what the sitemap lists)? A category page
+// that collapses onto its market page is not.
+const isOwnCanonical = (routePath, entry) => !entry.canonicalPath || entry.canonicalPath === routePath
 
 function buildStaticEntries() {
   const entries = {}
@@ -70,8 +84,73 @@ function attachAlternates(entries, groups) {
   return { linked, dropped }
 }
 
+// Titles and descriptions of product pages must be unique within a language.
+// The base copy already carries product, market and city; pages that still share
+// all three (one name under two categories, two sheet names with one translation)
+// get a variant in parentheses - see productVariant in src/utils/seoFacts.js, the
+// same rule the React pages apply. This reports uniqueness before and after the
+// variants and lists whatever still collides.
+function reportCopyUniqueness(entries) {
+  const measure = (paths, withVariants) => {
+    const titles = new Map()
+    const descriptions = new Map()
+    for (const routePath of paths) {
+      const entry = withVariants ? entries[routePath] : { ...entries[routePath], vr: undefined }
+      const copy = manifestEntryCopy(entry)
+      titles.set(copy.title, [...(titles.get(copy.title) ?? []), routePath])
+      descriptions.set(copy.description, [...(descriptions.get(copy.description) ?? []), routePath])
+    }
+    return { pages: paths.length, titles: titles.size, descriptions: descriptions.size, clashing: [...titles.values(), ...descriptions.values()].filter((list) => list.length > 1) }
+  }
+  for (const lang of SUPPORTED_LANGUAGES) {
+    const paths = Object.keys(entries).filter((p) => entries[p].type === 'product' && entries[p].lang === lang)
+    const base = measure(paths, false)
+    const final = measure(paths, true)
+    console.log(`[generate-seo-map] product copy ${lang}: ${base.pages} pages, unique titles/descriptions ${base.titles}/${base.descriptions} before variants, ${final.titles}/${final.descriptions} after (${paths.filter((p) => entries[p].vr).length} variants)`)
+    for (const list of final.clashing.slice(0, 5)) console.warn(`[generate-seo-map]   STILL DUPLICATE: ${list.slice(0, 3).join(' | ')}`)
+  }
+}
+
+// A product route with no priced row at its market (not even an older one - the
+// app has nothing to show for it) renders nothing but the "Ova tezga je
+// trenutno prazna" state: it stays in the manifest and answers 200
+// (so it comes back by itself once data returns) but is kept out of search -
+// noindex in the HTML and absent from sitemap.xml. A sr route and its en twin
+// are decided by the same condition (no priced row), so a pair always agrees.
+function markPricelessRoutes(entries) {
+  const priceless = Object.entries(entries).filter(([, entry]) => entry.type === 'product' && !entry.pr)
+  const listed = Object.entries(entries).filter(([routePath, entry]) => isOwnCanonical(routePath, entry)).length
+  const share = priceless.length / listed
+  const examples = priceless.filter(([, entry]) => entry.lang === 'sr').slice(0, 10).map(([routePath]) => routePath)
+  if (share > NOINDEX_MAX_SHARE) {
+    console.error(
+      `[generate-seo-map] NOINDEX NOT APPLIED: ${priceless.length} of ${listed} routes (${(share * 100).toFixed(1)}%) have no price, over the ${NOINDEX_MAX_SHARE * 100}% limit. Examples:\n  ${examples.join('\n  ')}`,
+    )
+    return
+  }
+  for (const [, entry] of priceless) entry.noindex = 1
+  console.log(`[generate-seo-map] noindex (no price rows): ${priceless.length} of ${listed} routes (${(share * 100).toFixed(2)}%)`)
+  for (const example of examples) console.log('[generate-seo-map]   noindex example:', example)
+}
+
 function buildManifest(rows) {
   const entries = buildStaticEntries()
+  // The same latest priced rows the page snapshots and the app's latest.json
+  // are made of (see generate-data.mjs), indexed by market once.
+  const latestRows = selectLatestRows(keepPricedRows(rows))
+  const marketLatest = new Map()
+  const marketAll = new Map()
+  const allFor = (grad, pijaca) => {
+    const key = `${grad}|${pijaca}`
+    if (!marketAll.has(key)) marketAll.set(key, rowsForMarket(latestRows, grad, pijaca))
+    return marketAll.get(key)
+  }
+  const latestFor = (grad, pijaca) => {
+    const key = `${grad}|${pijaca}`
+    if (!marketLatest.has(key)) marketLatest.set(key, latestRowsForMarket(latestRows, grad, pijaca))
+    return marketLatest.get(key)
+  }
+  const sourceLabelFor = (grad, pijaca) => MARKET_INFO[`${grad}|${pijaca}`]?.sourceLabel ?? 'STIPS'
   const groups = new Map()
   const addToGroup = (key, lang, routePath) => {
     if (!groups.has(key)) groups.set(key, {})
@@ -136,6 +215,10 @@ function buildManifest(rows) {
         city: translateDataValue(lang, 'grad', grad),
         slug: getCanonicalMarketSlug(grad, pijaca),
       }
+      if (isKvantaskaMarket(lang, entries[marketPath].market)) {
+        const { source, date } = listingFacts(latestFor(grad, pijaca))
+        Object.assign(entries[marketPath], { sr: source, dt: date })
+      }
     }
 
     for (const { grad, pijaca, kategorija } of marketCategories.values()) {
@@ -153,6 +236,10 @@ function buildManifest(rows) {
         slug: getCanonicalMarketSlug(grad, pijaca),
         canonicalPath: isOnlyCategory ? marketPath : categoryPath,
       }
+      if (isKvantaskaMarket(lang, entries[categoryPath].market)) {
+        const { source, date } = listingFacts(latestFor(grad, pijaca).filter((row) => row.Kategorija === kategorija))
+        Object.assign(entries[categoryPath], { sr: source, dt: date })
+      }
     }
 
     for (const { grad, pijaca, kategorija, proizvod } of products.values()) {
@@ -160,14 +247,40 @@ function buildManifest(rows) {
       const marketPath = buildMarketCategoryRoute(grad, pijaca, categoryUrlSlug, lang)
       const productPath = `${marketPath}/${getProductUrlSlug(proizvod, lang)}`
       addToGroup(`product|${grad}|${pijaca}|${kategorija}|${proizvod}`, lang, productPath)
+      // Facts of this product's own latest row at this market; null when the
+      // market has no priced row for it (see markPricelessRoutes).
+      const facts = productFacts(
+        allFor(grad, pijaca),
+        (row) => row.Proizvod === proizvod && row.Kategorija === kategorija,
+        sourceLabelFor(grad, pijaca),
+      )
+      const variant = productVariant(
+        allFor(grad, pijaca),
+        { proizvod, kategorija },
+        (raw) => translateDataValue(lang, 'proizvod', raw),
+        (category) => translateCategory(lang, category),
+      )
       entries[productPath] = {
         type: 'product',
         lang,
         name: translateDataValue(lang, 'proizvod', proizvod),
         slug: getCanonicalProductSlug(proizvod),
+        mk: translateDataValue(lang, 'pijaca', pijaca),
+        ct: translateDataValue(lang, 'grad', grad),
+        cg: translateCategory(lang, kategorija),
+        ...(facts && {
+          pr: [facts.min, facts.max],
+          ...(facts.unitRaw && { un: translateDataValue(lang, 'jedMere', facts.unitRaw) }),
+          sr: facts.source,
+          dt: facts.date,
+        }),
+        ...(variant && { vr: variant }),
       }
     }
   }
+
+  reportCopyUniqueness(entries)
+  markPricelessRoutes(entries)
 
   const { linked, dropped } = attachAlternates(entries, groups)
   console.log(`[generate-seo-map] hreflang: ${linked} routes linked sr<->en, ${dropped} left without alternates`)
@@ -181,7 +294,7 @@ function buildManifest(rows) {
 function buildSitemap(entries) {
   const today = new Date().toISOString().slice(0, 10)
   const urls = Object.entries(entries)
-    .filter(([routePath, entry]) => !entry.canonicalPath || entry.canonicalPath === routePath)
+    .filter(([routePath, entry]) => isOwnCanonical(routePath, entry) && !entry.noindex)
     .map(([routePath, entry]) => {
       const priority = entry.type === 'home' ? '1.0' : entry.type === 'disclaimer' ? '0.2' : '0.6'
       return `  <url><loc>${SITE_URL}${routePath}</loc><lastmod>${today}</lastmod><priority>${priority}</priority></url>`

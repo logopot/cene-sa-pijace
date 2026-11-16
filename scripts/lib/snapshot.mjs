@@ -9,7 +9,7 @@ import { getDisplayPrice, formatDisplayPrice } from '../../src/utils/price.js'
 import { isBlank } from '../../src/utils/blank.js'
 import { resolveUnit } from '../../src/utils/unit.js'
 import { spaceBeforeParens } from '../../src/utils/formatText.js'
-import { getRowTime } from '../../src/utils/week.js'
+import { latestRowsForMarket } from '../../src/utils/seoFacts.js'
 import { parseMesto } from '../../src/utils/market.js'
 import { translateDataValue } from './productLabels.mjs'
 import { readJsonFile } from './googleSheets.mjs'
@@ -99,21 +99,7 @@ export const cardList = (cards) => `<ul class="snap-grid">${cards.join('')}</ul>
 export const linkList = (links) =>
   `<ul class="snap-links">${links.map(({ href, label }) => `<li><a href="${escapeHtml(href)}">${escapeHtml(label)}</a></li>`).join('')}</ul>`
 
-// A market's products at that market's own latest reporting time - mirrors
-// src/pages/MarketDetails (see its useMarketData), so crawler HTML lists the
-// same rows the rendered page does.
-export function latestRowsForMarket(rows, grad, pijaca) {
-  const marketRows = rows.filter((row) => {
-    const parsed = parseMesto(row.Mesto)
-    return parsed.grad === grad && parsed.pijaca === pijaca
-  })
-  let latest = null
-  for (const row of marketRows) {
-    const time = getRowTime(row)
-    if (time !== null && (latest === null || time > latest)) latest = time
-  }
-  return latest === null ? [] : marketRows.filter((row) => getRowTime(row) === latest)
-}
+export { latestRowsForMarket }
 
 export function renderHome({ lang, drops, cityLinks, lastUpdated }) {
   return page({
@@ -132,12 +118,14 @@ export function renderCity({ lang, city, marketLinks }) {
   return page({ lang, heading: city, sections: [{ title: tr(lang, 'nav.markets'), html: linkList(marketLinks) }] })
 }
 
-export function renderMarket({ lang, market, city, cards }) {
-  return page({ lang, heading: market, intro: city, sections: [{ html: cardList(cards) }] })
+// `note` is the one visible sentence a page may carry under its heading (the
+// Serbian Kvantaška pijaca pages, see MarketDetails.jsx).
+export function renderMarket({ lang, market, city, cards, note = '' }) {
+  return page({ lang, heading: market, intro: note ? `${city}. ${note}` : city, sections: [{ html: cardList(cards) }] })
 }
 
-export function renderCategory({ lang, category, market, city, cards }) {
-  return page({ lang, heading: `${category} - ${market}`, intro: city, sections: [{ html: cardList(cards) }] })
+export function renderCategory({ lang, category, market, city, cards, note = '' }) {
+  return page({ lang, heading: `${category} - ${market}`, intro: note ? `${city}. ${note}` : city, sections: [{ html: cardList(cards) }] })
 }
 
 // The product's Product JSON-LD travels at the very start of its snapshot; the

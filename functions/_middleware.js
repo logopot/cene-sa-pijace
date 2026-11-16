@@ -9,6 +9,9 @@
 // script) - this file only ever does an O(1) object lookup per request, no
 // network/database calls happen here.
 import { SEO_MANIFEST } from './lib/seo-manifest.mjs'
+// Pure string builders shared with the build and the React pages, so the copy
+// served here and the copy the app sets after hydration are one rule.
+import { manifestEntryCopy } from '../src/utils/seoCopy.js'
 
 const SITE_URL = 'https://cenesapijace.org'
 
@@ -44,20 +47,10 @@ const DISCLAIMER = {
   },
 }
 
-// City, market and product pages each get a distinct title built from their
-// own name, mirroring the seo.* templates in the locale files.
-function productCopy(name, lang) {
-  return lang === 'en'
-    ? {
-        title: `${name} - Current Price at Serbian Markets`,
-        description: `Find out how much ${name} costs today at green market stalls. Compare the lowest and highest prices by city.`,
-      }
-    : {
-        title: `${name} - Aktuelna cena na pijacama u Srbiji`,
-        description: `Saznajte koliko danas košta ${name} na pijačnim tezgama. Pogledajte najniže i najviše cene po gradovima.`,
-      }
-}
-
+// City, market and category pages get a title built from their own names,
+// mirroring the seo.* templates in the locale files. Product pages and the
+// Serbian pages of Kvantaška pijaca are built from the manifest entry's own
+// facts by manifestEntryCopy (src/utils/seoCopy.js).
 // City and market names are already resolved to the right language by the
 // manifest (see scripts/generate-seo-map.mjs's translateDataValue calls), so
 // this format itself doesn't need a per-language branch.
@@ -140,7 +133,7 @@ function resolveMeta(pathname) {
 
     case 'market':
       return {
-        ...marketCopy(entry.market, entry.city, entry.lang),
+        ...(manifestEntryCopy(entry) ?? marketCopy(entry.market, entry.city, entry.lang)),
         lang: entry.lang,
         image: `${SITE_URL}/og/markets/${entry.slug}.png`,
         url,
@@ -152,7 +145,7 @@ function resolveMeta(pathname) {
     // market page instead of asking search engines to index both.
     case 'category':
       return {
-        ...categoryCopy(entry.category, entry.market, entry.city, entry.lang),
+        ...(manifestEntryCopy(entry) ?? categoryCopy(entry.category, entry.market, entry.city, entry.lang)),
         lang: entry.lang,
         image: `${SITE_URL}/og/markets/${entry.slug}.png`,
         url: entry.canonicalPath ? `${SITE_URL}${entry.canonicalPath}` : url,
@@ -160,7 +153,7 @@ function resolveMeta(pathname) {
 
     case 'product':
       return {
-        ...productCopy(entry.name, entry.lang),
+        ...manifestEntryCopy(entry),
         lang: entry.lang,
         image: `${SITE_URL}/og/products/${entry.slug}.png`,
         url,
@@ -303,7 +296,12 @@ function rewriteNotFoundHtml(response, meta) {
     .transform(response)
 }
 
-function rewriteHtml(response, meta, snapshot, hreflang) {
+// A product route nobody has a price for: still served (200, same canonical and
+// hreflang), but kept out of search until data returns - and out of sitemap.xml
+// (see markPricelessRoutes in scripts/generate-seo-map.mjs).
+const NOINDEX_META = '<meta name="robots" content="noindex">'
+
+function rewriteHtml(response, meta, snapshot, hreflang, noindex) {
   const rewriter = new HTMLRewriter()
     .on('html', new SetAttribute('lang', meta.lang))
     .on('title', new SetTextContent(meta.title))
@@ -322,6 +320,7 @@ function rewriteHtml(response, meta, snapshot, hreflang) {
   if (snapshot.root) rewriter.on('div#root', new FillPrerenderedRoot(snapshot.root))
   if (snapshot.jsonLd) rewriter.on('head', new AppendToHead(snapshot.jsonLd))
   if (hreflang) rewriter.on('head', new AppendToHead(hreflang))
+  if (noindex) rewriter.on('head', new AppendToHead(NOINDEX_META))
   return rewriter.transform(response)
 }
 
@@ -347,5 +346,6 @@ export async function onRequest(context) {
 
   const meta = resolveMeta(url.pathname)
   const snapshot = await loadSnapshot(context, url.pathname)
-  return rewriteHtml(response, meta, snapshot, renderHreflang(url.pathname, SEO_MANIFEST[url.pathname]))
+  const entry = SEO_MANIFEST[url.pathname]
+  return rewriteHtml(response, meta, snapshot, renderHreflang(url.pathname, entry), Boolean(entry.noindex))
 }

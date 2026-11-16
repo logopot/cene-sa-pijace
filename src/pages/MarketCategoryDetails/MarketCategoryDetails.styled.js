@@ -56,3 +56,9 @@ export const ContextHeading = styled.h2`
   margin: 0;
   color: ${({ theme }) => theme.colors.textDark};
 `
+
+export const KvantasIntro = styled.p`
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+`

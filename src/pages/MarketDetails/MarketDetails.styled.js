@@ -50,6 +50,12 @@ export const MarketTitle = styled.h1`
   color: ${({ theme }) => theme.colors.textDark};
 `
 
+export const KvantasIntro = styled.p`
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+`
+
 export const CityLabel = styled.span`
   font-size: 0.95rem;
   color: ${({ theme }) => theme.colors.textMuted};

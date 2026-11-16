@@ -20,6 +20,9 @@ import SEO from '../../components/SEO/SEO.jsx'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
 import { SITE_URL, getProductOgImage } from '../../constants/seo.js'
+import { productCopy } from '../../utils/seoCopy.js'
+import { rowsForMarket, productFacts, productVariant } from '../../utils/seoFacts.js'
+import { getSourceLabel } from '../../utils/marketTime.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
@@ -122,6 +125,30 @@ function Analytics({ rows, loading, error }) {
   })
 
   const categoryLabel = t(`categories.${getCategorySlug(categoryName)}`)
+
+  // Title and description are built from this market's own row for the product
+  // (its min/max price, unit, source and date) by the same builder the edge
+  // function uses for the HTML it serves (see seoCopy.js).
+  const marketRows = rowsForMarket(rows, grad, pijaca)
+  const matchesProduct = (row) => productMatchesSlug(row.Proizvod, productSlug) && row.Kategorija === categoryName
+  const facts = productFacts(marketRows, matchesProduct, getSourceLabel(grad, pijaca))
+  const seoCopy = productCopy(i18n.language, {
+    name: productName,
+    market: pijacaLabel,
+    city: gradLabel,
+    min: facts?.min ?? null,
+    max: facts?.max ?? null,
+    unit: facts?.unitRaw ? translateDataValue(t, 'jedMere', facts.unitRaw) : '',
+    source: facts?.source ?? '',
+    date: facts?.date ?? '',
+    variant: productVariant(
+      marketRows,
+      { proizvod: marketRows.find(matchesProduct)?.Proizvod ?? identity.proizvod, kategorija: categoryName },
+      (raw) => translateDataValue(t, 'proizvod', raw),
+      (category) => t(`categories.${getCategorySlug(category)}`),
+    ),
+  })
+
   const breadcrumbItems = [
     { label: t('breadcrumbs.home'), to: '/' },
     { label: gradLabel, to: buildCityRoute(grad, i18n.language) },
@@ -139,8 +166,8 @@ function Analytics({ rows, loading, error }) {
 
       <Container>
         <SEO
-          title={t('seo.product.title', { product: productName })}
-          description={t('seo.product.description', { product: productName })}
+          title={seoCopy.title}
+          description={seoCopy.description}
           url={`${SITE_URL}${location.pathname}`}
           image={getProductOgImage(identity.proizvod)}
           jsonLd={jsonLd}

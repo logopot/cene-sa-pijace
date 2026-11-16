@@ -24,6 +24,7 @@ import SEO from '../../components/SEO/SEO.jsx'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
 import { SITE_URL, getMarketOgImage } from '../../constants/seo.js'
+import { isKvantaskaMarket, kvantaskaCategoryCopy } from '../../utils/seoCopy.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
@@ -31,6 +32,7 @@ import {
   IconWrap,
   TitleGroup,
   ContextHeading,
+  KvantasIntro,
 } from './MarketCategoryDetails.styled.js'
 
 // How many distinct categories a single named market carries across all of
@@ -138,6 +140,9 @@ function MarketCategoryDetails({ rows, loading, error }) {
   // city page itself, so its trail skips straight from city to category
   // rather than inserting a non-clickable "Sve pijace" crumb.
   const seoKey = getMarketSeoKey('category', marketLabel, i18n.language)
+  // See MarketDetails.jsx: the Serbian Kvantaška pijaca pages use their own copy.
+  const kvantas = !isAllMarkets && isKvantaskaMarket(i18n.language, pijaca)
+  const kvantasCopy = kvantas ? kvantaskaCategoryCopy({ category: categoryLabel, city: gradLabel, source, date: weekLabel }) : null
 
   const breadcrumbItems = [
     { label: t('breadcrumbs.home'), to: '/' },
@@ -149,8 +154,8 @@ function MarketCategoryDetails({ rows, loading, error }) {
   return (
     <>
       <SEO
-        title={t(`${seoKey}.title`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
-        description={t(`${seoKey}.description`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
+        title={kvantasCopy?.title ?? t(`${seoKey}.title`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
+        description={kvantasCopy?.description ?? t(`${seoKey}.description`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
         url={canonicalUrl}
         image={isAllMarkets ? undefined : getMarketOgImage(grad, pijaca)}
       />
@@ -172,6 +177,7 @@ function MarketCategoryDetails({ rows, loading, error }) {
                 city: gradLabel,
               })}
             </ContextHeading>
+            {kvantas && <KvantasIntro>{t('marketDetails.kvantasIntro')}</KvantasIntro>}
           </TitleGroup>
         </PageHeader>
 

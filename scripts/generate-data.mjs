@@ -25,6 +25,7 @@ import { getCategoryUrlSlug } from '../src/utils/categoryIcons.js'
 import { getRowTime, getRowRangeLabel } from '../src/utils/week.js'
 import { normalizeProductName } from '../src/utils/productId.js'
 import { getAveragePrice } from '../src/utils/price.js'
+import { isKvantaskaMarket } from '../src/utils/seoCopy.js'
 import { computeCityComparison, buildProductJsonLd } from '../src/utils/productJsonLd.js'
 import { translateDataValue, translateCategory, getProductUrlSlug, SUPPORTED_LANGUAGES } from './lib/productLabels.mjs'
 import { fetchAllMarketRows, readLocalEnvFile, ROOT } from './lib/googleSheets.mjs'
@@ -128,6 +129,9 @@ function getLastUpdatedLabel(lang, latestRows) {
   return tr(lang, 'hero.lastUpdated.combined', { value: stips ?? jkp })
 }
 
+// The one-sentence note the Serbian Kvantaška pijaca pages show under their heading.
+const kvantasNote = (lang, pijaca) => (isKvantaskaMarket(lang, translateDataValue(lang, 'pijaca', pijaca)) ? tr(lang, 'marketDetails.kvantasIntro') : '')
+
 function buildSnapshots(latestRows) {
   const cities = new Map()
   const markets = new Map()
@@ -229,6 +233,7 @@ function buildSnapshots(latestRows) {
           market: translateDataValue(lang, 'pijaca', pijaca),
           city: translateDataValue(lang, 'grad', grad),
           cards,
+          note: kvantasNote(lang, pijaca),
         }),
       )
     }
@@ -247,6 +252,7 @@ function buildSnapshots(latestRows) {
           market: translateDataValue(lang, 'pijaca', pijaca),
           city: translateDataValue(lang, 'grad', grad),
           cards,
+          note: kvantasNote(lang, pijaca),
         }),
       )
     }

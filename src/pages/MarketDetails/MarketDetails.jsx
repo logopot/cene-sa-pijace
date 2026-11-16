@@ -21,6 +21,7 @@ import SEO from '../../components/SEO/SEO.jsx'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
 import { SITE_URL, getMarketOgImage } from '../../constants/seo.js'
+import { isKvantaskaMarket, kvantaskaMarketCopy } from '../../utils/seoCopy.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
@@ -29,6 +30,7 @@ import {
   TitleGroup,
   MarketTitle,
   CityLabel,
+  KvantasIntro,
 } from './MarketDetails.styled.js'
 
 // Products for this one specific market only (not the whole city - see
@@ -94,12 +96,16 @@ function MarketDetails({ rows, loading, error }) {
   const pijacaLabel = translateDataValue(t, 'pijaca', pijaca)
   const gradLabel = translateDataValue(t, 'grad', grad)
   const seoKey = getMarketSeoKey('market', pijacaLabel, i18n.language)
+  // Serbian pages of Kvantaška pijaca carry the slang name people search for
+  // (see seoCopy.js, shared with the edge function that serves the same text).
+  const kvantas = isKvantaskaMarket(i18n.language, pijaca)
+  const kvantasCopy = kvantas ? kvantaskaMarketCopy({ city: gradLabel, source, date: weekLabel }) : null
 
   return (
     <>
       <SEO
-        title={t(`${seoKey}.title`, { market: pijacaLabel, city: gradLabel })}
-        description={t(`${seoKey}.description`, { market: pijacaLabel, city: gradLabel })}
+        title={kvantasCopy?.title ?? t(`${seoKey}.title`, { market: pijacaLabel, city: gradLabel })}
+        description={kvantasCopy?.description ?? t(`${seoKey}.description`, { market: pijacaLabel, city: gradLabel })}
         url={`${SITE_URL}${buildMarketRoute(grad, pijaca, i18n.language)}`}
         image={getMarketOgImage(grad, pijaca)}
       />
@@ -125,6 +131,7 @@ function MarketDetails({ rows, loading, error }) {
           <TitleGroup>
             <MarketTitle>{pijacaLabel}</MarketTitle>
             <CityLabel>{gradLabel}</CityLabel>
+            {kvantas && <KvantasIntro>{t('marketDetails.kvantasIntro')}</KvantasIntro>}
           </TitleGroup>
         </PageHeader>
 
