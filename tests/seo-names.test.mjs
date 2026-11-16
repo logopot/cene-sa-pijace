@@ -55,9 +55,11 @@ test('market copy without the city', () => {
   })
 })
 
-test('English display dictionary: covers the locale dictionary and reads as English', () => {
-  for (const [serbian, english] of Object.entries(locale.dataValues.proizvod)) {
-    assert.equal(PRODUCT_NAMES_EN[serbian], english, `locale entry drifted for ${serbian}`)
+test('English display dictionary: covers every locale-dictionary name and reads as English', () => {
+  // The display names may differ from the locale file's (which only feeds URL
+  // slugs), but no name the locale file knows may be missing here.
+  for (const serbian of Object.keys(locale.dataValues.proizvod)) {
+    assert.ok(serbian in PRODUCT_NAMES_EN, `missing display name for ${serbian}`)
   }
   for (const [serbian, english] of Object.entries(PRODUCT_NAMES_EN)) {
     assert.ok(english.trim() !== '', serbian)
@@ -89,4 +91,9 @@ test('URL slugs do not follow the display names (they come from the locale dicti
   assert.equal(getProductUrlSlug('Grožđe (crno Hamburg)', 'en'), 'grozdje-crno-hamburg')
   assert.equal(getProductUrlSlug('Kupus (sve sorte)', 'en'), 'cabbage-all-varieties')
   assert.equal(getProductUrlSlug('Kupus (sve sorte)', 'sr'), 'kupus-sve-sorte')
+  // Renamed display names (garlic, onion, medlar, peppers) keep their old URLs.
+  assert.equal(getProductUrlSlug('Luk beli (sve sorte)', 'en'), 'white-onion-all-varieties')
+  assert.equal(getProductUrlSlug('Luk crni (sve sorte)', 'en'), 'yellow-onion-all-varieties')
+  assert.equal(getProductUrlSlug('Mušmula (sve sorte)', 'en'), 'loquat-all-varieties')
+  assert.equal(getProductUrlSlug('Paprika (ljuta)', 'en'), 'pepper-hot')
 })
