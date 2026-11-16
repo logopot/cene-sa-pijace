@@ -14,6 +14,7 @@ import MarketCategoryDetails from './pages/MarketCategoryDetails/MarketCategoryD
 import NotFound from './pages/NotFound/NotFound.jsx'
 import { CITY_PATH_PREFIX, DISCLAIMER_PATH, FEEDBACK_PATH } from './constants/routeLocales.js'
 import { rememberRoute } from './utils/lastRoute.js'
+import { getPageViewTracker } from './utils/pageView.js'
 import { FilterProvider } from './context/FilterContext.jsx'
 import { GlobalStyle } from './styles/globalStyle.js'
 import { AppShell, Main } from './App.styled.js'
@@ -33,6 +34,13 @@ function AppContent({ rows, loading, error, seed }) {
   // to send along (see utils/lastRoute.js).
   useEffect(() => {
     rememberRoute(location.pathname)
+  }, [location.pathname])
+
+  // One page_view per route, sent once the page has set its title and canonical.
+  useEffect(() => {
+    const tracker = getPageViewTracker()
+    tracker?.routeChanged()
+    return () => tracker?.cancel()
   }, [location.pathname])
 
   return (

@@ -101,25 +101,33 @@ Google Sheets (filled by the STIPS and JKP scrapers) stays the single source of 
 
 **Refreshing data:** run the "Weekly Market Scrape to Sheets" workflow manually (Actions -> Run workflow) or wait for the Monday schedule; its last step calls the Cloudflare Pages deploy hook (secret `CLOUDFLARE_DEPLOY_HOOK`), which rebuilds the site with the new data. Locally: `npm run generate:data`.
 
-## 📈 GA4 Events
+## 📈 GA4 događaji
 
-All events go through `trackEvent` in `src/utils/analytics.js` (values trimmed + lowercased, no personal data):
+All events go through `src/utils/analytics.js` (string parameters trimmed and lowercased, empty ones dropped, no personal data). The gtag snippet in `index.html` is configured with `send_page_view: false`: the single `page_view` of every page comes from `src/utils/pageView.js`.
 
-| Event | Parameters | Fired when |
-|---|---|---|
-| `filter_city` | `city` | user picks a city |
-| `filter_category` | `category` | user picks a category (`all` = every category) |
-| `filter_market` | `market` | user picks a market (`all` = every market) |
-| `search_submit` | `city`, `category`, `market` | search button clicked |
-| `view_market` | `market_name`, `city` | market page opened |
-| `view_product` | `product_name`, `category`, `market_name` | product page opened |
-| `view_price_history` | `product_name` | history chart shown with data |
-| `language_switch` | `from`, `to` | language switched |
-| `feedback_open` | `from_page_type` | suggestions form opened (kind of page only, never the path) |
-| `feedback_submit` | - | suggestions form sent successfully (no name or text is ever sent) |
+| Događaj | Kada okida | Parametri | Ključni događaj |
+|---|---|---|---|
+| `page_view` | once after the first load and after every route change, **after** the page has set its `document.title` and canonical (waits for the `<head>` to settle, max 3 s; never twice for the same URL) | `page_title`, `page_location`, `page_path` (sent as they are, not lowercased) | ne |
+| `view_product` | once per visit of a product page, when its data is loaded | `product_name`, `market`, `market_name`, `city`, `category` | ne |
+| `view_price_history` | NOT automatic: first hover/tap/click on the price-history chart or on its variety tabs, at most once per product page visit | same as `view_product` | ne |
+| `view_market` | market page opened | `market_name`, `city` | ne |
+| `click_source_link` | click on the link to the official source on a product page (only STIPS and JKP Beogradske pijace have a link); sent with `transport_type: beacon` | `source` (`stips` / `jkp`), `page_type`, `product_name` | ne |
+| `search_submit` | search button clicked | `city`, `category`, `market` | **da** |
+| `filter_city` | user picks a city | `city` | ne |
+| `filter_category` | user picks a category (`all` = every category) | `category` | ne |
+| `filter_market` | user picks a market (`all` = every market) | `market` | ne |
+| `language_switch` | language switched | `from`, `to` | ne |
+| `feedback_open` | suggestions form opened | `from_page_type` (`home`, `city`, `market`, `category`, `product`, `other`; never the path) | ne |
+| `feedback_submit` | suggestions form sent successfully (nothing the visitor wrote is ever sent) | - | **da** |
 
-Not wired (nothing in the UI to attach them to): `click_source_link` (the source is plain text, no link) and `share_click` (no share control). Scroll depth comes from GA4 Enhanced Measurement.
+`page_type` in `click_source_link` uses the same values as `from_page_type`. Scroll depth comes from GA4 Enhanced Measurement.
 
+**Debug.** Open any page with `?ga_debug=1`: for the rest of that browser session every event carries `debug_mode: true` and shows up in GA4 -> Admin -> DebugView. Without the parameter nothing changes.
+
+**Manual settings in GA4** (cannot be done from the code):
+1. Admin -> Data streams -> the web stream -> Enhanced measurement -> gear icon -> turn **off** "Page changes based on browser history events". The app sends its own `page_view` after each route change; with this option on, GA4 would add a second one at the moment of the URL change, carrying the previous page's title.
+2. Admin -> Events: mark only `search_submit` and `feedback_submit` as key events (turn off the key-event flag on anything else, e.g. `view_product`, `view_price_history`).
+3. If you want `market`, `market_name`, `city`, `category`, `product_name`, `source`, `page_type`, `from_page_type` in reports: Admin -> Custom definitions -> create event-scoped custom dimensions with those parameter names.
 
 ## 💬 Feedback forma: podešavanje
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useParams } from 'react-router-dom'
 import { Alert, Container } from 'react-bootstrap'
@@ -6,7 +6,8 @@ import PageSkeleton from '../../components/PageSkeleton/PageSkeleton.jsx'
 import { getCategoryIcon, getCategorySlug, getCategoryUrlSlug, resolveCategoryBySlug } from '../../utils/categoryIcons.js'
 import { translateDataValue } from '../../utils/translateValue.js'
 import { resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketRoute, buildMarketCategoryRoute } from '../../utils/market.js'
-import { trackPageEvent } from '../../utils/analytics.js'
+import { trackEvent } from '../../utils/analytics.js'
+import SourceLink from '../../components/SourceLink/SourceLink.jsx'
 import { formatPriceValue } from '../../utils/price.js'
 import { useProductAnalytics } from '../../hooks/useProductAnalytics.js'
 import { buildProductJsonLd } from '../../utils/productJsonLd.js'
@@ -69,23 +70,34 @@ function Analytics({ rows, loading, error }) {
 
   const analytics = useProductAnalytics(productHistory.rows ?? rows, productSlug, grad, categoryName, pijaca, selectedVariation)
   const { identity } = analytics
-  const hasHistory = analytics.history.length > 0
 
-  useEffect(() => {
-    if (!identity.proizvod || !pijaca) return
-    trackPageEvent('view_product', {
-      product_name: identity.proizvod,
-      category: identity.kategorija,
-      market_name: pijaca,
-    })
-  }, [identity.proizvod, identity.kategorija, pijaca])
+  // Both product events carry the same parameters. This component remounts per
+  // route (see AppContent), so a ref is "once per visit of a product page".
+  const productParams = {
+    product_name: identity.proizvod,
+    market: pijaca,
+    market_name: pijaca,
+    city: grad,
+    category: identity.kategorija,
+  }
+  const viewSent = useRef(false)
+  const historySent = useRef(false)
 
-  // The history chart is on screen once its lazy data has arrived and there's
-  // something to plot.
-  const historyVisible = !productHistory.loading && hasHistory
+  // view_product: once, as soon as the page has its product and market.
+  const dataReady = !loading && !error && Boolean(grad && pijaca && categoryName && identity.proizvod)
   useEffect(() => {
-    if (historyVisible) trackPageEvent('view_price_history', { product_name: identity.proizvod })
-  }, [historyVisible, identity.proizvod])
+    if (!dataReady || viewSent.current) return
+    viewSent.current = true
+    trackEvent('view_product', productParams)
+  })
+
+  // view_price_history: only when the visitor really uses the history chart
+  // (first hover / tap / click on it, or a variety tab), at most once per visit.
+  const handleHistoryInteraction = () => {
+    if (historySent.current || !dataReady) return
+    historySent.current = true
+    trackEvent('view_price_history', productParams)
+  }
 
   // Deep-linked/shared URLs land here before the app shell's own fetch has a
   // chance to run again - without these two gates, a data-fetch failure or a
@@ -198,9 +210,11 @@ function Analytics({ rows, loading, error }) {
                 {jedMereLabel ? t('productCard.priceUnit', { unit: jedMereLabel }) : t('productCard.priceNoUnit')}
               </PriceValue>
               <SourceLabel>
-                {t('analytics.priceSourceLabel', {
-                  source: t('productCard.source', { source: analytics.currentMarket.sourceLabel }),
-                })}
+                <SourceLink label={analytics.currentMarket.sourceLabel} productName={identity.proizvod}>
+                  {t('analytics.priceSourceLabel', {
+                    source: t('productCard.source', { source: analytics.currentMarket.sourceLabel }),
+                  })}
+                </SourceLink>
               </SourceLabel>
             </PriceBlock>
           )}
@@ -211,12 +225,16 @@ function Analytics({ rows, loading, error }) {
           <VariationSelector
             variations={analytics.availableVariations}
             selected={selectedVariation}
-            onSelect={setSelectedVariation}
+            onSelect={(key) => {
+              handleHistoryInteraction()
+              setSelectedVariation(key)
+            }}
           />
           {productHistory.loading ? (
             <ChartSkeleton role="status" aria-busy="true" aria-label={t('results.loading')} />
           ) : (
             <PriceHistoryChart
+              onInteract={handleHistoryInteraction}
               data={analytics.history}
               sources={analytics.historySources}
               missingSources={analytics.missingHistorySources}

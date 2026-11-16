@@ -75,7 +75,7 @@ function CustomTooltip({ active, payload, label, series }) {
   )
 }
 
-function PriceHistoryChart({ data, sources, missingSources = [] }) {
+function PriceHistoryChart({ onInteract, data, sources, missingSources = [] }) {
   const { t } = useTranslation()
 
   if (data.length === 0) {
@@ -85,7 +85,7 @@ function PriceHistoryChart({ data, sources, missingSources = [] }) {
   const series = buildSeries(sources, t)
 
   return (
-    <ChartWrap>
+    <ChartWrap onMouseEnter={onInteract} onTouchStart={onInteract} onClick={onInteract}>
       <ResponsiveContainer width="100%" height={360}>
         <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: ROTATED_AXIS_MARGIN_BOTTOM }}>
           <defs>
