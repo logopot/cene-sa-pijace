@@ -154,8 +154,24 @@ Parts: `src/pages/Feedback` (form), `src/utils/feedbackRules.js` (validation sha
 
 ### What the endpoint does
 
-Only `POST` (others 405), JSON up to 4 KB, `Origin`/`Referer` must be `https://cenesapijace.org`. It validates again on the server (name <= 60, message 5-1000, language `sr`/`en`, path rule), strips control characters, drops a filled honeypot silently (200, no write), verifies the Turnstile token with the visitor's `CF-Connecting-IP`, and appends the row (`valueInputOption=RAW`, `insertDataOption=INSERT_ROWS`). A name or message starting with `=`, `+`, `-` or `@` gets a leading apostrophe so Sheets cannot run it as a formula. Responses are generic (`200 {ok:true}` / 400 / 403 / 413 / 415 / 429 / 500); errors from Google are never returned, and logs carry only the failing stage and HTTP status, never names or messages. A small in-memory limit (5 posts per 10 minutes per address, per Worker instance) adds a best-effort 429.
+Only `POST` (others 405), JSON up to 4 KB, `Origin`/`Referer` must be `https://cenesapijace.org`. It validates again on the server (name <= 60, message 5-1000, language `sr`/`en`, path rule), strips control characters, drops a filled honeypot silently (200, no write), verifies the Turnstile token with the visitor's `CF-Connecting-IP`, and appends the row (`valueInputOption=RAW`, `insertDataOption=INSERT_ROWS`). A name or message starting with `=`, `+`, `-` or `@` gets a leading apostrophe so Sheets cannot run it as a formula. Responses are generic (`200 {ok:true}` / 400 / 403 / 413 / 415 / 429 / 500); a 500 carries only the failed `phase` and `upstream` status (see below), errors from Google are never returned, and logs carry only those two values, never names or messages. A small in-memory limit (5 posts per 10 minutes per address, per Worker instance) adds a best-effort 429.
+
+### When the form answers 500: reading the phase
+
+Every 5xx answer of `POST /api/feedback` says where it failed, e.g. `{"ok":false,"error":"server_error","phase":"sheets_append","upstream":403}` (browser DevTools -> Network -> `feedback` -> Response; the same two values are logged by the Function as `feedback: phase=... upstream=...`, see Pages -> Functions -> Real-time logs). `upstream` is only the HTTP status of the Google/Cloudflare service that answered, or `null` when there was no answer (network error) or the step is local. Nothing else is ever returned or logged: no error text from a service, no token, no key, no name or message.
+
+| `phase` | What failed | Typical `upstream` and what to check |
+|---|---|---|
+| `config` | a variable is missing or unusable; the answer adds `"var":"<NAME>"` (the name, never the value) | `null`. Set the named variable for the right environment (Production vs Preview) and redeploy. For `FEEDBACK_SERVICE_ACCOUNT_JSON`: it must hold the key file's JSON (pasted as text, as a "JSON" variable, or base64 of the file) with `client_email` and `private_key` |
+| `turnstile_fetch` | the request to Cloudflare's `siteverify` failed | `null` network problem, or the HTTP status Cloudflare returned |
+| `auth_parse_key` | `private_key` is not a readable PEM | `null`. The key was cut, or edited when pasted |
+| `auth_import_key` | WebCrypto refused the key | `null`. It is not a PKCS#8 RSA private key (use the key from the JSON file Google generated) |
+| `auth_sign` | WebCrypto could not sign the token request | `null` |
+| `auth_token` | Google's token endpoint did not give a token | `400` invalid key/clock, `401`/`403` account disabled or key deleted, `null` network |
+| `sheets_append` | the append to the sheet failed | `403` the account is not Editor on the file (or the Sheets API is not enabled in its project), `404` wrong `FEEDBACK_SPREADSHEET_ID`, `400` the tab name does not exist (check `FEEDBACK_SHEET_NAME`), `429` quota |
+
+For local development the endpoint can be pointed at mocks with `FEEDBACK_SHEETS_API_BASE` and `FEEDBACK_TURNSTILE_VERIFY_URL` (and a `token_uri` in a throw-away test key); leave them unset in production. `wrangler pages dev dist` reads such values from a git-ignored `.dev.vars` file.
 
 ### Tests
 
-`npm test` runs `tests/*.test.mjs` with Node's built-in runner: validation rules, endpoint (405, Origin, Turnstile, honeypot, Sheets request body and column order, JWT signature and caching) against mocks, and the route/sitemap rules. Nothing there touches Google or Cloudflare.
+`npm test` runs `tests/*.test.mjs` with Node's built-in runner: validation rules, endpoint (405, Origin, Turnstile, honeypot, Sheets request body and column order, JWT signature and caching) against mocks, the 5xx phases, a simulation of the Workers runtime without `Buffer`/`process`, and the route/sitemap rules. Nothing there touches Google or Cloudflare.

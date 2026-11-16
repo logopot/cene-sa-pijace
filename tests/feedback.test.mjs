@@ -225,21 +225,28 @@ test('write failure: generic 500, no Google detail, no content in logs', async (
     const { response } = await run(request, ENV, makeMock({ sheetsStatus: 403 }))
     assert.equal(response.status, 500)
     const text = await response.text()
-    assert.deepEqual(JSON.parse(text), { ok: false, error: 'server_error' })
+    assert.deepEqual(JSON.parse(text), { ok: false, error: 'server_error', phase: 'sheets_append', upstream: 403 })
     assert.equal(text.includes('secret detail'), false)
     assert.equal(text.includes('token'), false)
   } finally {
     console.error = original
   }
-  assert.deepEqual(logged, ['feedback: write failed append 403'])
+  assert.deepEqual(logged, ['feedback: phase=sheets_append upstream=403'])
 })
 
-test('missing configuration is a generic 500', async () => {
+test('missing configuration is a 500 naming only the variable', async () => {
   const original = console.error
   console.error = () => {}
   try {
     const { response } = await run(post(valid()), { ...ENV, TURNSTILE_SECRET_KEY: undefined })
     assert.equal(response.status, 500)
+    assert.deepEqual(await response.json(), {
+      ok: false,
+      error: 'server_error',
+      phase: 'config',
+      upstream: null,
+      var: 'TURNSTILE_SECRET_KEY',
+    })
   } finally {
     console.error = original
   }

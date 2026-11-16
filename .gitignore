@@ -48,3 +48,5 @@ yarn-error.log*
 .eslintcache
 .DS_Store
 Thumbs.db
+# Local secrets for wrangler pages dev
+.dev.vars
