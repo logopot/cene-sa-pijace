@@ -205,7 +205,7 @@
     "sending": "Slanje...",
     "successTitle": "Hvala!",
     "successBody": "Vaša poruka je poslata.",
-    "notePrivacy": "Poruke se koriste samo za poboljšanje sajta i ne prikazuju se javno; ime je opciono.",
+    "notePrivacy": "Poruke se koriste samo za poboljšanje sajta i ne prikazuju se javno.",
     "noteSources": "Cene preuzimamo iz zvaničnih izvora (STIPS i JKP Beogradske pijace) i ne možemo da ih menjamo.",
     "errors": {
       "nameLong": "Ime može imati najviše {{max}} znakova.",
