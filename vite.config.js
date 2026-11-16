@@ -20,6 +20,10 @@ function nonBlockingCss() {
 }
 
 // https://vite.dev/config/
+// Changes on every build; appended to the translation files' URL (src/i18n.js).
+const BUILD_VERSION = Date.now().toString(36)
+
 export default defineConfig({
+  define: { __BUILD_VERSION__: JSON.stringify(BUILD_VERSION) },
   plugins: [react(), nonBlockingCss()],
 })

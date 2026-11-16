@@ -7,6 +7,7 @@ import SEO from '../../components/SEO/SEO.jsx'
 import { SITE_URL } from '../../constants/seo.js'
 import { getFeedbackPath } from '../../constants/routeLocales.js'
 import { trackEvent, trackPageEvent } from '../../utils/analytics.js'
+import { withFallback } from '../../utils/feedbackText.js'
 import {
   NAME_MAX,
   MESSAGE_MIN,
@@ -71,6 +72,7 @@ function Feedback() {
   const [searchParams] = useSearchParams()
   const from = sanitizeFromPath(searchParams.get('from') ?? '')
   const language = i18n.resolvedLanguage ?? i18n.language
+  const tx = (key, vars) => withFallback(t, language, key, vars)
 
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
@@ -178,8 +180,8 @@ function Feedback() {
   return (
     <Container>
       <SEO
-        title={`${t('feedback.title')} | ${t('app.name')}`}
-        description={t('feedback.seoDescription')}
+        title={`${tx('feedback.title')} | ${t('app.name')}`}
+        description={tx('feedback.seoDescription')}
         url={`${SITE_URL}${getFeedbackPath(language)}`}
         noindex
       />
@@ -188,18 +190,18 @@ function Feedback() {
           <IconWrap>
             <LuMessageSquareText />
           </IconWrap>
-          <Title>{t('feedback.title')}</Title>
+          <Title>{tx('feedback.title')}</Title>
         </PageHeader>
 
         {done ? (
           <Success ref={successRef} tabIndex={-1} role="status">
-            <SuccessTitle>{t('feedback.successTitle')}</SuccessTitle>
-            <SuccessText>{t('feedback.successBody')}</SuccessText>
+            <SuccessTitle>{tx('feedback.successTitle')}</SuccessTitle>
+            <SuccessText>{tx('feedback.successBody')}</SuccessText>
           </Success>
         ) : (
           <Form onSubmit={handleSubmit} noValidate>
             <Field>
-              <Label htmlFor="feedback-name">{t('feedback.nameLabel')}</Label>
+              <Label htmlFor="feedback-name">{tx('feedback.nameLabel')}</Label>
               <Input
                 id="feedback-name"
                 name="name"
@@ -212,12 +214,12 @@ function Feedback() {
                 aria-describedby={fieldErrors.name ? 'feedback-name-error' : undefined}
               />
               {fieldErrors.name && (
-                <FieldError id="feedback-name-error">{t(fieldErrors.name, { max: NAME_MAX })}</FieldError>
+                <FieldError id="feedback-name-error">{tx(fieldErrors.name, { max: NAME_MAX })}</FieldError>
               )}
             </Field>
 
             <Field>
-              <Label htmlFor="feedback-message">{t('feedback.messageLabel')}</Label>
+              <Label htmlFor="feedback-message">{tx('feedback.messageLabel')}</Label>
               <Textarea
                 id="feedback-message"
                 name="message"
@@ -229,11 +231,11 @@ function Feedback() {
                 aria-describedby={`feedback-counter${fieldErrors.message ? ' feedback-message-error' : ''}`}
               />
               <Counter id="feedback-counter" $over={messageLength > MESSAGE_MAX}>
-                {t('feedback.counter', { count: messageLength, max: MESSAGE_MAX })}
+                {tx('feedback.counter', { count: messageLength, max: MESSAGE_MAX })}
               </Counter>
               {fieldErrors.message && (
                 <FieldError id="feedback-message-error">
-                  {t(fieldErrors.message, { min: MESSAGE_MIN, max: MESSAGE_MAX })}
+                  {tx(fieldErrors.message, { min: MESSAGE_MIN, max: MESSAGE_MAX })}
                 </FieldError>
               )}
             </Field>
@@ -252,18 +254,18 @@ function Feedback() {
             <TurnstileSlot ref={slotRef} />
 
             <FormError $visible={Boolean(formError)} role="status" aria-live="polite">
-              {formError ? t(formError) : null}
+              {formError ? tx(formError) : null}
             </FormError>
 
             <SubmitButton type="submit" disabled={sending} aria-busy={sending}>
-              {sending ? t('feedback.sending') : t('feedback.submit')}
+              {sending ? tx('feedback.sending') : tx('feedback.submit')}
             </SubmitButton>
           </Form>
         )}
 
         <Notes>
-          <Note>{t('feedback.notePrivacy')}</Note>
-          <Note>{t('feedback.noteSources')}</Note>
+          <Note>{tx('feedback.notePrivacy')}</Note>
+          <Note>{tx('feedback.noteSources')}</Note>
         </Notes>
       </Page>
     </Container>

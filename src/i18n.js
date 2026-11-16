@@ -3,6 +3,11 @@ import Backend from 'i18next-http-backend'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
 
+// Set by vite.config.js (define); absent where this file is bundled without it
+// (the homepage prerender, which gets its translations inline and never fetches).
+// eslint-disable-next-line no-undef
+const BUILD_VERSION = typeof __BUILD_VERSION__ === 'undefined' ? 'dev' : __BUILD_VERSION__
+
 export const SUPPORTED_LANGUAGES = ['sr', 'en']
 
 // One-time migration for visitors who were auto-detected into English before
@@ -44,7 +49,10 @@ i18n
     ns: ['translation'],
     defaultNS: 'translation',
     backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
+      // The version changes with every build, so a new deploy asks for a new URL
+      // and never gets a translation file the browser cached before it (the
+      // file itself is served with a long Cache-Control, see public/_headers).
+      loadPath: `/locales/{{lng}}/{{ns}}.json?v=${BUILD_VERSION}`,
     },
     ...(prerender ? { resources: prerender.resources, lng: prerender.lng, initAsync: false, initImmediate: false } : {}),
     // Serbian is the site's primary language (promoted only in Serbia);

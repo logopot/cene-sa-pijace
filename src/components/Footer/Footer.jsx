@@ -3,6 +3,7 @@ import { Container } from "react-bootstrap";
 import LogopotLogo from "../LogopotLogo/LogopotLogo.jsx";
 import { useLocation } from "react-router-dom";
 import { getDisclaimerPath, getFeedbackPath, isFeedbackPath } from "../../constants/routeLocales.js";
+import { withFallback } from "../../utils/feedbackText.js";
 import { isValidFromPath } from "../../utils/feedbackRules.js";
 import {
   StyledFooter,
@@ -65,7 +66,7 @@ function Footer() {
                 </li>
                 <li>
                   <FooterRouteLink to={feedbackLink}>
-                    {t("footer.feedbackLink")}
+                    {withFallback(t, i18n.language, "footer.feedbackLink")}
                   </FooterRouteLink>
                 </li>
               </NavList>
