@@ -72,9 +72,55 @@ function shortMarketName(lang, market) {
   return stripped || market
 }
 
-// A market named after its own city ("Kikinda" in Kikinda) is not repeated.
-function placeLabel(market, city) {
-  return market === city ? market : `${market} ${city}`
+// Lowercase, no diacritics, words separated by single spaces: "Niš" -> "nis",
+// "Đurđevo" -> "djurdjevo", "TC Novi Beograd" -> "tc novi beograd".
+function plain(text) {
+  return String(text)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/gi, 'dj')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+// True when the city already stands in the market's name as whole words, however
+// it is cased or accented ("TC Novi Beograd" holds "Beograd", so nothing is
+// added; "Zelena pijaca" does not hold "Niš"). Everything that puts a market and
+// its city side by side uses this, so no page reads "TC Novi Beograd Beograd".
+export function cityInMarketName(market, city) {
+  const name = plain(market ?? '')
+  const place = plain(city ?? '')
+  return place !== '' && ` ${name} `.includes(` ${place} `)
+}
+
+// "{market} {city}" - or just the market when the city is already in its name.
+export function placeLabel(market, city) {
+  return cityInMarketName(market, city) ? market : `${market} ${city}`
+}
+
+// "{market}, {city}" with the same rule (headings, subtitles, snapshot cards).
+export function placeWithComma(market, city) {
+  return cityInMarketName(market, city) ? market : `${market}, ${city}`
+}
+
+// Market and category pages of a market whose name holds its city: the same
+// copy as the templates in the locale files, without the city.
+export function marketCopyWithoutCity({ lang, market, generic }) {
+  if (lang === 'en') {
+    return generic
+      ? { title: `${market} - Current Price Overview`, description: `Fresh product prices at ${market}. Check the offer before you go shopping.` }
+      : { title: `${market} Market - Current Price Overview`, description: `Fresh product prices at ${market} market. Check the offer before you go shopping.` }
+  }
+  return generic
+    ? { title: `${market} - Pregled aktuelnih cena`, description: `Sveže cene proizvoda: ${market}. Proverite ponudu pre odlaska u kupovinu.` }
+    : { title: `Pijaca ${market} - Pregled aktuelnih cena`, description: `Sveže cene proizvoda na pijaci ${market}. Proverite ponudu pre odlaska u kupovinu.` }
+}
+
+export function categoryCopyWithoutCity({ lang, category, market, generic }) {
+  const description = `${market} • ${category}`
+  if (lang === 'en') return { title: `${category} Prices at ${market}${generic ? '' : ' Market'}`, description }
+  return { title: generic ? `${category} - Cene: ${market}` : `${category} - Cene na pijaci ${market}`, description }
 }
 
 // Dates come as "12.11.2026." / "09.11. – 15.11.2026." - already ending in a dot.
@@ -145,10 +191,11 @@ export function productCopy(lang, facts) {
 
 function productCopySr({ name, market, city, min, max, unit, source, date, variant }) {
   const kvantas = isKvantaskaMarket('sr', market)
+  const inName = cityInMarketName(market, city)
   const tag = variant ? ` (${variant})` : ''
   const titleFor = (marketName, withKvantas) => ({
     market: marketName,
-    build: (text, shown) => `${text} cena – ${placeLabel(shown, city)}${withKvantas ? ' (Kvantaš)' : ''}${tag}`,
+    build: (text, shown) => `${text} cena – ${inName ? shown : `${shown} ${city}`}${withKvantas ? ' (Kvantaš)' : ''}${tag}`,
   })
 
   // Order of shortening: "(Kvantaš)", then the market's name, the city stays.
@@ -175,8 +222,12 @@ function productCopySr({ name, market, city, min, max, unit, source, date, varia
 }
 
 function productCopyEn({ name, market, city, min, max, unit, source, date, variant }) {
-  const place = variant ? `${city}, ${variant}` : city
-  const titleFor = (marketName) => ({ market: marketName, build: (text, shown) => `${text} price – ${shown} (${place})` })
+  const inName = cityInMarketName(market, city)
+  const place = inName ? variant : variant ? `${city}, ${variant}` : city
+  const titleFor = (marketName) => ({
+    market: marketName,
+    build: (text, shown) => `${text} price – ${shown}${place ? ` (${place})` : ''}`,
+  })
   const title = fitTitle(TITLE_MAX, name, [titleFor(market), titleFor(shortMarketName('en', market))])
 
   const label = variant ? `${name} (${variant})` : name
@@ -184,10 +235,10 @@ function productCopyEn({ name, market, city, min, max, unit, source, date, varia
   const unitPart = unit ? ` per ${unit}` : ''
   let body
   if (min === null || min === undefined) {
-    body = `${label}: no current price at ${market}, ${city}.`
+    body = `${label}: no current price at ${placeWithComma(market, city)}.`
   } else {
     const range = min === max ? `current price ${formatPrice(min)} RSD` : `current price from ${formatPrice(min)} to ${formatPrice(max)} RSD`
-    body = `${label}: ${range}${unitPart} at ${market}, ${city}.`
+    body = `${label}: ${range}${unitPart} at ${placeWithComma(market, city)}.`
   }
   const description = fit([`${body}${tail(true)}`, `${body}${tail(false)}`, body], DESCRIPTION_MAX)
   return { title, description }

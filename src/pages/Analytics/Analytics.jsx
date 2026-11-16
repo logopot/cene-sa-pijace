@@ -21,7 +21,7 @@ import SEO from '../../components/SEO/SEO.jsx'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
 import { SITE_URL, getProductOgImage } from '../../constants/seo.js'
-import { productCopy } from '../../utils/seoCopy.js'
+import { productCopy, placeWithComma } from '../../utils/seoCopy.js'
 import { rowsForMarket, productFacts, productVariant } from '../../utils/seoFacts.js'
 import { getSourceLabel } from '../../utils/marketTime.js'
 import NotFound from '../NotFound/NotFound.jsx'
@@ -197,7 +197,7 @@ function Analytics({ rows, loading, error }) {
               <ProductTitle>{productName}</ProductTitle>
               {market && (
                 <MarketSubtitle>
-                  {pijacaLabel}, {gradLabel}
+                  {placeWithComma(pijacaLabel, gradLabel)}
                 </MarketSubtitle>
               )}
             </div>

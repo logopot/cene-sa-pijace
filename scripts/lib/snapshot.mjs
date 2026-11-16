@@ -10,6 +10,7 @@ import { isBlank } from '../../src/utils/blank.js'
 import { resolveUnit } from '../../src/utils/unit.js'
 import { spaceBeforeParens } from '../../src/utils/formatText.js'
 import { latestRowsForMarket } from '../../src/utils/seoFacts.js'
+import { placeWithComma } from '../../src/utils/seoCopy.js'
 import { parseMesto } from '../../src/utils/market.js'
 import { translateDataValue } from './productLabels.mjs'
 import { readJsonFile } from './googleSheets.mjs'
@@ -47,7 +48,7 @@ function getSourceLabel(row, grad, pijaca) {
 export function renderCard(row, lang, href, { compact = false } = {}) {
   const { grad, pijaca } = parseMesto(row.Mesto)
   const name = translateDataValue(lang, 'proizvod', row.Proizvod)
-  const place = `${translateDataValue(lang, 'pijaca', pijaca)}, ${translateDataValue(lang, 'grad', grad)}`
+  const place = placeWithComma(translateDataValue(lang, 'pijaca', pijaca), translateDataValue(lang, 'grad', grad))
   const unit = translateDataValue(lang, 'jedMere', resolveUnit(row.JedMere, row.Kategorija))
   const priceText = formatDisplayPrice(getDisplayPrice(row))
   const price = priceText ? `${priceText} ${unit ? tr(lang, 'productCard.priceUnit', { unit }) : tr(lang, 'productCard.priceNoUnit')}` : ''

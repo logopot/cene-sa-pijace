@@ -2,6 +2,7 @@ import { slugify } from '../../src/utils/productId.js'
 import { getCategorySlug } from '../../src/utils/categoryIcons.js'
 import { normalizeDistrictLabel } from '../../src/utils/market.js'
 import { readJsonFile } from './googleSheets.mjs'
+import { displayProductName } from '../../src/utils/productNames.js'
 
 // Node-safe stand-in for src/utils/translateValue.js + the private
 // getProductUrlSlug in src/utils/productId.js. Both of those go through the
@@ -27,7 +28,7 @@ export const SUPPORTED_LANGUAGES = ['sr', 'en']
 export function translateDataValue(language, field, raw) {
   if (raw === undefined || raw === null || raw === '') return raw
   const dict = LOCALES[language]?.dataValues?.[field] ?? {}
-  const value = dict[raw] ?? raw
+  const value = field === 'proizvod' ? displayProductName(language, raw, dict) : (dict[raw] ?? raw)
   return field === 'grad' ? normalizeDistrictLabel(value) : value
 }
 
@@ -35,7 +36,10 @@ export function translateDataValue(language, field, raw) {
 // private getProductUrlSlug (translated name, slugified; untranslated
 // products fall back to slugifying the raw Serbian name).
 export function getProductUrlSlug(proizvod, language) {
-  return slugify(translateDataValue(language, 'proizvod', proizvod))
+  // The locale file's dictionary only - NOT the English display names of
+  // src/data/productNamesEn.js, which must never change a URL.
+  const dict = LOCALES[language]?.dataValues?.proizvod ?? {}
+  return slugify(dict[proizvod] ?? proizvod)
 }
 
 // Category display names live under the top-level `categories.*` key (see

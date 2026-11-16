@@ -11,7 +11,7 @@
 import { SEO_MANIFEST } from './lib/seo-manifest.mjs'
 // Pure string builders shared with the build and the React pages, so the copy
 // served here and the copy the app sets after hydration are one rule.
-import { manifestEntryCopy } from '../src/utils/seoCopy.js'
+import { manifestEntryCopy, cityInMarketName, marketCopyWithoutCity, categoryCopyWithoutCity } from '../src/utils/seoCopy.js'
 
 const SITE_URL = 'https://cenesapijace.org'
 
@@ -147,7 +147,10 @@ function resolveMeta(pathname) {
 
     case 'market':
       return {
-        ...(manifestEntryCopy(entry) ?? marketCopy(entry.market, entry.city, entry.lang)),
+        ...(manifestEntryCopy(entry) ??
+          (cityInMarketName(entry.market, entry.city)
+            ? marketCopyWithoutCity({ lang: entry.lang, market: entry.market, generic: hasMarketWord(entry.market, entry.lang) })
+            : marketCopy(entry.market, entry.city, entry.lang))),
         lang: entry.lang,
         image: `${SITE_URL}/og/markets/${entry.slug}.png`,
         url,
@@ -159,7 +162,15 @@ function resolveMeta(pathname) {
     // market page instead of asking search engines to index both.
     case 'category':
       return {
-        ...(manifestEntryCopy(entry) ?? categoryCopy(entry.category, entry.market, entry.city, entry.lang)),
+        ...(manifestEntryCopy(entry) ??
+          (cityInMarketName(entry.market, entry.city)
+            ? categoryCopyWithoutCity({
+                lang: entry.lang,
+                category: entry.category,
+                market: entry.market,
+                generic: hasMarketWord(entry.market, entry.lang),
+              })
+            : categoryCopy(entry.category, entry.market, entry.city, entry.lang))),
         lang: entry.lang,
         image: `${SITE_URL}/og/markets/${entry.slug}.png`,
         url: entry.canonicalPath ? `${SITE_URL}${entry.canonicalPath}` : url,
@@ -234,7 +245,14 @@ async function loadSnapshot(context, pathname) {
   const entry = SEO_MANIFEST[pathname]
   if (!entry || entry.type === 'disclaimer' || entry.type === 'feedback') return { helpers: '', root: '', jsonLd: '' }
   if (pathname !== '/') {
-    return { ...splitJsonLd(await fetchAsset(context, `/snap${pathname}.html`)), root: '' }
+    const loaded = splitJsonLd(await fetchAsset(context, `/snap/${pathname.replace(/^\//, '')}.html`))
+    // A product page with no price anywhere has no snapshot (nothing to list), but
+    // it must not reach crawlers with an empty heading: it carries the product's
+    // name (the page stays noindex, see generate-seo-map.mjs).
+    if (!loaded.helpers && entry.type === 'product' && entry.name) {
+      return { helpers: emptyProductSnapshot(entry), root: '', jsonLd: '' }
+    }
+    return { ...loaded, root: '' }
   }
 
   const [helpers, root] = await Promise.all([
@@ -242,6 +260,14 @@ async function loadSnapshot(context, pathname) {
     fetchAsset(context, '/snap/index.root.html'),
   ])
   return { helpers, root, jsonLd: '' }
+}
+
+const escapeHtml = (value) =>
+  String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
+
+// Same shell as scripts/lib/snapshot.mjs's page(), with the product name only.
+function emptyProductSnapshot(entry) {
+  return `<header class="snap-head"><a href="/" class="snap-logo">Cene sa pijace</a></header><main class="snap-main" lang="${entry.lang}"><h1>${escapeHtml(entry.name)}</h1></main>`
 }
 
 class SetInnerHtml {

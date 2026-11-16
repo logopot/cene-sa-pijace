@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next'
+import { extractVariation } from '../../utils/productId.js'
+import { translateDataValue } from '../../utils/translateValue.js'
 import { TabList, TabButton } from './VariationSelector.styled.js'
 
 // Segmented tab group above the Price History Chart, letting a product with
@@ -11,6 +13,11 @@ function VariationSelector({ variations, selected, onSelect }) {
   const { t } = useTranslation()
 
   if (variations.length <= 1) return null
+
+  // The tab shows the qualifier of the product's displayed (translated) name, so
+  // English pages read "Black Hamburg", not the Serbian "Crno Hamburg".
+  const labelOf = (variation) =>
+    (variation.sample && extractVariation(translateDataValue(t, 'proizvod', variation.sample))?.label) || variation.label
 
   return (
     <TabList role="tablist" aria-label={t('analytics.variationSelectorLabel')}>
@@ -32,7 +39,7 @@ function VariationSelector({ variations, selected, onSelect }) {
           $isActive={selected === variation.key}
           onClick={() => onSelect(variation.key)}
         >
-          {variation.label}
+          {labelOf(variation)}
         </TabButton>
       ))}
     </TabList>

@@ -20,6 +20,7 @@ import { fetchAllMarketRows, readLocalEnvFile, ROOT, readJsonFile } from './lib/
 import { keepPricedRows, selectLatestRows } from './lib/dataset.mjs'
 import { latestRowsForMarket, rowsForMarket, listingFacts, productFacts, productVariant } from '../src/utils/seoFacts.js'
 import { manifestEntryCopy, isKvantaskaMarket } from '../src/utils/seoCopy.js'
+import { untranslatedProductNames } from '../src/utils/productNames.js'
 import { writeFileSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
 
@@ -283,6 +284,14 @@ function buildManifest(rows) {
     }
   }
 
+  const untranslated = untranslatedProductNames(rows.map((row) => row.Proizvod).filter(Boolean))
+  if (untranslated.length > 0) {
+    console.warn(
+      `[generate-seo-map] WARNING: ${untranslated.length} product name(s) have no English translation in src/data/productNamesEn.js (the Serbian name is shown on English pages):\n  - ${untranslated.join('\n  - ')}`,
+    )
+  } else {
+    console.log('[generate-seo-map] every product name has an English translation')
+  }
   reportCopyUniqueness(entries)
   markPricelessRoutes(entries)
 

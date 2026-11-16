@@ -171,6 +171,7 @@
   },
   "marketCategoryDetails": {
     "contextHeading": "Current prices for {{category}} ({{market}}, {{city}})",
+    "contextHeadingNoCity": "Current prices for {{category}} ({{market}})",
     "allMarketsShort": "All markets"
   },
   "analytics": {

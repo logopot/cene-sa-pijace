@@ -78,9 +78,9 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
     const seen = new Map()
     for (const row of itemRows) {
       const variation = extractVariation(row.Proizvod)
-      if (variation && !seen.has(variation.key)) seen.set(variation.key, variation.label)
+      if (variation && !seen.has(variation.key)) seen.set(variation.key, { label: variation.label, sample: row.Proizvod })
     }
-    return Array.from(seen, ([key, label]) => ({ key, label }))
+    return Array.from(seen, ([key, { label, sample }]) => ({ key, label, sample }))
   }, [itemRows])
 
   // City-scoped, unfiltered-by-variation - the baseline historyRows narrows

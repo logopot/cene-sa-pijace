@@ -1,4 +1,5 @@
 import { normalizeDistrictLabel } from './market.js'
+import { displayProductName } from './productNames.js'
 
 // Looks up a raw Serbian data value (Trend, Poreklo, JedMere, Pakovanje,
 // Ponuda, Proizvod, ...) in the active locale's dataValues dictionary via
@@ -13,6 +14,7 @@ import { normalizeDistrictLabel } from './market.js'
 export function translateDataValue(t, field, raw) {
   if (raw === undefined || raw === null || raw === '') return raw
   const dict = t(`dataValues.${field}`, { returnObjects: true, defaultValue: {} })
-  const value = dict[raw] ?? raw
+  // Product names have their own complete English dictionary (see productNames.js).
+  const value = field === 'proizvod' ? displayProductName(t.lng, raw, dict) : (dict[raw] ?? raw)
   return field === 'grad' ? normalizeDistrictLabel(value) : value
 }

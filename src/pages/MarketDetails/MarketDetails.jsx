@@ -21,7 +21,7 @@ import SEO from '../../components/SEO/SEO.jsx'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
 import { SITE_URL, getMarketOgImage } from '../../constants/seo.js'
-import { isKvantaskaMarket, kvantaskaMarketCopy } from '../../utils/seoCopy.js'
+import { isKvantaskaMarket, kvantaskaMarketCopy, cityInMarketName, marketCopyWithoutCity } from '../../utils/seoCopy.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
@@ -100,12 +100,19 @@ function MarketDetails({ rows, loading, error }) {
   // (see seoCopy.js, shared with the edge function that serves the same text).
   const kvantas = isKvantaskaMarket(i18n.language, pijaca)
   const kvantasCopy = kvantas ? kvantaskaMarketCopy({ city: gradLabel, source, date: weekLabel }) : null
+  // A market whose name already holds its city ("TC Novi Beograd" in Beograd): the
+  // copy leaves the city out instead of repeating it.
+  const noCityCopy =
+    !kvantas && cityInMarketName(pijacaLabel, gradLabel)
+      ? marketCopyWithoutCity({ lang: i18n.language, market: pijacaLabel, generic: seoKey.endsWith('Generic') })
+      : null
+  const seoCopy = kvantasCopy ?? noCityCopy
 
   return (
     <>
       <SEO
-        title={kvantasCopy?.title ?? t(`${seoKey}.title`, { market: pijacaLabel, city: gradLabel })}
-        description={kvantasCopy?.description ?? t(`${seoKey}.description`, { market: pijacaLabel, city: gradLabel })}
+        title={seoCopy?.title ?? t(`${seoKey}.title`, { market: pijacaLabel, city: gradLabel })}
+        description={seoCopy?.description ?? t(`${seoKey}.description`, { market: pijacaLabel, city: gradLabel })}
         url={`${SITE_URL}${buildMarketRoute(grad, pijaca, i18n.language)}`}
         image={getMarketOgImage(grad, pijaca)}
       />

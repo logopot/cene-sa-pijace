@@ -171,6 +171,7 @@
   },
   "marketCategoryDetails": {
     "contextHeading": "Aktuelne cene za {{category}} ({{market}}, {{city}})",
+    "contextHeadingNoCity": "Aktuelne cene za {{category}} ({{market}})",
     "allMarketsShort": "Sve pijace"
   },
   "analytics": {

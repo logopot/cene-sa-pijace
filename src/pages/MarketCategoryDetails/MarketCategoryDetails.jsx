@@ -24,7 +24,7 @@ import SEO from '../../components/SEO/SEO.jsx'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
 import { SITE_URL, getMarketOgImage } from '../../constants/seo.js'
-import { isKvantaskaMarket, kvantaskaCategoryCopy } from '../../utils/seoCopy.js'
+import { isKvantaskaMarket, kvantaskaCategoryCopy, cityInMarketName, categoryCopyWithoutCity } from '../../utils/seoCopy.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
@@ -143,6 +143,13 @@ function MarketCategoryDetails({ rows, loading, error }) {
   // See MarketDetails.jsx: the Serbian Kvantaška pijaca pages use their own copy.
   const kvantas = !isAllMarkets && isKvantaskaMarket(i18n.language, pijaca)
   const kvantasCopy = kvantas ? kvantaskaCategoryCopy({ category: categoryLabel, city: gradLabel, source, date: weekLabel }) : null
+  // City already in the market's name: the copy leaves it out (see MarketDetails.jsx).
+  const cityInName = !isAllMarkets && cityInMarketName(marketLabel, gradLabel)
+  const noCityCopy =
+    !kvantas && cityInName
+      ? categoryCopyWithoutCity({ lang: i18n.language, category: categoryLabel, market: marketLabel, generic: seoKey.endsWith('Generic') })
+      : null
+  const seoCopy = kvantasCopy ?? noCityCopy
 
   const breadcrumbItems = [
     { label: t('breadcrumbs.home'), to: '/' },
@@ -154,8 +161,8 @@ function MarketCategoryDetails({ rows, loading, error }) {
   return (
     <>
       <SEO
-        title={kvantasCopy?.title ?? t(`${seoKey}.title`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
-        description={kvantasCopy?.description ?? t(`${seoKey}.description`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
+        title={seoCopy?.title ?? t(`${seoKey}.title`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
+        description={seoCopy?.description ?? t(`${seoKey}.description`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
         url={canonicalUrl}
         image={isAllMarkets ? undefined : getMarketOgImage(grad, pijaca)}
       />
@@ -171,7 +178,7 @@ function MarketCategoryDetails({ rows, loading, error }) {
           </IconWrap>
           <TitleGroup>
             <ContextHeading>
-              {t('marketCategoryDetails.contextHeading', {
+              {t(cityInName ? 'marketCategoryDetails.contextHeadingNoCity' : 'marketCategoryDetails.contextHeading', {
                 category: lowercaseFirst(t(`categories.${getCategorySlug(category)}`)),
                 market: marketLabel,
                 city: gradLabel,
