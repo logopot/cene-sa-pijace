@@ -37,7 +37,7 @@ function isPrerenderedJsonLd(jsonLd) {
 // title/description/image/url so search engines and chat-app link unfurlers
 // (Viber/WhatsApp/Facebook all read Open Graph, not just <title>) get a
 // distinct, accurate preview per page instead of the static index.html tags.
-function SEO({ title, description, image = DEFAULT_OG_IMAGE, url = SITE_URL, jsonLd }) {
+function SEO({ title, description, image = DEFAULT_OG_IMAGE, url = SITE_URL, jsonLd, noindex = false }) {
   const { i18n } = useTranslation()
   const alreadyInHtml = isPrerenderedJsonLd(jsonLd)
 
@@ -74,6 +74,7 @@ function SEO({ title, description, image = DEFAULT_OG_IMAGE, url = SITE_URL, jso
       <meta name="twitter:image" content={image} />
 
       <link rel="canonical" href={url} />
+      {noindex && <meta name="robots" content="noindex" />}
 
       {jsonLd && !alreadyInHtml && <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>}
     </Helmet>

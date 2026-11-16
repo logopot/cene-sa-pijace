@@ -16,6 +16,10 @@
 //                      UI shows the source as plain text, there is no link to
 //                      the official report to click)
 //   language_switch    from, to
+//   feedback_open      from_page_type  (kind of page the suggestions form was
+//                      opened from: home, city, market, category, product, ...
+//                      - never the path; the form's text is never sent anywhere)
+//   feedback_submit    (successful send of the suggestions form)
 //   share_click        (not wired: the site has no share control)
 // scroll depth is covered by GA4's built-in Enhanced Measurement ("scroll"),
 // so no extra code or weight is added for it.

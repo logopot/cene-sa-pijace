@@ -30,6 +30,17 @@ const HOME_SR = {
     'Pratite svakodnevne promene cena poljoprivrednih proizvoda na pijacama širom Srbije. Brz i jasan uvid u pijačni portal.',
 }
 
+const FEEDBACK = {
+  sr: {
+    title: 'Predlozi i komentari | Cene sa pijace',
+    description: 'Pošaljite predlog ili komentar za sajt Cene sa pijace.',
+  },
+  en: {
+    title: 'Suggestions & comments | Cene sa pijace',
+    description: 'Send a suggestion or comment about the Cene sa pijace website.',
+  },
+}
+
 const FALLBACK_SR = {
   title: 'Cene sa pijace | Nezavisni pijačni portal',
   description:
@@ -122,6 +133,9 @@ function resolveMeta(pathname) {
       const copy = DISCLAIMER[entry.lang] ?? DISCLAIMER.sr
       return { ...copy, lang: entry.lang, image: `${SITE_URL}/og-fallback.png`, url }
     }
+
+    case 'feedback':
+      return { ...(FEEDBACK[entry.lang] ?? FEEDBACK.sr), lang: entry.lang, image: `${SITE_URL}/og-fallback.png`, url }
 
     case 'city':
       return {
@@ -218,7 +232,7 @@ function splitJsonLd(html) {
 // (root is empty), the homepage just keeps its text snapshot.
 async function loadSnapshot(context, pathname) {
   const entry = SEO_MANIFEST[pathname]
-  if (!entry || entry.type === 'disclaimer') return { helpers: '', root: '', jsonLd: '' }
+  if (!entry || entry.type === 'disclaimer' || entry.type === 'feedback') return { helpers: '', root: '', jsonLd: '' }
   if (pathname !== '/') {
     return { ...splitJsonLd(await fetchAsset(context, `/snap${pathname}.html`)), root: '' }
   }

@@ -191,10 +191,32 @@
     "variationSelectorLabel": "Product variation filter",
     "variationSourceGap": "No data from {{sources}} for this variation."
   },
+  "feedback": {
+    "title": "Suggestions & comments",
+    "seoDescription": "Send a suggestion or comment about the Cene sa pijace website.",
+    "nameLabel": "Name (optional)",
+    "messageLabel": "Message",
+    "counter": "{{count}} / {{max}}",
+    "submit": "Send",
+    "sending": "Sending...",
+    "successTitle": "Thank you!",
+    "successBody": "Your message has been sent.",
+    "notePrivacy": "Messages are used only to improve the site and are not shown publicly; the name is optional.",
+    "noteSources": "We take prices from official sources (STIPS and JKP Beogradske pijace) and cannot change them.",
+    "errors": {
+      "nameLong": "The name can have at most {{max}} characters.",
+      "messageShort": "The message must have at least {{min}} characters.",
+      "messageLong": "The message can have at most {{max}} characters.",
+      "verification": "Please wait for the check to finish and try again.",
+      "tooMany": "Too many attempts. Please try again a little later.",
+      "generic": "Something went wrong, please try again later."
+    }
+  },
   "footer": {
     "tagline": "An independent market portal giving you a fast, clear view of agricultural price trends at green markets across Serbia.",
     "copyright": "© {{year}} Cene sa pijace. All rights reserved.",
     "disclaimerLink": "Disclaimer",
+    "feedbackLink": "Suggestions & comments",
     "credit": "Design & development <portfolioLink></portfolioLink>",
     "nav": {
       "aboutHeading": "About the project"

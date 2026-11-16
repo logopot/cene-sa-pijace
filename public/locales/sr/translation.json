@@ -191,10 +191,32 @@
     "variationSelectorLabel": "Filter varijacija proizvoda",
     "variationSourceGap": "Nema podataka iz izvora {{sources}} za ovu varijaciju."
   },
+  "feedback": {
+    "title": "Predlozi i komentari",
+    "seoDescription": "Pošaljite predlog ili komentar za sajt Cene sa pijace.",
+    "nameLabel": "Ime (opciono)",
+    "messageLabel": "Poruka",
+    "counter": "{{count}} / {{max}}",
+    "submit": "Pošalji",
+    "sending": "Slanje...",
+    "successTitle": "Hvala!",
+    "successBody": "Vaša poruka je poslata.",
+    "notePrivacy": "Poruke se koriste samo za poboljšanje sajta i ne prikazuju se javno; ime je opciono.",
+    "noteSources": "Cene preuzimamo iz zvaničnih izvora (STIPS i JKP Beogradske pijace) i ne možemo da ih menjamo.",
+    "errors": {
+      "nameLong": "Ime može imati najviše {{max}} znakova.",
+      "messageShort": "Poruka mora imati najmanje {{min}} znakova.",
+      "messageLong": "Poruka može imati najviše {{max}} znakova.",
+      "verification": "Sačekajte da se završi provera pa pokušajte ponovo.",
+      "tooMany": "Previše pokušaja. Pokušajte ponovo malo kasnije.",
+      "generic": "Nije uspelo, pokušaj ponovo kasnije."
+    }
+  },
   "footer": {
     "tagline": "Nezavisni pijačni portal koji omogućava brz i jasan uvid u kretanje cena poljoprivrednih proizvoda na pijacama širom Srbije.",
     "copyright": "© {{year}} Cene sa pijace. Sva prava zadržana.",
     "disclaimerLink": "Odricanje od odgovornosti",
+    "feedbackLink": "Predlozi i komentari",
     "credit": "Dizajn i razvoj <portfolioLink></portfolioLink>",
     "nav": {
       "aboutHeading": "O projektu"

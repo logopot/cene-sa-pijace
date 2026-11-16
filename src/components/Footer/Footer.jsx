@@ -1,7 +1,9 @@
 import { Trans, useTranslation } from "react-i18next";
 import { Container } from "react-bootstrap";
 import LogopotLogo from "../LogopotLogo/LogopotLogo.jsx";
-import { getDisclaimerPath } from "../../constants/routeLocales.js";
+import { useLocation } from "react-router-dom";
+import { getDisclaimerPath, getFeedbackPath, isFeedbackPath } from "../../constants/routeLocales.js";
+import { isValidFromPath } from "../../utils/feedbackRules.js";
 import {
   StyledFooter,
   TopSection,
@@ -36,6 +38,14 @@ function Footer() {
   const { t, i18n } = useTranslation();
   const year = new Date().getFullYear();
   const disclaimerPath = getDisclaimerPath(i18n.language);
+  const { pathname } = useLocation();
+  // The only entry point to the suggestions form: it remembers the page the
+  // visitor was on (see pages/Feedback). Left off when already on the form.
+  const feedbackPath = getFeedbackPath(i18n.language);
+  const feedbackLink =
+    isFeedbackPath(pathname) || !isValidFromPath(pathname)
+      ? feedbackPath
+      : `${feedbackPath}?${new URLSearchParams({ from: pathname })}`;
 
   return (
     <StyledFooter>
@@ -51,6 +61,11 @@ function Footer() {
                 <li>
                   <FooterRouteLink to={disclaimerPath}>
                     {t("footer.disclaimerLink")}
+                  </FooterRouteLink>
+                </li>
+                <li>
+                  <FooterRouteLink to={feedbackLink}>
+                    {t("footer.feedbackLink")}
                   </FooterRouteLink>
                 </li>
               </NavList>

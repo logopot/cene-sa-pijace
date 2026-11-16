@@ -8,7 +8,7 @@ import {
 } from './market.js'
 import { getCategoryUrlSlug, resolveCategoryBySlug } from './categoryIcons.js'
 import { buildProductRoute, productMatchesSlug } from './productId.js'
-import { CITY_PATH_PREFIX, isDisclaimerPath, getDisclaimerPath } from '../constants/routeLocales.js'
+import { CITY_PATH_PREFIX, isDisclaimerPath, getDisclaimerPath, isFeedbackPath, getFeedbackPath } from '../constants/routeLocales.js'
 
 // Re-localizes the current pathname for `targetLanguage` - swaps the
 // /grad|city prefix and every dynamic segment's word, reusing the exact same
@@ -20,6 +20,7 @@ import { CITY_PATH_PREFIX, isDisclaimerPath, getDisclaimerPath } from '../consta
 // reload instead of redirecting to a broken URL.
 export function translatePathForLanguage(pathname, rows, targetLanguage) {
   if (isDisclaimerPath(pathname)) return getDisclaimerPath(targetLanguage)
+  if (isFeedbackPath(pathname)) return getFeedbackPath(targetLanguage)
 
   const segments = pathname.split('/').filter(Boolean)
   if (segments.length === 0) return null

@@ -115,5 +115,47 @@ All events go through `trackEvent` in `src/utils/analytics.js` (values trimmed +
 | `view_product` | `product_name`, `category`, `market_name` | product page opened |
 | `view_price_history` | `product_name` | history chart shown with data |
 | `language_switch` | `from`, `to` | language switched |
+| `feedback_open` | `from_page_type` | suggestions form opened (kind of page only, never the path) |
+| `feedback_submit` | - | suggestions form sent successfully (no name or text is ever sent) |
 
 Not wired (nothing in the UI to attach them to): `click_source_link` (the source is plain text, no link) and `share_click` (no share control). Scroll depth comes from GA4 Enhanced Measurement.
+
+
+## 💬 Feedback forma: podešavanje
+
+The suggestions/comments form (`/predlozi` in Serbian, `/feedback` in English; linked only from the footer) writes each message as a new row into a `Feedback` tab of the **same Google file** that holds the prices. It is not a price-error report: prices come from the official sources and the site never changes them. Messages are never shown publicly. The page is `noindex`, left out of `sitemap.xml`, has no hreflang, and `robots.txt` disallows `/api/`.
+
+Parts: `src/pages/Feedback` (form), `src/utils/feedbackRules.js` (validation shared by browser and server), `functions/api/feedback.js` + `functions/lib/feedback.js` (endpoint `POST /api/feedback`, Workers runtime, JWT signed with WebCrypto, no Node packages).
+
+### Manual steps (once)
+
+1. **Tab.** In the spreadsheet add a tab named `Feedback` (or pick another name and set `FEEDBACK_SHEET_NAME`) and put this header in row 1:
+
+   | A | B | C | D | E | F |
+   |---|---|---|---|---|---|
+   | Datum | Ime | Poruka | Strana | Jezik | Status |
+
+   `Datum` is ISO UTC set by the server, `Strana` is the page path the visitor came from (may be empty), `Jezik` is `sr`/`en`, `Status` starts as `novo`. No IP address and no User-Agent are stored.
+2. **Service account.** Use a service account whose key you can paste as JSON. It must be **Editor** on the spreadsheet file (needed to append rows). Because Editor access covers the whole file, **protect the price tabs** (Data -> Protect sheets and ranges -> only the scrapers' account may edit), so the form's account can write only to `Feedback`. The scope used is `https://www.googleapis.com/auth/spreadsheets`. Using a separate account from the scrapers is recommended.
+3. **Turnstile.** In the Cloudflare dashboard create a Turnstile widget for `cenesapijace.org` (managed mode). You get a site key (public) and a secret key.
+4. **Environment variables** (Cloudflare Pages -> the project -> Settings -> Variables and Secrets; set them for Production, and for Preview if you test there). Values are never written to the repo:
+
+   | Name | Type | Where it is used | Notes |
+   |---|---|---|---|
+   | `FEEDBACK_SERVICE_ACCOUNT_JSON` | Secret | Functions (runtime) | full service-account key JSON |
+   | `FEEDBACK_SPREADSHEET_ID` | Text | Functions (runtime) | id of the price spreadsheet |
+   | `FEEDBACK_SHEET_NAME` | Text, optional | Functions (runtime) | default `Feedback` |
+   | `TURNSTILE_SECRET_KEY` | Secret | Functions (runtime) | Turnstile secret |
+   | `ALLOW_PREVIEW_ORIGINS` | Text, optional | Functions (runtime) | `true` also accepts `https://*.pages.dev` (for preview deployments); leave unset in production |
+   | `VITE_TURNSTILE_SITE_KEY` | Text | **build time** (browser bundle) | public site key; must exist when the site is built, so redeploy after setting it |
+
+   The `FEEDBACK_*`/`TURNSTILE_*`/`ALLOW_*` variables are read by the Functions at request time from `context.env`; `VITE_TURNSTILE_SITE_KEY` is baked into the bundle at build time. Locally `.env.example` lists the build-time name; Cloudflare's test keys (site `1x00000000000000000000AA`, secret `1x0000000000000000000000000000000AA`) always pass and are meant for development.
+5. **Redeploy** so the new build picks up `VITE_TURNSTILE_SITE_KEY`, then send one test message from the live site and check that a row appeared in `Feedback`.
+
+### What the endpoint does
+
+Only `POST` (others 405), JSON up to 4 KB, `Origin`/`Referer` must be `https://cenesapijace.org`. It validates again on the server (name <= 60, message 5-1000, language `sr`/`en`, path rule), strips control characters, drops a filled honeypot silently (200, no write), verifies the Turnstile token with the visitor's `CF-Connecting-IP`, and appends the row (`valueInputOption=RAW`, `insertDataOption=INSERT_ROWS`). A name or message starting with `=`, `+`, `-` or `@` gets a leading apostrophe so Sheets cannot run it as a formula. Responses are generic (`200 {ok:true}` / 400 / 403 / 413 / 415 / 429 / 500); errors from Google are never returned, and logs carry only the failing stage and HTTP status, never names or messages. A small in-memory limit (5 posts per 10 minutes per address, per Worker instance) adds a best-effort 429.
+
+### Tests
+
+`npm test` runs `tests/*.test.mjs` with Node's built-in runner: validation rules, endpoint (405, Origin, Turnstile, honeypot, Sheets request body and column order, JWT signature and caching) against mocks, and the route/sitemap rules. Nothing there touches Google or Cloudflare.

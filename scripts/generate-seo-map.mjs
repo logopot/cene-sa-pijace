@@ -5,7 +5,8 @@
 // the request path, only here at build time.
 import { parseMesto, buildCityRoute, buildMarketRoute, buildMarketCategoryRoute } from '../src/utils/market.js'
 import { getCategoryUrlSlug } from '../src/utils/categoryIcons.js'
-import { DISCLAIMER_PATH } from '../src/constants/routeLocales.js'
+import { DISCLAIMER_PATH, FEEDBACK_PATH } from '../src/constants/routeLocales.js'
+import { pathToFileURL } from 'node:url'
 import {
   translateDataValue,
   translateCategory,
@@ -39,11 +40,14 @@ const NOINDEX_MAX_SHARE = 0.05
 // that collapses onto its market page is not.
 const isOwnCanonical = (routePath, entry) => !entry.canonicalPath || entry.canonicalPath === routePath
 
-function buildStaticEntries() {
+export function buildStaticEntries() {
   const entries = {}
   entries['/'] = { type: 'home' }
   for (const lang of SUPPORTED_LANGUAGES) {
     entries[DISCLAIMER_PATH[lang]] = { type: 'disclaimer', lang }
+    // The suggestions form: a known route (200, real page) but noindex, so it
+    // is kept out of sitemap.xml, and never part of a hreflang group.
+    entries[FEEDBACK_PATH[lang]] = { type: 'feedback', lang, noindex: 1 }
   }
   return entries
 }
@@ -291,7 +295,7 @@ function buildManifest(rows) {
 // Every indexable route in the manifest. A category page that canonicalizes
 // onto its market page (a market with a single category) is left out, so the
 // sitemap only lists URLs that are their own canonical.
-function buildSitemap(entries) {
+export function buildSitemap(entries) {
   const today = new Date().toISOString().slice(0, 10)
   const urls = Object.entries(entries)
     .filter(([routePath, entry]) => isOwnCanonical(routePath, entry) && !entry.noindex)
@@ -330,4 +334,5 @@ async function main() {
   console.log(`[generate-seo-map] wrote ${SITEMAP_PATH}`)
 }
 
-main()
+// Only when run as a script (the tests import the helpers above).
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main()

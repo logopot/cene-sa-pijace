@@ -4,6 +4,7 @@ import Header from './components/Header/Header.jsx'
 import Footer from './components/Footer/Footer.jsx'
 import MarketExplorer from './components/MarketExplorer/MarketExplorer.jsx'
 import DisclaimerPage from './components/DisclaimerPage/DisclaimerPage.jsx'
+import Feedback from './pages/Feedback/Feedback.jsx'
 import ScrollToTop from './components/ScrollToTop/ScrollToTop.jsx'
 import ScrollToTopButton from './components/ScrollToTopButton/ScrollToTopButton.jsx'
 import PageSkeleton from './components/PageSkeleton/PageSkeleton.jsx'
@@ -11,7 +12,7 @@ import CityDetails from './pages/CityDetails/CityDetails.jsx'
 import MarketDetails from './pages/MarketDetails/MarketDetails.jsx'
 import MarketCategoryDetails from './pages/MarketCategoryDetails/MarketCategoryDetails.jsx'
 import NotFound from './pages/NotFound/NotFound.jsx'
-import { CITY_PATH_PREFIX, DISCLAIMER_PATH } from './constants/routeLocales.js'
+import { CITY_PATH_PREFIX, DISCLAIMER_PATH, FEEDBACK_PATH } from './constants/routeLocales.js'
 import { FilterProvider } from './context/FilterContext.jsx'
 import { GlobalStyle } from './styles/globalStyle.js'
 import { AppShell, Main } from './App.styled.js'
@@ -70,6 +71,9 @@ function AppContent({ rows, loading, error, seed }) {
                 all rendering the same DisclaimerPage component. */}
             {Object.values(DISCLAIMER_PATH).map((path) => (
               <Route key={path} path={path} element={<DisclaimerPage />} />
+            ))}
+            {Object.values(FEEDBACK_PATH).map((path) => (
+              <Route key={path} path={path} element={<Feedback key={location.key} />} />
             ))}
             <Route path="*" element={<NotFound />} />
           </Routes>

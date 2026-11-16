@@ -121,3 +121,18 @@ export function getDisclaimerPath(language) {
 export function isDisclaimerPath(pathname) {
   return Object.values(DISCLAIMER_PATH).includes(pathname)
 }
+
+// The suggestions/comments form (see pages/Feedback). Not an indexed page: it
+// is noindex, has no hreflang pair and is left out of sitemap.xml.
+export const FEEDBACK_PATH = {
+  sr: '/predlozi',
+  en: '/feedback',
+}
+
+export function getFeedbackPath(language) {
+  return FEEDBACK_PATH[language] ?? FEEDBACK_PATH[DEFAULT_LANGUAGE]
+}
+
+export function isFeedbackPath(pathname) {
+  return Object.values(FEEDBACK_PATH).includes(pathname)
+}
