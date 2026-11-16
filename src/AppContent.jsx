@@ -1,4 +1,5 @@
-import { Fragment, lazy, Suspense, useEffect } from 'react'
+import { Fragment, lazy, Suspense, useEffect, useLayoutEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Header from './components/Header/Header.jsx'
 import Footer from './components/Footer/Footer.jsx'
@@ -12,7 +13,7 @@ import CityDetails from './pages/CityDetails/CityDetails.jsx'
 import MarketDetails from './pages/MarketDetails/MarketDetails.jsx'
 import MarketCategoryDetails from './pages/MarketCategoryDetails/MarketCategoryDetails.jsx'
 import NotFound from './pages/NotFound/NotFound.jsx'
-import { CITY_PATH_PREFIX, DISCLAIMER_PATH, FEEDBACK_PATH } from './constants/routeLocales.js'
+import { CITY_PATH_PREFIX, DISCLAIMER_PATH, FEEDBACK_PATH, getRouteLanguage } from './constants/routeLocales.js'
 import { rememberRoute } from './utils/lastRoute.js'
 import { getPageViewTracker } from './utils/pageView.js'
 import { FilterProvider } from './context/FilterContext.jsx'
@@ -29,6 +30,21 @@ const Analytics = lazy(() => import('./pages/Analytics/Analytics.jsx'))
 // scripts/prerender-home.mjs).
 function AppContent({ rows, loading, error, seed }) {
   const location = useLocation()
+  const { i18n } = useTranslation()
+
+  // The first load already starts in the route's language (src/i18n.js); this keeps
+  // it so across in-app navigation, before the new page paints.
+  useLayoutEffect(() => {
+    const routeLanguage = getRouteLanguage(location.pathname)
+    if (routeLanguage && i18n.language !== routeLanguage) i18n.changeLanguage(routeLanguage)
+  }, [location.pathname, i18n])
+
+  // <html lang> follows the page language on every page, including those that set
+  // no head tags of their own (the disclaimer): the server sends the route's
+  // language there, and this keeps it so after hydration.
+  useLayoutEffect(() => {
+    document.documentElement.setAttribute('lang', i18n.language)
+  }, [i18n.language])
 
   // Remember the last page that is not the suggestions form, for the form
   // to send along (see utils/lastRoute.js).

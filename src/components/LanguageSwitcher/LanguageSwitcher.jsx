@@ -3,7 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { trackEvent } from '../../utils/analytics.js'
 import { translatePathForLanguage } from '../../utils/localizedPath.js'
+import { getRouteLanguage } from '../../constants/routeLocales.js'
 import { TextSwitcher, LangTextButton, Separator } from './LanguageSwitcher.styled.js'
+
+// The saved choice read by the language detector (src/i18n.js) for paths that
+// have no language of their own. Storage may be blocked: then it just isn't saved.
+function saveLanguageChoice(language) {
+  try {
+    window.localStorage.setItem('i18nextLng', language)
+  } catch {
+    // Storage unavailable: the choice lasts for this page load only.
+  }
+}
 
 function LanguageSwitcher({ rows }) {
   const { i18n } = useTranslation()
@@ -20,14 +31,20 @@ function LanguageSwitcher({ rows }) {
     setIsRedirecting(true)
     trackEvent('language_switch', { from: i18n.resolvedLanguage, to: targetLanguage })
 
-    const translatedPath = translatePathForLanguage(location.pathname, rows, targetLanguage)
-    await i18n.changeLanguage(targetLanguage)
-
-    if (translatedPath) {
-      window.location.href = translatedPath
-    } else {
-      window.location.reload()
+    // An address written in a language (/city/..., /grad/..., /feedback, ...) is
+    // switched by going to its pair in the other language; that address's own
+    // language then shows, and nothing is saved. Only a path with no language of
+    // its own (the homepage) switches in place and remembers the choice.
+    if (getRouteLanguage(location.pathname)) {
+      const translatedPath = translatePathForLanguage(location.pathname, rows, targetLanguage)
+      // No pair for this address: the other language's homepage, with the choice saved.
+      if (!translatedPath) saveLanguageChoice(targetLanguage)
+      window.location.href = translatedPath ?? '/'
+      return
     }
+    saveLanguageChoice(targetLanguage)
+    await i18n.changeLanguage(targetLanguage)
+    window.location.reload()
   }
 
   return (

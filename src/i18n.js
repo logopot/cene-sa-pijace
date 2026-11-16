@@ -2,13 +2,14 @@ import i18n from 'i18next'
 import Backend from 'i18next-http-backend'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
+import { createI18nOptions, SUPPORTED_LANGUAGES } from './utils/i18nOptions.js'
 
 // Set by vite.config.js (define); absent where this file is bundled without it
 // (the homepage prerender, which gets its translations inline and never fetches).
 // eslint-disable-next-line no-undef
 const BUILD_VERSION = typeof __BUILD_VERSION__ === 'undefined' ? 'dev' : __BUILD_VERSION__
 
-export const SUPPORTED_LANGUAGES = ['sr', 'en']
+export { SUPPORTED_LANGUAGES }
 
 // One-time migration for visitors who were auto-detected into English before
 // 'navigator' was removed from the detector's order (see below) - without
@@ -39,34 +40,8 @@ if (!prerender) i18n.use(Backend).use(LanguageDetector)
 i18n
   .use(initReactI18next)
   .init({
-    fallbackLng: 'sr',
-    supportedLngs: SUPPORTED_LANGUAGES,
-    // Both bundles are always fetched up front (not just the active one) so
-    // routing utilities (see productId.js's getProductUrlSlug) can resolve a
-    // product-name URL slug in either language via i18n.getResource,
-    // regardless of which language the UI is currently displaying.
-    preload: SUPPORTED_LANGUAGES,
-    ns: ['translation'],
-    defaultNS: 'translation',
-    backend: {
-      // The version changes with every build, so a new deploy asks for a new URL
-      // and never gets a translation file the browser cached before it (the
-      // file itself is served with a long Cache-Control, see public/_headers).
-      loadPath: `/locales/{{lng}}/{{ns}}.json?v=${BUILD_VERSION}`,
-    },
+    ...createI18nOptions(typeof window === 'undefined' ? '' : window.location.pathname, BUILD_VERSION),
     ...(prerender ? { resources: prerender.resources, lng: prerender.lng, initAsync: false, initImmediate: false } : {}),
-    // Serbian is the site's primary language (promoted only in Serbia);
-    // English exists for foreigners looking up Serbian market prices, so it
-    // must be an explicit user choice (via LanguageSwitcher) rather than
-    // something the browser's OS/navigator language picks automatically -
-    // hence 'navigator' is intentionally excluded from the detection order.
-    detection: {
-      order: ['localStorage'],
-      caches: ['localStorage'],
-    },
-    interpolation: {
-      escapeValue: false,
-    },
   })
 
 export default i18n

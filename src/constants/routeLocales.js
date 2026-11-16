@@ -136,3 +136,22 @@ export function getFeedbackPath(language) {
 export function isFeedbackPath(pathname) {
   return Object.values(FEEDBACK_PATH).includes(pathname)
 }
+
+// The language a URL is written in: "sr" for /grad/..., /predlozi,
+// /odricanje-od-odgovornosti; "en" for /city/..., /feedback, /disclaimer. null for a
+// path that belongs to no language (the homepage "/", unknown paths) - there the
+// visitor's saved choice (else "sr") decides. The page language follows this, so
+// an address always shows the language it is written in, whatever is saved.
+export function getRouteLanguage(pathname) {
+  if (typeof pathname !== 'string') return null
+  for (const [language, prefix] of Object.entries(CITY_PATH_PREFIX)) {
+    if (pathname === `/${prefix}` || pathname.startsWith(`/${prefix}/`)) return language
+  }
+  for (const [language, path] of Object.entries(DISCLAIMER_PATH)) {
+    if (pathname === path) return language
+  }
+  for (const [language, path] of Object.entries(FEEDBACK_PATH)) {
+    if (pathname === path) return language
+  }
+  return null
+}
