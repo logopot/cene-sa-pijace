@@ -90,8 +90,20 @@ export const Textarea = styled.textarea`
   }
 `
 
+// Helper text on the left, character counter on the right.
+export const FieldMeta = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: ${({ theme }) => theme.spacing.sm};
+`
+
+export const Hint = styled.span`
+  font-size: 0.85rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+`
+
 export const Counter = styled.span`
-  align-self: flex-end;
+  margin-left: auto;
   font-size: 0.85rem;
   color: ${({ $over, theme }) => ($over ? theme.colors.danger : theme.colors.textMuted)};
 `
@@ -113,13 +125,45 @@ export const Honeypot = styled.div`
   overflow: hidden;
 `
 
-// The page declares "color-scheme: light dark" (index.css); an iframe inherits it
-// and the widget would get a dark backdrop in a dark OS theme. Pinned to light
-// here, together with the widget's own fixed light theme.
+// Holds the Turnstile widget. It has no height of its own: empty (nothing
+// started) it takes no room at all, and when Cloudflare shows something - the
+// "Success!" tick or a "Confirm you are human" box - it simply grows. The page
+// declares "color-scheme: light dark" (index.css); an iframe inherits it and the
+// widget would get a dark backdrop in a dark OS theme, so it is pinned to light,
+// together with the widget's own fixed light theme.
 export const TurnstileSlot = styled.div`
-  min-height: 65px;
   color-scheme: light;
-  background: #fff;
+  max-width: 100%;
+  overflow-x: auto;
+`
+
+export const WidgetArea = styled.div`
+  display: ${({ $visible }) => ($visible ? 'block' : 'none')};
+`
+
+export const VerifyNote = styled.p`
+  margin: 0;
+  font-size: 0.9rem;
+  color: ${({ theme }) => theme.colors.textMuted};
+`
+
+export const RetryButton = styled.button`
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radius.md};
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.textDark};
+  font-size: 0.95rem;
+  font-weight: ${({ theme }) => theme.font.weight.semibold};
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: ${({ theme }) => theme.colors.primaryGreen};
+    color: ${({ theme }) => theme.colors.primaryGreen};
+  }
 `
 
 export const FormError = styled.div`
