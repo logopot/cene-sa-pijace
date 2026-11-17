@@ -236,8 +236,8 @@ function Analytics({ rows, loading, error }) {
             <PriceHistoryChart
               onInteract={handleHistoryInteraction}
               data={analytics.history}
-              sources={analytics.historySources}
-              missingSources={analytics.missingHistorySources}
+              series={analytics.historySeries}
+              missingSeries={analytics.missingHistorySeries}
             />
           )}
         </Section>

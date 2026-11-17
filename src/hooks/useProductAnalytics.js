@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import { parseMesto } from '../utils/market.js'
 import { productMatchesSlug, normalizeProductName, extractVariation } from '../utils/productId.js'
-import { getRowLabel, getRowTime } from '../utils/week.js'
+import { getRowTime } from '../utils/week.js'
+import { buildHistorySeries } from '../utils/historySeries.js'
 import { getAveragePrice as getComparablePrice } from '../utils/price.js'
 import { resolveUnit } from '../utils/unit.js'
 import { getSourceLabel } from '../utils/marketTime.js'
@@ -100,60 +101,22 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
     return cityRows.filter((row) => extractVariation(row.Proizvod)?.key === selectedVariation)
   }, [cityRows, selectedVariation])
 
-  // Grouped by the row's own literal Source text (see scripts/jkp-scraper's
-  // SOURCE_LABEL) rather than a hardcoded STIPS/JKP binary, so a future
-  // third scraper with its own distinct Source string becomes its own
-  // series automatically, with no change needed here - STIPS rows never
-  // carry a Source at all, so they fall back to the generic "STIPS" bucket.
-  const history = useMemo(() => {
-    const byWeek = new Map()
-    historyRows.forEach((row) => {
-      const time = getRowTime(row)
-      if (time === null) return
-      if (!byWeek.has(time)) byWeek.set(time, { time, weekLabel: getRowLabel(row), bySource: new Map() })
-      const bucket = byWeek.get(time)
-      const source = row.Source || 'STIPS'
-      if (!bucket.bySource.has(source)) bucket.bySource.set(source, [])
-      bucket.bySource.get(source).push(row.CenaDom)
-    })
+  // The chart's lines (see utils/historySeries.js): the prices of the market this
+  // page is about and, next to them, those of the city's wholesale market - each
+  // named "{market} ({source})". Built from the variation-narrowed rows.
+  const historyData = useMemo(() => buildHistorySeries(historyRows, selectedGrad, selectedPijaca), [historyRows, selectedGrad, selectedPijaca])
+  const history = historyData.history
+  const historySeries = historyData.series
 
-    const sortedWeeks = Array.from(byWeek.values()).sort((a, b) => a.time - b.time)
-    return sortedWeeks.map(({ time, weekLabel, bySource }) => ({
-      time,
-      weekLabel,
-      ...Object.fromEntries(Array.from(bySource, ([source, prices]) => [source, average(prices)])),
-    }))
-  }, [historyRows])
-
-  // Stable series order (first-seen chronologically across `history` above)
-  // so the chart's legend/series list and their assigned colors don't
-  // reshuffle between renders - a product with only one source for the
-  // selected city naturally ends up with a single-entry array here.
-  const historySources = useMemo(() => {
-    const sources = []
-    for (const week of history) {
-      for (const key of Object.keys(week)) {
-        if (key !== 'time' && key !== 'weekLabel' && !sources.includes(key)) sources.push(key)
-      }
-    }
-    return sources
-  }, [history])
-
-  // Sources present for this city at the whole-family level (cityRows,
-  // ignoring the variation filter) but absent once narrowed to the selected
-  // variation - e.g. JKP only ever reports generic "Krompir" with no
-  // Beli/Crveni/Mladi breakdown at all, so those three tabs correctly drop
-  // its line, but the chart should say why rather than silently rendering
-  // one fewer series with no explanation. Empty for "all" (nothing was
-  // narrowed away yet) and empty whenever every source the city has still
-  // shows up under the selected variation (e.g. Luk crni's "Mladi" tab,
-  // where JKP does report a "(mladi)"-qualified row).
-  const missingHistorySources = useMemo(() => {
+  // Lines the whole family has but the selected variation does not - e.g. JKP only
+  // ever reports a generic "Krompir" with no Beli/Crveni/Mladi breakdown, so those
+  // tabs drop its line; the chart says so instead of silently drawing one line
+  // fewer. Empty for "all" and whenever every line survives the narrowing.
+  const missingHistorySeries = useMemo(() => {
     if (!selectedVariation || selectedVariation === 'all') return []
-    const fullFamilySources = new Set(cityRows.map((row) => row.Source || 'STIPS'))
-    const filteredSources = new Set(historySources)
-    return [...fullFamilySources].filter((source) => !filteredSources.has(source))
-  }, [cityRows, historySources, selectedVariation])
+    const shown = new Set(historySeries.map((entry) => entry.key))
+    return buildHistorySeries(cityRows, selectedGrad, selectedPijaca).series.filter((entry) => !shown.has(entry.key))
+  }, [cityRows, historySeries, selectedVariation, selectedGrad, selectedPijaca])
 
   // Each city's own latest record for this product (see computeCityComparison).
   const cityComparison = useMemo(() => computeCityComparison(itemRows), [itemRows])
@@ -220,8 +183,8 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
     identity,
     availableVariations,
     history,
-    historySources,
-    missingHistorySources,
+    historySeries,
+    missingHistorySeries,
     cityComparison,
     cheapest: cityComparison[0] ?? null,
     priciest: cityComparison[cityComparison.length - 1] ?? null,

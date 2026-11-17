@@ -191,7 +191,8 @@
     "priceSourceLabel": "Most common price · {{source}}",
     "allVariations": "All variations",
     "variationSelectorLabel": "Product variation filter",
-    "variationSourceGap": "No data from {{sources}} for this variation."
+    "variationSourceGap": "No data from {{sources}} for this variation.",
+    "historyReferenceNote": "The green line shows the wholesale market price for comparison."
   },
   "feedback": {
     "title": "Suggestions & comments",

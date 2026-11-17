@@ -191,7 +191,8 @@
     "priceSourceLabel": "Najčešća cena · {{source}}",
     "allVariations": "Sve varijacije",
     "variationSelectorLabel": "Filter varijacija proizvoda",
-    "variationSourceGap": "Nema podataka iz izvora {{sources}} za ovu varijaciju."
+    "variationSourceGap": "Nema podataka iz izvora {{sources}} za ovu varijaciju.",
+    "historyReferenceNote": "Zelena linija je cena na veletržnici i služi za poređenje."
   },
   "feedback": {
     "title": "Predlozi i komentari",
