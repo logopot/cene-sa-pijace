@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Container } from 'react-bootstrap'
 import { LuChevronLeft, LuChevronRight } from 'react-icons/lu'
 import ProductCard from '../ProductCard/ProductCard.jsx'
+import { weeklyDropDefault } from '../../constants/weeklyDropText.js'
 import {
   Section,
   SectionHeader,
@@ -19,8 +20,9 @@ import {
 const SLIDE_GAP_PX = 24
 const EDGE_TOLERANCE_PX = 5
 
-function WeeklyTrends({ rows }) {
-  const { t } = useTranslation()
+// `drops`: [{ row, change }] from pickWeeklyDrops - each card shows its computed change.
+function WeeklyTrends({ drops }) {
+  const { t, i18n } = useTranslation()
   const trackRef = useRef(null)
   const [isAtStart, setIsAtStart] = useState(true)
   const [isAtEnd, setIsAtEnd] = useState(false)
@@ -38,9 +40,9 @@ function WeeklyTrends({ rows }) {
   // instead of defaulting to "start" only.
   useEffect(() => {
     handleScroll()
-  }, [handleScroll, rows])
+  }, [handleScroll, drops])
 
-  if (rows.length === 0) return null
+  if (drops.length === 0) return null
 
   const scrollByDirection = (direction) => {
     const track = trackRef.current
@@ -55,7 +57,7 @@ function WeeklyTrends({ rows }) {
         <SectionHeader>
           <HeaderText>
             <Heading>{t('weeklyTrends.title')}</Heading>
-            <Subtitle>{t('weeklyTrends.subtitle')}</Subtitle>
+            <Subtitle>{t('weeklyTrends.subtitle', { defaultValue: weeklyDropDefault(i18n.language, 'weeklyTrends.subtitle') })}</Subtitle>
           </HeaderText>
           <NavControls>
             <NavButton
@@ -78,9 +80,9 @@ function WeeklyTrends({ rows }) {
         </SectionHeader>
         <Viewport>
           <Track ref={trackRef} onScroll={handleScroll}>
-            {rows.map((row) => (
-              <Slide key={`${row.Mesto}-${row.Proizvod}-${row.Velicina}-${row.Pakovanje}`}>
-                <ProductCard row={row} />
+            {drops.map(({ row, change }) => (
+              <Slide key={`${row.Mesto}-${row.Proizvod}-${row.Velicina}-${row.Pakovanje}-${row.Source}`}>
+                <ProductCard row={row} change={change} />
               </Slide>
             ))}
           </Track>

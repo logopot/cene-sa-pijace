@@ -39,7 +39,7 @@ function MarketExplorer({ rows, loading, error, seed }) {
       <Hero rows={rows} />
       <GlobalFilterBar />
 
-      <WeeklyTrends rows={explorer.weeklyDrops} />
+      <WeeklyTrends drops={explorer.weeklyDrops} />
       <MarketShowcase markets={explorer.showcaseMarkets} />
       <HowItWorks />
     </>

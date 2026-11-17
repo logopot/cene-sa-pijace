@@ -108,7 +108,7 @@
   },
   "weeklyTrends": {
     "title": "Najveća pojeftinjenja ove nedelje",
-    "subtitle": "Proizvodi sa najsvežijim padom cene na pijacama širom Srbije.",
+    "subtitle": "Proizvodi sa najvećim padom cene u odnosu na prethodnu nedelju.",
     "scrollLeft": "Pomeri levo",
     "scrollRight": "Pomeri desno"
   },
@@ -136,6 +136,7 @@
   },
   "productCard": {
     "source": "Izvor: {{source}}",
+    "dropPercent": "pad cene −{{percent}}%",
     "avgPrice": "Najčešća cena",
     "avgPriceValue": "{{price}} RSD",
     "priceUnit": "RSD / {{unit}}",

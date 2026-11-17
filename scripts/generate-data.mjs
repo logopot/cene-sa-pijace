@@ -27,6 +27,7 @@ import { normalizeProductName } from '../src/utils/productId.js'
 import { getAveragePrice } from '../src/utils/price.js'
 import { isKvantaskaMarket } from '../src/utils/seoCopy.js'
 import { computeCityComparison, buildProductJsonLd } from '../src/utils/productJsonLd.js'
+import { analyzeWeeklyDrops } from '../src/utils/weeklyDrops.js'
 import { translateDataValue, translateCategory, getProductUrlSlug, SUPPORTED_LANGUAGES } from './lib/productLabels.mjs'
 import { fetchAllMarketRows, readLocalEnvFile, ROOT } from './lib/googleSheets.mjs'
 import {
@@ -54,8 +55,6 @@ readLocalEnvFile()
 const DATA_DIR = path.join(ROOT, 'public/data')
 const SNAP_DIR = path.join(ROOT, 'public/snap')
 const SNAPSHOT_PRODUCTS_PER_PAGE = 15
-const HOME_DROPS = 8
-const CURRENT_WINDOW_MS = 7 * 24 * 60 * 60 * 1000
 
 function writeJson(relativePath, value) {
   const file = path.join(DATA_DIR, relativePath)
@@ -76,37 +75,6 @@ function writeSnapshot(routePath, html) {
 function productPath(grad, pijaca, kategorija, proizvod, lang) {
   const categoryPath = buildMarketCategoryRoute(grad, pijaca, getCategoryUrlSlug(kategorija, lang), lang)
   return `${categoryPath}/${getProductUrlSlug(proizvod, lang)}`
-}
-
-// Deterministic counterpart of src/utils/weeklyDrops.js's tier 1 (the live
-// page shuffles; a snapshot should be stable between builds): each product's
-// latest price against the datapoint right before it, biggest relative drop
-// first, only for products still being reported within the last week of the
-// dataset's own timeline.
-function pickHomeDrops(latestRows) {
-  const buckets = new Map()
-  let globalLatest = -Infinity
-  for (const row of latestRows) {
-    const time = getRowTime(row)
-    if (time === null) continue
-    globalLatest = Math.max(globalLatest, time)
-    const key = `${row.Proizvod}|${row.Mesto}|${row.Source ?? ''}`
-    if (!buckets.has(key)) buckets.set(key, [])
-    buckets.get(key).push({ row, time })
-  }
-
-  const drops = []
-  for (const entries of buckets.values()) {
-    const times = Array.from(new Set(entries.map((entry) => entry.time))).sort((a, b) => b - a)
-    if (times.length < 2 || globalLatest - times[0] > CURRENT_WINDOW_MS) continue
-    const latest = entries.find((entry) => entry.time === times[0]).row
-    const previous = entries.find((entry) => entry.time === times[1]).row
-    const now = getAveragePrice(latest)
-    const before = getAveragePrice(previous)
-    if (now === null || before === null || before <= 0 || before - now <= 0) continue
-    drops.push({ row: latest, ratio: (before - now) / before })
-  }
-  return drops.sort((a, b) => b.ratio - a.ratio).slice(0, HOME_DROPS).map((drop) => drop.row)
 }
 
 function getLastUpdatedLabel(lang, latestRows) {
@@ -161,9 +129,13 @@ function buildSnapshots(latestRows) {
   }
 
   const homeLang = 'sr'
-  const dropCards = pickHomeDrops(latestRows).map((row) => {
+  // The same selection the live homepage makes (src/utils/weeklyDrops.js), so the
+  // text snapshot lists exactly the cards the page shows, with the same badge.
+  const { drops, candidates, rejected } = analyzeWeeklyDrops(latestRows)
+  console.log(`[generate-data] weekly drops: ${drops.length} shown of ${candidates} candidates, rejected ${JSON.stringify(rejected)}`)
+  const dropCards = drops.map(({ row, change }) => {
     const { grad, pijaca } = parseMesto(row.Mesto)
-    return renderCard(row, homeLang, productPath(grad, pijaca, row.Kategorija, row.Proizvod, homeLang))
+    return renderCard(row, homeLang, productPath(grad, pijaca, row.Kategorija, row.Proizvod, homeLang), { change })
   })
   const cityLinks = Array.from(cities.values())
     .sort((a, b) => a.localeCompare(b))

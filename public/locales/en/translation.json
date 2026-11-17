@@ -136,6 +136,7 @@
   },
   "productCard": {
     "source": "Source: {{source}}",
+    "dropPercent": "price drop −{{percent}}%",
     "avgPrice": "Most common price",
     "avgPriceValue": "{{price}} RSD",
     "priceUnit": "RSD / {{unit}}",

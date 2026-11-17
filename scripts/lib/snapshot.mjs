@@ -11,6 +11,7 @@ import { resolveUnit } from '../../src/utils/unit.js'
 import { spaceBeforeParens } from '../../src/utils/formatText.js'
 import { latestRowsForMarket } from '../../src/utils/seoFacts.js'
 import { placeWithComma } from '../../src/utils/seoCopy.js'
+import { dropPercent } from '../../src/utils/weeklyDrops.js'
 import { parseMesto } from '../../src/utils/market.js'
 import { translateDataValue } from './productLabels.mjs'
 import { readJsonFile } from './googleSheets.mjs'
@@ -45,7 +46,7 @@ function getSourceLabel(row, grad, pijaca) {
 
 // One <li> per priced row. Empty secondary attributes are skipped entirely
 // (same rule as the live ProductCard), never replaced with a placeholder.
-export function renderCard(row, lang, href, { compact = false } = {}) {
+export function renderCard(row, lang, href, { compact = false, change } = {}) {
   const { grad, pijaca } = parseMesto(row.Mesto)
   const name = translateDataValue(lang, 'proizvod', row.Proizvod)
   const place = placeWithComma(translateDataValue(lang, 'pijaca', pijaca), translateDataValue(lang, 'grad', grad))
@@ -62,7 +63,10 @@ export function renderCard(row, lang, href, { compact = false } = {}) {
     .map(([key, value]) => `<span>${escapeHtml(tr(lang, key))}: ${escapeHtml(value)}</span>`)
     .join('')
 
-  const trend = !compact && KNOWN_TRENDS.has(row.Trend)
+  const computedDrop = typeof change === 'number' && change < 0
+  const trend = computedDrop
+    ? `<span class="snap-trend snap-trend-pad">↓ ${escapeHtml(tr(lang, 'productCard.dropPercent', { percent: dropPercent(change) }))}</span>`
+    : !compact && KNOWN_TRENDS.has(row.Trend)
     ? `<span class="snap-trend snap-trend-${row.Trend === 'bez promene' ? 'flat' : row.Trend}">${TREND_MARK[row.Trend]} ${escapeHtml(translateDataValue(lang, 'trend', row.Trend))}</span>`
     : ''
 

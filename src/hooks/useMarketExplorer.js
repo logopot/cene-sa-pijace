@@ -23,10 +23,9 @@ export function useMarketExplorer(rows, seed) {
     return shuffleArray(unique, seed === undefined ? undefined : `${seed}:markets`).slice(0, 8)
   }, [rows, seed])
 
-  const weeklyDrops = useMemo(
-    () => pickWeeklyDrops(rows, seed === undefined ? undefined : `${seed}:drops`),
-    [rows, seed],
-  )
+  // The drops are decided by the data alone (utils/weeklyDrops.js): no shuffling,
+  // so the build-time prerender and the live page show the same cards.
+  const weeklyDrops = useMemo(() => pickWeeklyDrops(rows), [rows])
 
   return { showcaseMarkets, weeklyDrops }
 }

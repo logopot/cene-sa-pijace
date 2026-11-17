@@ -10,6 +10,8 @@ import { getDisplayPrice, formatDisplayPrice, formatPriceValue, hasPrice } from 
 import { isBlank } from "../../utils/blank.js";
 import { resolveUnit } from "../../utils/unit.js";
 import { getSourceLabel } from "../../utils/marketTime.js";
+import { dropPercent } from "../../utils/weeklyDrops.js";
+import { weeklyDropDefault } from "../../constants/weeklyDropText.js";
 
 import { buildProductRoute } from "../../utils/productId.js";
 import {
@@ -40,7 +42,11 @@ function capitalize(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function ProductCard({ row, selection }) {
+// `change` (optional): the computed week-on-week change of this price (-0.06 = 6%
+// cheaper). Given by the "biggest price drops" section, whose badge then shows
+// that figure instead of the source's own Trend label (two sources of truth in one
+// card is what this prevents).
+function ProductCard({ row, selection, change }) {
   const { t, i18n } = useTranslation();
 
   const { grad, pijaca } = parseMesto(row.Mesto);
@@ -68,9 +74,18 @@ function ProductCard({ row, selection }) {
   const sourceLabel = row.Source || getSourceLabel(grad, pijaca);
   // No trend data (STIPS writes "-", JKP rows have none at all) means no
   // badge at all - never a made-up "no trend" label.
-  const hasTrendData = KNOWN_TRENDS.has(row.Trend);
-  const trend = hasTrendData ? translateDataValue(t, "trend", row.Trend) : "";
-  const TrendIcon = getTrendIcon(row.Trend);
+  const hasComputedDrop = typeof change === "number" && change < 0;
+  const hasTrendData = hasComputedDrop || KNOWN_TRENDS.has(row.Trend);
+  const trendKind = hasComputedDrop ? "pad" : row.Trend;
+  const trend = hasComputedDrop
+    ? t("productCard.dropPercent", {
+        percent: dropPercent(change),
+        defaultValue: weeklyDropDefault(i18n.language, "productCard.dropPercent"),
+      })
+    : hasTrendData
+      ? translateDataValue(t, "trend", row.Trend)
+      : "";
+  const TrendIcon = getTrendIcon(trendKind);
   const comment = classifyComment(row.Komentar);
   const displayPrice = getDisplayPrice(row);
 
@@ -168,7 +183,7 @@ function ProductCard({ row, selection }) {
               {t("productCard.source", { source: sourceLabel })}
             </SourceTag>
             {hasTrendData && (
-              <TrendIndicator $trend={row.Trend}>
+              <TrendIndicator $trend={trendKind}>
                 {/* eslint-disable-next-line react-hooks/static-components -- TrendIcon is a stable module-level reference, not created during render */}
                 <TrendIcon />
                 {trend}
