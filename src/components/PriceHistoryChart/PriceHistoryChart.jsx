@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Area,
@@ -6,7 +6,8 @@ import {
   CartesianGrid,
   Legend,
   ResponsiveContainer,
-  Tooltip,
+  useChartHeight,
+  useChartWidth,
   usePlotArea,
   useXAxisScale,
   useYAxisScale,
@@ -16,7 +17,7 @@ import {
 import { theme } from '../../styles/theme.js'
 import { ROTATED_AXIS_HEIGHT, ROTATED_AXIS_MARGIN_BOTTOM, RotatedAxisTick } from '../../utils/chartAxisTick.js'
 import { translateDataValue } from '../../utils/translateValue.js'
-import { formatSeriesLabel, selectHoverPoints, showsReferenceLine } from '../../utils/historySeries.js'
+import { formatSeriesLabel, locateCursor, selectHoverPoints, showsReferenceLine } from '../../utils/historySeries.js'
 import { chartDefault } from '../../constants/chartText.js'
 import {
   ChartWrap,
@@ -27,6 +28,7 @@ import {
   TooltipDot,
   TooltipRow,
   TooltipSeriesName,
+  TooltipSlot,
   TooltipValue,
 } from './PriceHistoryChart.styled.js'
 
@@ -56,19 +58,27 @@ function buildSeries(series, t) {
   }))
 }
 
-// What the cursor is over, decided here and not by Recharts' shared tooltip (which
-// follows the nearest date of ALL series and so shows another series' point when
-// the cursor sits on a line between that series' own records). A transparent layer
-// over the plot area reads the mouse/finger, asks selectHoverPoints which series
-// has its line under it, shows exactly those points and reports them upward for the
-// tooltip - dots and tooltip always come from the same series and date.
-function HoverLayer({ data, series, hover, onHover }) {
+// What the cursor is over is decided by PriceHistoryChart (below), not by Recharts'
+// shared tooltip (which follows the nearest date of ALL series and so shows another
+// series' point when the cursor sits on a line between that series' own records).
+// This layer lives inside the chart only because the scales do: it hands them (and the
+// plot area) upward after every render, and draws the active dots of the points the
+// tooltip shows - dots and tooltip always come from the same series and date. It
+// takes no pointer events itself.
+const TOOLTIP_WIDTH = 250
+const TOOLTIP_ROW_HEIGHT = 26
+const TOOLTIP_BASE_HEIGHT = 56
+const TOOLTIP_GAP = 14
+
+function HoverLayer({ series, hover, scalesRef, data }) {
+  const { t } = useTranslation()
+  const chartWidth = useChartWidth()
+  const chartHeight = useChartHeight()
   const xScale = useXAxisScale()
   const yScale = useYAxisScale()
   const plot = usePlotArea()
-  if (!xScale || !yScale || !plot) return null
-
-  const offset = typeof xScale.bandwidth === 'function' ? xScale.bandwidth() / 2 : 0
+  const ready = Boolean(xScale && yScale && plot)
+  const offset = ready && typeof xScale.bandwidth === 'function' ? xScale.bandwidth() / 2 : 0
   // Recharts keys the category axis by label - or, when some dates share a label
   // (a STIPS week start and a JKP day can), by position in the data.
   const xOf = (index) => {
@@ -77,56 +87,51 @@ function HoverLayer({ data, series, hover, onHover }) {
   }
   const yOf = (value) => yScale(value)
 
-  const track = (clientX, clientY, target) => {
-    const box = (target.ownerSVGElement ?? target).getBoundingClientRect()
-    const cursor = { x: clientX - box.left, y: clientY - box.top }
-    const points = selectHoverPoints({ series, cursor, xOf, yOf, valueAt: (index, key) => data[index][key] })
-    onHover(points.length > 0 ? { points, anchor: cursor } : null)
-  }
-  const colorOf = new Map(series.map((entry) => [entry.key, entry.color]))
+  useEffect(() => {
+    scalesRef.current = ready ? { xOf, yOf, plot } : null
+  })
+  if (!ready) return null
+
+  const byKey = new Map(series.map((entry) => [entry.key, entry]))
+
+  // The tooltip is drawn here, inside the chart, from our own state - not by Recharts'
+  // Tooltip, whose visibility depends on its own mouse tracking and so can lag or stay
+  // hidden when the pointer arrives by another route. It sits to the right of the
+  // pointer, flipped to the left near the right edge, and never leaves the chart.
+  const tooltipHeight = hover ? TOOLTIP_BASE_HEIGHT + hover.points.length * TOOLTIP_ROW_HEIGHT : 0
+  const flip = hover ? hover.anchor.x + TOOLTIP_GAP + TOOLTIP_WIDTH > chartWidth : false
+  const tooltipX = hover ? (flip ? hover.anchor.x - TOOLTIP_GAP - TOOLTIP_WIDTH : hover.anchor.x + TOOLTIP_GAP) : 0
+  const tooltipY = hover ? Math.min(Math.max(hover.anchor.y - tooltipHeight - 8, 0), Math.max(chartHeight - tooltipHeight, 0)) : 0
 
   return (
     <g>
-      <rect
-        x={plot.x}
-        y={plot.y}
-        width={plot.width}
-        height={plot.height}
-        fill="transparent"
-        onMouseMove={(event) => track(event.clientX, event.clientY, event.currentTarget)}
-        onMouseLeave={() => onHover(null)}
-        onTouchStart={(event) => track(event.touches[0].clientX, event.touches[0].clientY, event.currentTarget)}
-        onTouchMove={(event) => track(event.touches[0].clientX, event.touches[0].clientY, event.currentTarget)}
-      />
+      {hover && (
+        <foreignObject x={Math.max(tooltipX, 0)} y={tooltipY} width={TOOLTIP_WIDTH} height={tooltipHeight} pointerEvents="none">
+          <TooltipSlot $alignEnd={flip}>
+            <TooltipCard>
+              <TooltipDate>{data[hover.points[0].index].weekLabel}</TooltipDate>
+              {hover.points.map((point) => (
+                <TooltipRow key={point.key}>
+                  <TooltipDot $color={byKey.get(point.key).color} />
+                  <TooltipSeriesName>{byKey.get(point.key).label}</TooltipSeriesName>
+                  <TooltipValue>{t('productCard.avgPriceValue', { price: Number(point.value).toFixed(2) })}</TooltipValue>
+                </TooltipRow>
+              ))}
+            </TooltipCard>
+          </TooltipSlot>
+        </foreignObject>
+      )}
       {hover?.points.map((point) => (
         <circle
           key={point.key}
           cx={xOf(point.index)}
           cy={yOf(point.value)}
           r={6}
-          fill={colorOf.get(point.key)}
+          fill={byKey.get(point.key).color}
           pointerEvents="none"
         />
       ))}
     </g>
-  )
-}
-
-function HoverTooltip({ hover, data, series }) {
-  const { t } = useTranslation()
-  if (!hover) return null
-  const byKey = new Map(series.map((entry) => [entry.key, entry]))
-  return (
-    <TooltipCard>
-      <TooltipDate>{data[hover.points[0].index].weekLabel}</TooltipDate>
-      {hover.points.map((point) => (
-        <TooltipRow key={point.key}>
-          <TooltipDot $color={byKey.get(point.key).color} />
-          <TooltipSeriesName>{byKey.get(point.key).label}</TooltipSeriesName>
-          <TooltipValue>{t('productCard.avgPriceValue', { price: Number(point.value).toFixed(2) })}</TooltipValue>
-        </TooltipRow>
-      ))}
-    </TooltipCard>
   )
 }
 
@@ -135,6 +140,17 @@ function HoverTooltip({ hover, data, series }) {
 function PriceHistoryChart({ onInteract, data, series: rawSeries, missingSeries = [] }) {
   const { t, i18n } = useTranslation()
   const [hover, setHover] = useState(null)
+  const wrapRef = useRef(null)
+  const scalesRef = useRef(null)
+
+  // A finger or mouse outside the chart clears the tooltip (touch has no "leave").
+  useEffect(() => {
+    const clear = (event) => {
+      if (!wrapRef.current?.contains(event.target)) setHover(null)
+    }
+    document.addEventListener('touchstart', clear, { passive: true })
+    return () => document.removeEventListener('touchstart', clear)
+  }, [])
 
   if (data.length === 0) {
     return <EmptyState>{t('analytics.noHistory')}</EmptyState>
@@ -143,8 +159,48 @@ function PriceHistoryChart({ onInteract, data, series: rawSeries, missingSeries 
   const series = buildSeries(rawSeries, t)
   const missingLabels = buildSeries(missingSeries, t).map((entry) => entry.label)
 
+  // One handler for everything: the pointer's screen position against the chart's
+  // bounding box - whatever element is under it (rect, line, dot, area, svg, axis).
+  // Outside the plot area, or in a gap of every line, there is no tooltip.
+  const track = (clientX, clientY) => {
+    const scales = scalesRef.current
+    const svg = wrapRef.current?.querySelector('.recharts-wrapper > svg')
+    if (!scales || !svg) return
+    const cursor = locateCursor({ clientX, clientY, box: svg.getBoundingClientRect(), plot: scales.plot })
+    if (!cursor.inside) {
+      setHover(null)
+      return
+    }
+    const points = selectHoverPoints({
+      series: rawSeries,
+      cursor,
+      xOf: scales.xOf,
+      yOf: scales.yOf,
+      valueAt: (index, key) => data[index][key],
+    })
+    setHover(points.length > 0 ? { points, anchor: cursor } : null)
+  }
+  const touch = (event) => {
+    if (event.touches.length > 0) track(event.touches[0].clientX, event.touches[0].clientY)
+  }
+
   return (
-    <ChartWrap onMouseEnter={onInteract} onTouchStart={onInteract} onClick={onInteract}>
+    <ChartWrap
+      ref={wrapRef}
+      onMouseEnter={onInteract}
+      onMouseMove={(event) => track(event.clientX, event.clientY)}
+      onPointerMove={(event) => {
+        if (event.pointerType !== 'touch') track(event.clientX, event.clientY)
+      }}
+      onMouseLeave={() => setHover(null)}
+      onPointerLeave={() => setHover(null)}
+      onTouchStart={(event) => {
+        onInteract?.()
+        touch(event)
+      }}
+      onTouchMove={touch}
+      onClick={onInteract}
+    >
       <ResponsiveContainer width="100%" height={360}>
         <AreaChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: ROTATED_AXIS_MARGIN_BOTTOM }}>
           <defs>
@@ -163,13 +219,6 @@ function PriceHistoryChart({ onInteract, data, series: rawSeries, missingSeries 
             minTickGap={24}
           />
           <YAxis tick={{ fontSize: 11 }} width={48} />
-          <Tooltip
-            active={Boolean(hover)}
-            position={hover ? { x: hover.anchor.x + 14, y: Math.max(hover.anchor.y - 64, 0) } : undefined}
-            content={<HoverTooltip hover={hover} data={data} series={series} />}
-            cursor={false}
-            isAnimationActive={false}
-          />
           {/* One line has nothing to tell apart: the legend only appears with two. */}
           {series.length > 1 && (
             <Legend
@@ -202,7 +251,7 @@ function PriceHistoryChart({ onInteract, data, series: rawSeries, missingSeries 
               />
             )),
           )}
-          <HoverLayer data={data} series={series} hover={hover} onHover={setHover} />
+          <HoverLayer data={data} series={series} hover={hover} scalesRef={scalesRef} />
         </AreaChart>
       </ResponsiveContainer>
 

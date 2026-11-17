@@ -126,6 +126,18 @@ export function showsReferenceLine(series) {
 
 // ---- the point under the cursor --------------------------------------------------
 
+// Where a pointer is in the chart's own coordinates, from nothing but its screen
+// position and the chart's bounding box - never from the event's target, so it makes
+// no difference whether the pointer is over a rect, a line, a dot, an area or the
+// svg itself. `inside` is whether that point is in the plot area.
+export function locateCursor({ clientX, clientY, box, plot, slack = 1 }) {
+  const x = clientX - box.left
+  const y = clientY - box.top
+  // slack: a pixel of leeway at the plot edges (positions are fractional).
+  const inside = x >= plot.x - slack && x <= plot.x + plot.width + slack && y >= plot.y - slack && y <= plot.y + plot.height + slack
+  return { x, y, inside }
+}
+
 // Which points of the chart to show for a cursor position (pixels in the chart's own
 // coordinates). Pure - the chart gives it its scales:
 //   xOf(index)        pixel x of a position in the data

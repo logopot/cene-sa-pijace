@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { buildHistorySeries, maxGapDays, segmentIndices, selectHoverPoints } from '../src/utils/historySeries.js'
+import { buildHistorySeries, locateCursor, maxGapDays, segmentIndices, selectHoverPoints } from '../src/utils/historySeries.js'
 import { FRESH_DAYS_JKP, FRESH_WEEKS_STIPS } from '../src/data/freshness.js'
 
 const DAY = 24 * 60 * 60 * 1000
@@ -145,4 +145,31 @@ test('both series are shown only when both have a record at the very same positi
 test('an isolated record is hoverable only on the dot itself', () => {
   assert.deepEqual(pick({ x: 20, y: 400 - 100 }), [{ key: 'blue', index: 2, value: 100 }])
   assert.deepEqual(pick({ x: 30, y: 300 }).map((p) => p.key).filter((k) => k === 'blue'), [], '10 pixels away is already the gap')
+})
+
+// ---- the pointer is located from its screen position alone ----------------------
+
+test('locateCursor: coordinates from the bounding box only, whatever element is under the pointer', () => {
+  const box = { left: 91.2, top: 443.7 }
+  const plot = { x: 48, y: 40, width: 1018, height: 176 }
+  // The same screen position gives the same answer for any "target": the function does
+  // not even take one (rect, path, circle, svg, ... make no difference).
+  const at = { clientX: 91.2 + 581, clientY: 443.7 + 96 }
+  const first = locateCursor({ ...at, box, plot })
+  assert.ok(Math.abs(first.x - 581) < 1e-9 && Math.abs(first.y - 96) < 1e-9)
+  assert.equal(first.inside, true)
+  for (const target of ['rect', 'path.recharts-area-curve', 'circle', 'svg', 'g.recharts-xAxis']) {
+    assert.deepEqual(locateCursor({ ...at, box, plot, target }), first, target)
+  }
+})
+
+test('locateCursor: outside the plot area is not inside (tooltip hides), edges count as inside', () => {
+  const box = { left: 0, top: 0 }
+  const plot = { x: 48, y: 40, width: 1000, height: 176 }
+  assert.equal(locateCursor({ clientX: 46, clientY: 100, box, plot }).inside, false, 'left of the plot (the axis)')
+  assert.equal(locateCursor({ clientX: 500, clientY: 218, box, plot }).inside, false, 'below the plot (the date labels)')
+  assert.equal(locateCursor({ clientX: 500, clientY: 10, box, plot }).inside, false, 'above (the legend)')
+  assert.equal(locateCursor({ clientX: 1050, clientY: 100, box, plot }).inside, false)
+  assert.equal(locateCursor({ clientX: 48, clientY: 40, box, plot }).inside, true)
+  assert.equal(locateCursor({ clientX: 1048, clientY: 216, box, plot }).inside, true)
 })
