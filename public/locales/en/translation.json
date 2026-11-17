@@ -137,6 +137,7 @@
   "productCard": {
     "source": "Source: {{source}}",
     "dropPercent": "price drop −{{percent}}%",
+    "lastPrice": "Last price: {{date}}",
     "avgPrice": "Most common price",
     "avgPriceValue": "{{price}} RSD",
     "priceUnit": "RSD / {{unit}}",
@@ -153,6 +154,7 @@
   "results": {
     "loading": "Loading data...",
     "error": "Failed to load data from Google Sheets.",
+    "noCurrentData": "No current data.",
     "emptyTitle": "No results for this filter combination",
     "emptyDescription": "Try a different market, category, or city.",
     "emptyAction": "Back to homepage"
@@ -192,6 +194,8 @@
     "allVariations": "All variations",
     "variationSelectorLabel": "Product variation filter",
     "variationSourceGap": "No data from {{sources}} for this variation.",
+    "noCurrentData": "No current data. Last price: {{date}}.",
+    "lastPriceOn": "Last price: {{date}}",
     "historyReferenceNote": "The green line shows the wholesale market price for comparison."
   },
   "feedback": {

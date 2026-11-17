@@ -23,9 +23,12 @@ function highestMarketPrice(prices) {
 // (see the STIPS/JKP note on useMarketExplorer.js for the same class of bug).
 // Cheapest city first. Shared by the product page (useProductAnalytics) and
 // the build-time JSON-LD (scripts/generate-data.mjs), so both always agree.
-export function computeCityComparison(itemRows) {
+// `isFresh` (optional): only rows it accepts count - a stale record never takes part
+// in a price range (see data/freshness.js). A city with no fresh row drops out.
+export function computeCityComparison(itemRows, isFresh = () => true) {
   const byCity = new Map()
   itemRows.forEach((row) => {
+    if (!isFresh(row)) return
     const time = getRowTime(row)
     if (time === null) return
     const { grad } = parseMesto(row.Mesto)

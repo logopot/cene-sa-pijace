@@ -1,4 +1,5 @@
 import { getRowTime } from './week.js'
+import { computeReference, isFreshRow } from '../data/freshness.js'
 
 // "Najveća pojeftinjenja ove nedelje" - the ONE place that decides which products
 // are shown there. The homepage (live app and its build-time prerender) and the
@@ -115,8 +116,12 @@ export function analyzeWeeklyDrops(rows) {
 
   // The section's promise, checked where the list is made: every card is a real
   // drop and none carries a rising trend.
+  // ...and every card is a current price: a stale product (data/freshness.js) never
+  // reaches it.
+  const reference = computeReference(rows)
   for (const { row, change } of drops) {
     if (!(change <= DROP_THRESHOLD) || row.Trend === 'rast') throw new Error('weekly drops: a non-drop reached the list')
+    if (!isFreshRow(row, reference)) throw new Error('weekly drops: a stale product reached the list')
   }
   return { drops, candidates, rejected, total: found.length }
 }

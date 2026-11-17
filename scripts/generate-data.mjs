@@ -29,6 +29,7 @@ import { isKvantaskaMarket } from '../src/utils/seoCopy.js'
 import { computeCityComparison, buildProductJsonLd } from '../src/utils/productJsonLd.js'
 import { analyzeWeeklyDrops } from '../src/utils/weeklyDrops.js'
 import { applySourcePreference, describeSourcePreference } from '../src/data/sourcePreference.js'
+import { computeReference, referenceAgeDays, isFreshRow, STALE_REFERENCE_WARN_DAYS } from '../src/data/freshness.js'
 import { translateDataValue, translateCategory, getProductUrlSlug, SUPPORTED_LANGUAGES } from './lib/productLabels.mjs'
 import { fetchAllMarketRows, readLocalEnvFile, ROOT } from './lib/googleSheets.mjs'
 import {
@@ -101,7 +102,21 @@ function getLastUpdatedLabel(lang, latestRows) {
 // The one-sentence note the Serbian Kvantaška pijaca pages show under their heading.
 const kvantasNote = (lang, pijaca) => (isKvantaskaMarket(lang, translateDataValue(lang, 'pijaca', pijaca)) ? tr(lang, 'marketDetails.kvantasIntro') : '')
 
-function buildSnapshots(latestRows) {
+function buildSnapshots(latestRows, reference) {
+  // Freshness (src/data/freshness.js): a record is fresh when it is close enough to
+  // the newest data of its own source. Stale ones are shown as "last price", go to
+  // the end of a list, and never feed a computed price range or JSON-LD.
+  const isFresh = (row) => isFreshRow(row, reference)
+  const freshFirst = (rows) => [...rows.filter(isFresh), ...rows.filter((row) => !isFresh(row))]
+  // Each product's own newest priced row at its market, whatever its age.
+  const ownLatest = new Map()
+  for (const row of latestRows) {
+    const key = `${row.Mesto}|${row.Kategorija}|${row.Proizvod}`
+    const time = getRowTime(row)
+    const existing = ownLatest.get(key)
+    if (time !== null && (!existing || time > existing.time)) ownLatest.set(key, { time, row })
+  }
+
   const cities = new Map()
   const markets = new Map()
   const marketCategories = new Map()
@@ -119,6 +134,7 @@ function buildSnapshots(latestRows) {
         pijaca,
         kategorija: row.Kategorija,
         proizvod: row.Proizvod,
+        mesto: row.Mesto,
       })
     }
   }
@@ -174,7 +190,7 @@ function buildSnapshots(latestRows) {
   }
   const cityComparisonByBase = new Map()
   const cityComparisonFor = (base) => {
-    if (!cityComparisonByBase.has(base)) cityComparisonByBase.set(base, computeCityComparison(rowsByBase.get(base) ?? []))
+    if (!cityComparisonByBase.has(base)) cityComparisonByBase.set(base, computeCityComparison(rowsByBase.get(base) ?? [], isFresh))
     return cityComparisonByBase.get(base)
   }
 
@@ -195,9 +211,9 @@ function buildSnapshots(latestRows) {
     }
 
     for (const { grad, pijaca } of markets.values()) {
-      const rows = latestRowsForMarket(latestRows, grad, pijaca)
+      const rows = freshFirst(latestRowsForMarket(latestRows, grad, pijaca))
       const cards = rows.map((row) =>
-        renderCard(row, lang, productPath(grad, pijaca, row.Kategorija, row.Proizvod, lang), { compact: true }),
+        renderCard(row, lang, productPath(grad, pijaca, row.Kategorija, row.Proizvod, lang), { compact: true, stale: !isFresh(row) }),
       )
       emit(
         buildMarketRoute(grad, pijaca, lang),
@@ -212,9 +228,9 @@ function buildSnapshots(latestRows) {
     }
 
     for (const { grad, pijaca, kategorija } of marketCategories.values()) {
-      const rows = latestRowsForMarket(latestRows, grad, pijaca).filter((row) => row.Kategorija === kategorija)
+      const rows = freshFirst(latestRowsForMarket(latestRows, grad, pijaca).filter((row) => row.Kategorija === kategorija))
       const cards = rows.map((row) =>
-        renderCard(row, lang, productPath(grad, pijaca, row.Kategorija, row.Proizvod, lang), { compact: true }),
+        renderCard(row, lang, productPath(grad, pijaca, row.Kategorija, row.Proizvod, lang), { compact: true, stale: !isFresh(row) }),
       )
       const categoryPath = buildMarketCategoryRoute(grad, pijaca, getCategoryUrlSlug(kategorija, lang), lang)
       emit(
@@ -230,7 +246,7 @@ function buildSnapshots(latestRows) {
       )
     }
 
-    for (const { grad, pijaca, kategorija, proizvod } of products.values()) {
+    for (const { grad, pijaca, kategorija, proizvod, mesto } of products.values()) {
       const base = normalizeProductName(proizvod)
       const ownKey = `${grad}|${pijaca}`
 
@@ -238,7 +254,9 @@ function buildSnapshots(latestRows) {
       // product family at the cheapest other markets (each at its own latest
       // time), as compact lines to keep the snapshot payload small.
       const here = latestRowsForMarket(latestRows, grad, pijaca).filter((row) => row.Proizvod === proizvod)
+      const ownRow = ownLatest.get(`${mesto}|${kategorija}|${proizvod}`)?.row
       const cards = familyMarketRows(base)
+        .filter(isFresh)
         .filter((row) => {
           const parsed = parseMesto(row.Mesto)
           return `${parsed.grad}|${parsed.pijaca}` !== ownKey
@@ -253,8 +271,17 @@ function buildSnapshots(latestRows) {
 
       const route = productPath(grad, pijaca, kategorija, proizvod, lang)
       const name = translateDataValue(lang, 'proizvod', proizvod.trim())
+      // The row this page is about: the market's own listing of the product (its
+      // newest record). A stale one gets no Product/AggregateOffer markup - it
+      // must not claim a current price - and a fresh one gets a price range made
+      // of fresh rows only.
+      const shown = here[0] ?? ownRow
+      const stale = shown ? !isFresh(shown) : false
       if (!jsonLdByPath.has(route)) {
-        jsonLdByPath.set(route, buildProductJsonLd({ name, category: kategorija, cityComparison: cityComparisonFor(base) }))
+        jsonLdByPath.set(
+          route,
+          stale ? null : buildProductJsonLd({ name, category: kategorija, cityComparison: cityComparisonFor(base) }),
+        )
       }
 
       emit(
@@ -262,7 +289,7 @@ function buildSnapshots(latestRows) {
         renderProduct({
           lang,
           product: translateDataValue(lang, 'proizvod', proizvod),
-          current: here[0] ? renderCard(here[0], lang, null, { compact: true }) : '',
+          current: shown ? renderCard(shown, lang, null, { compact: true, stale }) : '',
           cards,
           jsonLd: jsonLdByPath.get(route),
         }),
@@ -286,11 +313,21 @@ async function main() {
   rmSync(SNAP_DIR, { recursive: true, force: true })
 
   const latestRows = selectLatestRows(allRows)
+  // The newest data of each source - the yardstick of freshness (src/data/freshness.js),
+  // written into latest.json so every consumer uses the same values.
+  const reference = computeReference(allRows)
+  const age = referenceAgeDays(reference)
+  console.log(`[generate-data] freshness reference: JKP ${reference.jkp} (${age.jkp} days old), STIPS week from ${reference.stipsWeek} (${age.stips} days old)`)
+  for (const [source, days] of Object.entries(age)) {
+    if (days !== null && days > STALE_REFERENCE_WARN_DAYS) {
+      console.warn(`[generate-data] WARNING: newest ${source.toUpperCase()} data is ${days} days older than this build (> ${STALE_REFERENCE_WARN_DAYS}) - are the scrapers running? Nothing changes because of it.`)
+    }
+  }
   const latestPayload = encodeRows(latestRows, LATEST_COLUMNS)
   const version = createHash('sha1').update(JSON.stringify(latestPayload)).digest('hex').slice(0, 10)
   const generatedAt = new Date().toISOString()
 
-  const latestBytes = writeJson('latest.json', { version, generatedAt, ...latestPayload })
+  const latestBytes = writeJson('latest.json', { version, generatedAt, reference, ...latestPayload })
 
   const families = groupByFamily(allRows)
   let largestFamily = { slug: '', bytes: 0 }
@@ -307,7 +344,7 @@ async function main() {
     productFamilies: families.size,
   })
 
-  const snapshots = buildSnapshots(latestRows)
+  const snapshots = buildSnapshots(latestRows, reference)
 
   console.log(
     `[generate-data] ${allRows.length} source rows -> latest.json ${latestRows.length} rows (${(latestBytes / 1024).toFixed(0)} KB raw), ` +

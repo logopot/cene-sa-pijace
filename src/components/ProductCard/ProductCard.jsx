@@ -11,7 +11,10 @@ import { isBlank } from "../../utils/blank.js";
 import { resolveUnit } from "../../utils/unit.js";
 import { getSourceLabel } from "../../utils/marketTime.js";
 import { dropPercent } from "../../utils/weeklyDrops.js";
+import { useFreshness } from "../../hooks/useFreshness.js";
+import { lastPriceLabel } from "../../data/freshness.js";
 import { weeklyDropDefault } from "../../constants/weeklyDropText.js";
+import { freshnessDefault } from "../../constants/freshnessText.js";
 
 import { buildProductRoute } from "../../utils/productId.js";
 import {
@@ -31,6 +34,7 @@ import {
   FieldLabel,
   FieldValue,
   PriceValue,
+  StalePrice,
   CardFooter,
   TrendIndicator,
   CommentText,
@@ -48,6 +52,10 @@ function capitalize(value) {
 // card is what this prevents).
 function ProductCard({ row, selection, change }) {
   const { t, i18n } = useTranslation();
+  // A record too old to be called a current price (data/freshness.js): the card
+  // says "Last price: 24.09." instead, quietly, and shows no average price or trend.
+  const { isFresh } = useFreshness();
+  const stale = !isFresh(row);
 
   const { grad, pijaca } = parseMesto(row.Mesto);
 
@@ -74,8 +82,8 @@ function ProductCard({ row, selection, change }) {
   const sourceLabel = row.Source || getSourceLabel(grad, pijaca);
   // No trend data (STIPS writes "-", JKP rows have none at all) means no
   // badge at all - never a made-up "no trend" label.
-  const hasComputedDrop = typeof change === "number" && change < 0;
-  const hasTrendData = hasComputedDrop || KNOWN_TRENDS.has(row.Trend);
+  const hasComputedDrop = !stale && typeof change === "number" && change < 0;
+  const hasTrendData = !stale && (hasComputedDrop || KNOWN_TRENDS.has(row.Trend));
   const trendKind = hasComputedDrop ? "pad" : row.Trend;
   const trend = hasComputedDrop
     ? t("productCard.dropPercent", {
@@ -99,7 +107,7 @@ function ProductCard({ row, selection, change }) {
       {
         key: "avgPrice",
         label: t("productCard.avgPrice"),
-        value: hasPrice(row.CenaDom) ? t("productCard.avgPriceValue", { price: formatPriceValue(row.CenaDom) }) : "",
+        value: !stale && hasPrice(row.CenaDom) ? t("productCard.avgPriceValue", { price: formatPriceValue(row.CenaDom) }) : "",
       },
       { key: "packaging", label: t("productCard.packaging"), value: pakovanje },
     ],
@@ -169,7 +177,15 @@ function ProductCard({ row, selection, change }) {
             <CommentText title={comment.value}>{comment.value}</CommentText>
           )}
 
-          {displayPrice && (
+          {displayPrice && stale && (
+            <StalePrice>
+              {t("productCard.lastPrice", {
+                date: lastPriceLabel(row, { short: true }),
+                defaultValue: freshnessDefault(i18n.language, "productCard.lastPrice"),
+              })}
+            </StalePrice>
+          )}
+          {displayPrice && !stale && (
             <PriceValue>
               {formatDisplayPrice(displayPrice)}{" "}
               {jedMere ?

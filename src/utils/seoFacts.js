@@ -2,6 +2,7 @@ import { parseMesto } from './market.js'
 import { getRowTime, getRowRangeLabel } from './week.js'
 import { getDisplayPrice } from './price.js'
 import { resolveUnit } from './unit.js'
+import { isFreshRow, lastPriceLabel } from '../data/freshness.js'
 
 // The facts the page-specific title/description copy (see seoCopy.js) is built
 // from, read from the same latest rows the page itself renders - shared by the
@@ -46,7 +47,9 @@ export function rowsForMarket(rows, grad, pijaca) {
 // `matches(row)` picks the product's rows out of the market's rows;
 // `fallbackSource` is the market's attributed source for rows that carry none.
 // Returns null when the market has no priced row for the product at all.
-export function productFacts(marketRows, matches, fallbackSource) {
+// `reference` (see data/freshness.js) is what decides `stale`; without it nothing is
+// stale. A stale product's `lastDate` is the date of that record ("24.09.2026.").
+export function productFacts(marketRows, matches, fallbackSource, reference) {
   let row = null
   let rowTime = null
   for (const candidate of marketRows) {
@@ -65,6 +68,8 @@ export function productFacts(marketRows, matches, fallbackSource) {
     unitRaw: resolveUnit(row.JedMere, row.Kategorija),
     source: row.Source || fallbackSource,
     date: getRowRangeLabel(row),
+    stale: reference ? !isFreshRow(row, reference) : false,
+    lastDate: lastPriceLabel(row),
   }
 }
 

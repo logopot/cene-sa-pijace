@@ -27,6 +27,13 @@ export const CardGrid = styled.div`
   }
 `
 
+// "No current data." above a list in which not one product is fresh.
+export const NoCurrentData = styled.p`
+  margin: 0 0 ${({ theme }) => theme.spacing.md};
+  color: ${({ theme }) => theme.colors.textSecondary};
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+`
+
 export const EmptyState = styled.div`
   display: flex;
   flex-direction: column;

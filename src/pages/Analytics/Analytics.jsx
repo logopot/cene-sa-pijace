@@ -8,6 +8,8 @@ import { translateDataValue } from '../../utils/translateValue.js'
 import { resolveGradBySlug, resolvePijacaBySlug, buildCityRoute, buildMarketRoute, buildMarketCategoryRoute } from '../../utils/market.js'
 import { trackEvent } from '../../utils/analytics.js'
 import SourceLink from '../../components/SourceLink/SourceLink.jsx'
+import { getReference } from '../../data/freshness.js'
+import { freshnessDefault } from '../../constants/freshnessText.js'
 import { formatPriceValue } from '../../utils/price.js'
 import { useProductAnalytics } from '../../hooks/useProductAnalytics.js'
 import { buildProductJsonLd } from '../../utils/productJsonLd.js'
@@ -34,6 +36,7 @@ import {
   ProductTitle,
   MarketSubtitle,
   PriceBlock,
+  StaleNote,
   PriceValue,
   SourceLabel,
   Section,
@@ -68,7 +71,10 @@ function Analytics({ rows, loading, error }) {
   }, [rows, productSlug, categoryName])
   const productHistory = useProductHistory(familySlug)
 
-  const analytics = useProductAnalytics(productHistory.rows ?? rows, productSlug, grad, categoryName, pijaca, selectedVariation)
+  // What counts as current is judged against the newest data of each source (the app's
+  // latest rows, not the product's own history) - see data/freshness.js.
+  const reference = useMemo(() => getReference(rows), [rows])
+  const analytics = useProductAnalytics(productHistory.rows ?? rows, productSlug, grad, categoryName, pijaca, selectedVariation, reference)
   const { identity } = analytics
 
   // Both product events carry the same parameters. This component remounts per
@@ -130,12 +136,6 @@ function Analytics({ rows, loading, error }) {
   const jedMereLabel =
     analytics.currentMarket?.unit ? translateDataValue(t, 'jedMere', analytics.currentMarket.unit) : ''
 
-  const jsonLd = buildProductJsonLd({
-    name: productName,
-    category: identity.kategorija,
-    cityComparison: analytics.cityComparison,
-  })
-
   const categoryLabel = t(`categories.${getCategorySlug(categoryName)}`)
 
   // Title and description are built from this market's own row for the product
@@ -143,7 +143,15 @@ function Analytics({ rows, loading, error }) {
   // function uses for the HTML it serves (see seoCopy.js).
   const marketRows = rowsForMarket(rows, grad, pijaca)
   const matchesProduct = (row) => productMatchesSlug(row.Proizvod, productSlug) && row.Kategorija === categoryName
-  const facts = productFacts(marketRows, matchesProduct, getSourceLabel(grad, pijaca))
+  const facts = productFacts(marketRows, matchesProduct, getSourceLabel(grad, pijaca), reference)
+  // Stale (no record close enough to the newest data): the page says so, its copy
+  // makes no current-price claim and it carries no Product/AggregateOffer markup.
+  // Decided from this product's own row, exactly as the server HTML was.
+  const stale = facts ? facts.stale : Boolean(analytics.currentMarket?.stale)
+  const lastDate = facts?.lastDate ?? analytics.currentMarket?.lastDate ?? ''
+  const jsonLd = stale
+    ? undefined
+    : buildProductJsonLd({ name: productName, category: identity.kategorija, cityComparison: analytics.cityComparison })
   const seoCopy = productCopy(i18n.language, {
     name: productName,
     market: pijacaLabel,
@@ -153,6 +161,8 @@ function Analytics({ rows, loading, error }) {
     unit: facts?.unitRaw ? translateDataValue(t, 'jedMere', facts.unitRaw) : '',
     source: facts?.source ?? '',
     date: facts?.date ?? '',
+    stale,
+    lastDate,
     variant: productVariant(
       marketRows,
       { proizvod: marketRows.find(matchesProduct)?.Proizvod ?? identity.proizvod, kategorija: categoryName },
@@ -205,6 +215,11 @@ function Analytics({ rows, loading, error }) {
 
           {analytics.currentMarket && (
             <PriceBlock>
+              {stale && (
+                <StaleNote role="note">
+                  {t('analytics.noCurrentData', { date: lastDate, defaultValue: freshnessDefault(i18n.language, 'analytics.noCurrentData') })}
+                </StaleNote>
+              )}
               <PriceValue>
                 {formatPriceValue(analytics.currentMarket.price)}{' '}
                 {jedMereLabel ? t('productCard.priceUnit', { unit: jedMereLabel }) : t('productCard.priceNoUnit')}
@@ -244,7 +259,11 @@ function Analytics({ rows, loading, error }) {
 
         <Section>
           <SectionTitle>{t('analytics.marketComparisonTitle', { city: gradLabel })}</SectionTitle>
-          <MarketComparisonChart data={analytics.marketComparison} highlightPijaca={market?.pijaca} />
+          <MarketComparisonChart
+            data={analytics.marketComparison}
+            staleMarkets={analytics.staleMarkets}
+            highlightPijaca={market?.pijaca}
+          />
         </Section>
 
         <Section>

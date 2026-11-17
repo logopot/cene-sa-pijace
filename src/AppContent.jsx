@@ -17,6 +17,8 @@ import { CITY_PATH_PREFIX, DISCLAIMER_PATH, FEEDBACK_PATH, getRouteLanguage } fr
 import { rememberRoute } from './utils/lastRoute.js'
 import { getPageViewTracker } from './utils/pageView.js'
 import { FilterProvider } from './context/FilterContext.jsx'
+import { FreshnessContext } from './context/freshnessContext.js'
+import { getReference } from './data/freshness.js'
 import { GlobalStyle } from './styles/globalStyle.js'
 import { AppShell, Main } from './App.styled.js'
 
@@ -60,6 +62,7 @@ function AppContent({ rows, loading, error, seed }) {
   }, [location.pathname])
 
   return (
+    <FreshnessContext.Provider value={getReference(rows)}>
     <FilterProvider rows={rows}>
       <AppShell>
         <GlobalStyle />
@@ -114,6 +117,7 @@ function AppContent({ rows, loading, error, seed }) {
         <ScrollToTopButton />
       </AppShell>
     </FilterProvider>
+    </FreshnessContext.Provider>
   )
 }
 

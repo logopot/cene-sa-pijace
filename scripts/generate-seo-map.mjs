@@ -22,6 +22,7 @@ import { latestRowsForMarket, rowsForMarket, listingFacts, productFacts, product
 import { manifestEntryCopy, isKvantaskaMarket } from '../src/utils/seoCopy.js'
 import { untranslatedProductNames } from '../src/utils/productNames.js'
 import { applySourcePreference, describeSourcePreference, PREFERRED_SOURCE_BY_MARKET } from '../src/data/sourcePreference.js'
+import { computeReference } from '../src/data/freshness.js'
 import { writeFileSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
 
@@ -157,6 +158,11 @@ function buildManifest(rows) {
   // without a price (200, noindex, out of the sitemap), see markPricelessRoutes.
   const preferred = applySourcePreference(keepPricedRows(rows))
   for (const line of describeSourcePreference(preferred, 'generate-seo-map')) console.log(line)
+  // Freshness (src/data/freshness.js): a product whose newest record is old - against
+  // the newest data of its own source - keeps its page (200, indexed) but its title and
+  // description stop claiming a current price (see seoCopy.js), and the page carries
+  // no JSON-LD (generate-data.mjs).
+  const reference = computeReference(preferred.rows)
   const latestRows = selectLatestRows(preferred.rows)
   const marketLatest = new Map()
   const marketAll = new Map()
@@ -279,6 +285,7 @@ function buildManifest(rows) {
         allFor(grad, pijaca),
         (row) => row.Proizvod === proizvod && row.Kategorija === kategorija,
         sourceLabelFor(grad, pijaca),
+        reference,
       )
       const variant = productVariant(
         allFor(grad, pijaca),
@@ -300,6 +307,7 @@ function buildManifest(rows) {
           ...(facts.unitRaw && { un: translateDataValue(lang, 'jedMere', facts.unitRaw) }),
           sr: facts.source,
           dt: facts.date,
+          ...(facts.stale && { st: 1, lp: facts.lastDate }),
         }),
         ...(variant && { vr: variant }),
       }

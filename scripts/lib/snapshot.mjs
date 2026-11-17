@@ -12,6 +12,7 @@ import { spaceBeforeParens } from '../../src/utils/formatText.js'
 import { latestRowsForMarket } from '../../src/utils/seoFacts.js'
 import { placeWithComma } from '../../src/utils/seoCopy.js'
 import { dropPercent } from '../../src/utils/weeklyDrops.js'
+import { lastPriceLabel } from '../../src/data/freshness.js'
 import { parseMesto } from '../../src/utils/market.js'
 import { translateDataValue } from './productLabels.mjs'
 import { readJsonFile } from './googleSheets.mjs'
@@ -46,13 +47,15 @@ function getSourceLabel(row, grad, pijaca) {
 
 // One <li> per priced row. Empty secondary attributes are skipped entirely
 // (same rule as the live ProductCard), never replaced with a placeholder.
-export function renderCard(row, lang, href, { compact = false, change } = {}) {
+export function renderCard(row, lang, href, { compact = false, change, stale = false } = {}) {
   const { grad, pijaca } = parseMesto(row.Mesto)
   const name = translateDataValue(lang, 'proizvod', row.Proizvod)
   const place = placeWithComma(translateDataValue(lang, 'pijaca', pijaca), translateDataValue(lang, 'grad', grad))
   const unit = translateDataValue(lang, 'jedMere', resolveUnit(row.JedMere, row.Kategorija))
   const priceText = formatDisplayPrice(getDisplayPrice(row))
-  const price = priceText ? `${priceText} ${unit ? tr(lang, 'productCard.priceUnit', { unit }) : tr(lang, 'productCard.priceNoUnit')}` : ''
+  const price = stale
+    ? tr(lang, 'productCard.lastPrice', { date: lastPriceLabel(row, { short: true }) })
+    : priceText ? `${priceText} ${unit ? tr(lang, 'productCard.priceUnit', { unit }) : tr(lang, 'productCard.priceNoUnit')}` : ''
 
   const facts = compact ? '' : [
     ['productCard.packaging', translateDataValue(lang, 'pakovanje', resolveUnit(row.Pakovanje, row.Kategorija))],
@@ -78,7 +81,7 @@ export function renderCard(row, lang, href, { compact = false, change } = {}) {
     '<li class="snap-card">',
     `<strong class="snap-name">${title}</strong>`,
     `<span class="snap-place">${escapeHtml(place)}</span>`,
-    price ? `<span class="snap-price">${escapeHtml(price)}</span>` : '',
+    price ? `<span class="snap-price${stale ? ' snap-stale' : ''}">${escapeHtml(price)}</span>` : '',
     facts ? `<span class="snap-facts">${facts}</span>` : '',
     `<span class="snap-foot"><span>${escapeHtml(tr(lang, 'productCard.source', { source: getSourceLabel(row, grad, pijaca) }))}</span>${trend}</span>`,
     '</li>',

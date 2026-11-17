@@ -137,6 +137,7 @@
   "productCard": {
     "source": "Izvor: {{source}}",
     "dropPercent": "pad cene −{{percent}}%",
+    "lastPrice": "Poslednja cena: {{date}}",
     "avgPrice": "Najčešća cena",
     "avgPriceValue": "{{price}} RSD",
     "priceUnit": "RSD / {{unit}}",
@@ -153,6 +154,7 @@
   "results": {
     "loading": "Učitavanje podataka...",
     "error": "Greška pri učitavanju podataka sa Google Sheets-a.",
+    "noCurrentData": "Nema aktuelnih podataka.",
     "emptyTitle": "Nema rezultata za ovu kombinaciju filtera",
     "emptyDescription": "Pokušajte sa drugom pijacom, kategorijom ili gradom.",
     "emptyAction": "Nazad na početnu"
@@ -192,6 +194,8 @@
     "allVariations": "Sve varijacije",
     "variationSelectorLabel": "Filter varijacija proizvoda",
     "variationSourceGap": "Nema podataka iz izvora {{sources}} za ovu varijaciju.",
+    "noCurrentData": "Nema aktuelnih podataka. Poslednja cena: {{date}}.",
+    "lastPriceOn": "Poslednja cena: {{date}}",
     "historyReferenceNote": "Zelena linija je cena na veletržnici i služi za poređenje."
   },
   "feedback": {

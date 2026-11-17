@@ -3,6 +3,7 @@ import { parseMesto } from '../utils/market.js'
 import { productMatchesSlug, normalizeProductName, extractVariation } from '../utils/productId.js'
 import { getRowTime } from '../utils/week.js'
 import { buildHistorySeries } from '../utils/historySeries.js'
+import { isFreshRow, lastPriceLabel } from '../data/freshness.js'
 import { getAveragePrice as getComparablePrice } from '../utils/price.js'
 import { resolveUnit } from '../utils/unit.js'
 import { getSourceLabel } from '../utils/marketTime.js'
@@ -22,7 +23,10 @@ function matchesExactSlug(row, productSlug, categoryName) {
   return true
 }
 
-export function useProductAnalytics(rows, productSlug, selectedGrad, categoryName, selectedPijaca, selectedVariation) {
+// `reference` (data/freshness.js) tells fresh records from stale ones: a stale record
+// never takes part in a computed price (city/market comparison), it is only reported
+// as "last price".
+export function useProductAnalytics(rows, productSlug, selectedGrad, categoryName, selectedPijaca, selectedVariation, reference) {
   // Two passes: first, the exact clicked variant/slug (e.g. "Krompir
   // (beli)") purely to discover which product *family* this page is about;
   // then every row anywhere - any market, any city, any source - whose name
@@ -119,7 +123,10 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
   }, [cityRows, historySeries, selectedVariation, selectedGrad, selectedPijaca])
 
   // Each city's own latest record for this product (see computeCityComparison).
-  const cityComparison = useMemo(() => computeCityComparison(itemRows), [itemRows])
+  const cityComparison = useMemo(
+    () => computeCityComparison(itemRows, (row) => (reference ? isFreshRow(row, reference) : true)),
+    [itemRows, reference],
+  )
 
   // Same "each grouping's own latest record" convention as cityComparison
   // above, but grouped by market instead of city and pre-scoped to
@@ -141,10 +148,20 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
       }
     })
     return Array.from(byMarket.entries())
-      .map(([pijaca, { rows: marketRows }]) => ({ pijaca, price: average(marketRows.map(getComparablePrice)) }))
+      .map(([pijaca, { rows: marketRows }]) => ({
+        pijaca,
+        price: average(marketRows.map(getComparablePrice)),
+        stale: reference ? !isFreshRow(marketRows[0], reference) : false,
+        lastDate: lastPriceLabel(marketRows[0]),
+      }))
       .filter((entry) => entry.price !== null)
       .sort((a, b) => a.price - b.price)
-  }, [itemRows, selectedGrad])
+  }, [itemRows, selectedGrad, reference])
+
+  // Fresh markets only: the cheapest/priciest of the comparison come from these. Stale
+  // ones are listed apart as "last price".
+  const freshMarketComparison = useMemo(() => marketComparison.filter((entry) => !entry.stale), [marketComparison])
+  const staleMarkets = useMemo(() => marketComparison.filter((entry) => entry.stale), [marketComparison])
 
   // The exact row(s) for the market currently being viewed - not every
   // market in the city (marketComparison) and not aggregated across markets
@@ -176,8 +193,12 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
       price,
       unit: resolveUnit(latestRows[0].JedMere, latestRows[0].Kategorija),
       sourceLabel: latestRows[0].Source || getSourceLabel(selectedGrad, selectedPijaca),
+      // A record too old to be called current: the page says "No current data. Last
+      // price: 24.09.2026." above the price (which stays visible).
+      stale: reference ? !isFreshRow(latestRows[0], reference) : false,
+      lastDate: lastPriceLabel(latestRows[0]),
     }
-  }, [itemRows, selectedGrad, selectedPijaca])
+  }, [itemRows, selectedGrad, selectedPijaca, reference])
 
   return {
     identity,
@@ -188,7 +209,8 @@ export function useProductAnalytics(rows, productSlug, selectedGrad, categoryNam
     cityComparison,
     cheapest: cityComparison[0] ?? null,
     priciest: cityComparison[cityComparison.length - 1] ?? null,
-    marketComparison,
+    marketComparison: freshMarketComparison,
+    staleMarkets,
     currentMarket,
   }
 }

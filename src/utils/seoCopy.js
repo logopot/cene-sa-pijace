@@ -189,7 +189,7 @@ export function productCopy(lang, facts) {
   return lang === 'en' ? productCopyEn(facts) : productCopySr(facts)
 }
 
-function productCopySr({ name, market, city, min, max, unit, source, date, variant }) {
+function productCopySr({ name, market, city, min, max, unit, source, date, variant, stale, lastDate }) {
   const kvantas = isKvantaskaMarket('sr', market)
   const inName = cityInMarketName(market, city)
   const tag = variant ? ` (${variant})` : ''
@@ -204,6 +204,17 @@ function productCopySr({ name, market, city, min, max, unit, source, date, varia
     titleFor(market, false),
     titleFor(shortMarketName('sr', market), false),
   ])
+
+  if (stale && min !== null && min !== undefined) {
+    // Nothing recent to quote: no "aktuelna cena" - the page says so and gives the
+    // last recorded price with its date.
+    const range = min === max ? formatPrice(min) : `${formatPrice(min)}–${formatPrice(max)}`
+    const place = placeLabel(market, city)
+    const label = `${name}${tag}, ${place}`
+    const withUnit = `${label}: Nema aktuelnih podataka. Poslednja zabeležena cena: ${range} RSD${unit ? `/${unit}` : ''} (${lastDate}).`
+    const noUnit = `${label}: Nema aktuelnih podataka. Poslednja cena: ${range} RSD (${lastDate}).`
+    return { title, description: fit([withUnit, noUnit], DESCRIPTION_MAX) }
+  }
 
   const generic = hasPijaca(market)
   const where = generic ? `, ${placeLabel(market, city)}` : ` na pijaci ${placeLabel(market, city)}`
@@ -221,7 +232,7 @@ function productCopySr({ name, market, city, min, max, unit, source, date, varia
   return { title, description }
 }
 
-function productCopyEn({ name, market, city, min, max, unit, source, date, variant }) {
+function productCopyEn({ name, market, city, min, max, unit, source, date, variant, stale, lastDate }) {
   const inName = cityInMarketName(market, city)
   const place = inName ? variant : variant ? `${city}, ${variant}` : city
   const titleFor = (marketName) => ({
@@ -229,6 +240,14 @@ function productCopyEn({ name, market, city, min, max, unit, source, date, varia
     build: (text, shown) => `${text} price – ${shown}${place ? ` (${place})` : ''}`,
   })
   const title = fitTitle(TITLE_MAX, name, [titleFor(market), titleFor(shortMarketName('en', market))])
+
+  if (stale && min !== null && min !== undefined) {
+    const range = min === max ? formatPrice(min) : `${formatPrice(min)}–${formatPrice(max)}`
+    const label = `${variant ? `${name} (${variant})` : name}, ${placeWithComma(market, city)}`
+    const withUnit = `${label}: No current data. Last recorded price: ${range} RSD${unit ? ` per ${unit}` : ''} (${lastDate}).`
+    const noUnit = `${label}: No current data. Last price: ${range} RSD (${lastDate}).`
+    return { title, description: fit([withUnit, noUnit], DESCRIPTION_MAX) }
+  }
 
   const label = variant ? `${name} (${variant})` : name
   const tail = (withDate) => (source ? closed(` Source: ${source}${withDate && date ? `, ${date}` : ''}`) : '')
@@ -262,6 +281,8 @@ export function manifestEntryCopy(entry) {
       source: entry.sr,
       date: entry.dt,
       variant: entry.vr,
+      stale: Boolean(entry.st),
+      lastDate: entry.lp,
     })
   }
   if (entry.type === 'market' && isKvantaskaMarket(entry.lang, entry.market)) {

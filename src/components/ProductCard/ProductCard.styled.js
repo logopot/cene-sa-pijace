@@ -191,6 +191,17 @@ export const FieldValue = styled.span`
   text-align: right;
 `;
 
+// The "Last price: 24.09." line of a stale card: same place as the price, quieter -
+// plain muted text (contrast kept, no reduced opacity).
+export const StalePrice = styled.div`
+  margin-top: auto;
+  padding-top: ${({ theme }) => theme.spacing.xs};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+  font-size: 0.95rem;
+  font-weight: ${({ theme }) => theme.font.weight.medium};
+  color: ${({ theme }) => theme.colors.textSecondary};
+`
+
 export const PriceValue = styled.div`
   margin-top: auto;
   padding-top: ${({ theme }) => theme.spacing.xs};

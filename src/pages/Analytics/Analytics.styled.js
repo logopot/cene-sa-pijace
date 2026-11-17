@@ -96,6 +96,16 @@ export const PriceValue = styled.span`
 // secondary text, rather than a distinct UI element competing for
 // attention. Allowed to wrap (unlike PriceValue) since it's the longest
 // string in the header and the column itself may be fairly narrow on mobile.
+// "No current data. Last price: 24.09.2026." above the price: a quiet note (muted
+// text colour at full contrast, no reduced opacity), the price stays visible below.
+export const StaleNote = styled.p`
+  margin: 0 0 ${({ theme }) => theme.spacing.xs};
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  text-align: right;
+`
+
 export const SourceLabel = styled.span`
   font-size: 0.625rem;
   font-weight: ${({ theme }) => theme.font.weight.regular};
