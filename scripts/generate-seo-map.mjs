@@ -22,7 +22,7 @@ import { latestRowsForMarket, rowsForMarket, listingFacts, productFacts, product
 import { manifestEntryCopy, isKvantaskaMarket } from '../src/utils/seoCopy.js'
 import { untranslatedProductNames } from '../src/utils/productNames.js'
 import { applySourcePreference, describeSourcePreference, PREFERRED_SOURCE_BY_MARKET } from '../src/data/sourcePreference.js'
-import { computeReference } from '../src/data/freshness.js'
+import { computeReference, listingStatus } from '../src/data/freshness.js'
 import { writeFileSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
 
@@ -242,6 +242,9 @@ function buildManifest(rows) {
         city: translateDataValue(lang, 'grad', grad),
         slug: getCanonicalMarketSlug(grad, pijaca),
       }
+      // A market whose whole list is stale: its description says so (seoCopy.js).
+      const marketListing = listingStatus(latestFor(grad, pijaca), reference)
+      if (marketListing.noFresh) Object.assign(entries[marketPath], { ns: 1, lr: marketListing.lastReport })
       if (isKvantaskaMarket(lang, entries[marketPath].market)) {
         const { source, date } = listingFacts(latestFor(grad, pijaca))
         Object.assign(entries[marketPath], { sr: source, dt: date })
@@ -268,6 +271,8 @@ function buildManifest(rows) {
       // prices, like a product page without one: served (200), noindex, out of the
       // sitemap. Only for such markets: elsewhere a category keeps its old behaviour.
       if (ruled && !latestFor(grad, pijaca).some((row) => row.Kategorija === kategorija)) entries[categoryPath].noindex = 1
+      const categoryListing = listingStatus(latestFor(grad, pijaca).filter((row) => row.Kategorija === kategorija), reference)
+      if (categoryListing.noFresh) Object.assign(entries[categoryPath], { ns: 1, lr: categoryListing.lastReport })
       if (isKvantaskaMarket(lang, entries[categoryPath].market)) {
         const { source, date } = listingFacts(latestFor(grad, pijaca).filter((row) => row.Kategorija === kategorija))
         Object.assign(entries[categoryPath], { sr: source, dt: date })

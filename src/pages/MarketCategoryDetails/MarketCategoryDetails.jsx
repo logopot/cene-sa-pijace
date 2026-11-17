@@ -24,7 +24,9 @@ import SEO from '../../components/SEO/SEO.jsx'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
 import { SITE_URL, getMarketOgImage } from '../../constants/seo.js'
-import { isKvantaskaMarket, kvantaskaCategoryCopy, cityInMarketName, categoryCopyWithoutCity } from '../../utils/seoCopy.js'
+import { isKvantaskaMarket, kvantaskaCategoryCopy, cityInMarketName, categoryCopyWithoutCity, staleListingDescription } from '../../utils/seoCopy.js'
+import { useFreshness } from '../../hooks/useFreshness.js'
+import { listingStatus } from '../../data/freshness.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
@@ -99,6 +101,7 @@ function MarketCategoryDetails({ rows, loading, error }) {
   const pijaca = useMemo(() => resolveMarketSlug(rows, grad, marketSlug), [rows, grad, marketSlug])
   const category = useMemo(() => resolveCategoryBySlug(categorySlug), [categorySlug])
   const { filteredRows, weekLabel, isFallbackWeek, source } = useCategoryMarketData(rows, category, grad, pijaca)
+  const { reference } = useFreshness()
   const marketCategoryCount = useMarketCategoryCount(rows, grad, pijaca)
 
   if (loading) {
@@ -150,6 +153,11 @@ function MarketCategoryDetails({ rows, loading, error }) {
       ? categoryCopyWithoutCity({ lang: i18n.language, category: categoryLabel, market: marketLabel, generic: seoKey.endsWith('Generic') })
       : null
   const seoCopy = kvantasCopy ?? noCityCopy
+  // Whole list stale: the description makes no claim of current prices.
+  const listing = isAllMarkets ? { noFresh: false } : listingStatus(filteredRows, reference)
+  const staleDescription = listing.noFresh
+    ? staleListingDescription({ lang: i18n.language, kind: 'category', market: marketLabel, city: gradLabel, category: categoryLabel, lastReport: listing.lastReport })
+    : null
 
   const breadcrumbItems = [
     { label: t('breadcrumbs.home'), to: '/' },
@@ -162,7 +170,7 @@ function MarketCategoryDetails({ rows, loading, error }) {
     <>
       <SEO
         title={seoCopy?.title ?? t(`${seoKey}.title`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
-        description={seoCopy?.description ?? t(`${seoKey}.description`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
+        description={staleDescription ?? seoCopy?.description ?? t(`${seoKey}.description`, { category: categoryLabel, market: marketLabel, city: gradLabel })}
         url={canonicalUrl}
         image={isAllMarkets ? undefined : getMarketOgImage(grad, pijaca)}
       />

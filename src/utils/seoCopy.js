@@ -117,6 +117,17 @@ export function marketCopyWithoutCity({ lang, market, generic }) {
     : { title: `Pijaca ${market} - Pregled aktuelnih cena`, description: `Sveže cene proizvoda na pijaci ${market}. Proverite ponudu pre odlaska u kupovinu.` }
 }
 
+// The description of a market or category page whose whole list is stale (see
+// listingStatus in data/freshness.js): it must not talk of current prices. The name
+// part has the form the description had before (market and city; for a category the
+// "city • market • category" line).
+export function staleListingDescription({ lang, kind, market, city, category, lastReport }) {
+  const sentence = lang === 'en' ? `No current data. Last report: ${lastReport}.` : `Nema aktuelnih podataka. Poslednja prijava: ${lastReport}.`
+  if (kind === 'market') return fit([`${placeWithComma(market, city)}: ${sentence}`], DESCRIPTION_MAX)
+  const name = cityInMarketName(market, city) ? `${market} • ${category}` : `${city} • ${market} • ${category}`
+  return fit([`${name}. ${sentence}`], DESCRIPTION_MAX)
+}
+
 export function categoryCopyWithoutCity({ lang, category, market, generic }) {
   const description = `${market} • ${category}`
   if (lang === 'en') return { title: `${category} Prices at ${market}${generic ? '' : ' Market'}`, description }

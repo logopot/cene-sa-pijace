@@ -14,7 +14,7 @@ import { parseWeekEndTime } from '../utils/week.js'
 // latest.json), never the clock of the build or of the visitor: a scraper that has
 // not run for a month must not turn every price on the site stale.
 export const FRESH_DAYS_JKP = 21
-export const FRESH_WEEKS_STIPS = 2
+export const FRESH_WEEKS_STIPS = 3
 // Only a warning in the build log: a reference this much older than the build means
 // the scrapers have probably stopped. Behaviour does not change.
 export const STALE_REFERENCE_WARN_DAYS = 14
@@ -122,6 +122,16 @@ export function lastPriceLabel(row, { short = false } = {}) {
   const day = rowDay(row)
   if (day === null) return ''
   return short ? formatDayShort(day) : formatDay(day)
+}
+
+// Is a market's or category's whole list stale - not one fresh product in it? Then
+// its page says "No current data. Last report: dd.mm.yyyy" (the date of the newest
+// record in the list). An empty list is not "stale", it is empty.
+export function listingStatus(rows, reference) {
+  if (!reference || rows.length === 0) return { noFresh: false, lastReport: '' }
+  if (rows.some((row) => isFreshRow(row, reference))) return { noFresh: false, lastReport: '' }
+  const days = rows.map(rowDay).filter((day) => day !== null)
+  return { noFresh: true, lastReport: days.length > 0 ? formatDay(Math.max(...days)) : '' }
 }
 
 // The reference of a row set, computed once per array (the app passes the same

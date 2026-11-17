@@ -5,6 +5,7 @@ import {
   FRESH_DAYS_JKP,
   FRESH_WEEKS_STIPS,
   computeReference,
+  listingStatus,
   isFreshRow,
   isFreshDay,
   rowDay,
@@ -14,7 +15,7 @@ import {
   referenceAgeDays,
 } from '../src/data/freshness.js'
 import { computeCityComparison, buildProductJsonLd } from '../src/utils/productJsonLd.js'
-import { productCopy, manifestEntryCopy } from '../src/utils/seoCopy.js'
+import { productCopy, manifestEntryCopy, staleListingDescription } from '../src/utils/seoCopy.js'
 import { productFacts } from '../src/utils/seoFacts.js'
 import { analyzeWeeklyDrops } from '../src/utils/weeklyDrops.js'
 
@@ -28,6 +29,7 @@ const WEEK = {
   45: '45. (02.11.2026-08.11.2026)',
   44: '44. (26.10.2026-01.11.2026)',
   43: '43. (19.10.2026-25.10.2026)',
+  42: '42. (12.10.2026-18.10.2026)',
 }
 
 test('the reference is the newest date of each source in the data - not the clock', () => {
@@ -56,20 +58,22 @@ test('JKP threshold: 21 days is fresh, 22 is stale', () => {
   assert.equal(isFreshRow(jkp('M', '2026-10-21'), reference), false, '22 days')
 })
 
-test('STIPS threshold: the newest week minus 2 is fresh, minus 3 is stale', () => {
-  assert.equal(FRESH_WEEKS_STIPS, 2)
+test('STIPS threshold: the newest week minus 3 is fresh, minus 4 is stale', () => {
+  assert.equal(FRESH_WEEKS_STIPS, 3)
   const reference = { jkp: '2026-11-12', stipsWeek: '2026-11-09' }
   assert.equal(isFreshRow(stips('M', WEEK[46]), reference), true)
   assert.equal(isFreshRow(stips('M', WEEK[45]), reference), true, 'week -1')
   assert.equal(isFreshRow(stips('M', WEEK[44]), reference), true, 'week -2')
-  assert.equal(isFreshRow(stips('M', WEEK[43]), reference), false, 'week -3')
+  assert.equal(isFreshRow(stips('M', WEEK[43]), reference), true, 'week -3: markets that report every 3-4 weeks stay current')
+  assert.equal(isFreshRow(stips('M', WEEK[42]), reference), false, 'week -4')
 })
 
 test('weeks count across a year end', () => {
   const reference = { jkp: '2026-01-07', stipsWeek: '2026-01-05' } // week of 05.01.2026
   assert.equal(isFreshRow(stips('M', '1. (29.12.2025-04.01.2026)'), reference), true, 'week -1, previous year')
   assert.equal(isFreshRow(stips('M', '52. (22.12.2025-28.12.2025)'), reference), true, 'week -2')
-  assert.equal(isFreshRow(stips('M', '51. (15.12.2025-21.12.2025)'), reference), false, 'week -3')
+  assert.equal(isFreshRow(stips('M', '51. (15.12.2025-21.12.2025)'), reference), true, 'week -3')
+  assert.equal(isFreshRow(stips('M', '50. (08.12.2025-14.12.2025)'), reference), false, 'week -4')
   assert.equal(isFreshRow(jkp('M', '2025-12-17'), reference), true, '21 days over the year end')
   assert.equal(isFreshRow(jkp('M', '2025-12-16'), reference), false, '22 days')
 })
@@ -96,7 +100,7 @@ test('computed ranges come from fresh rows only', () => {
     jkp('Kalenić-Beograd-zelena pijaca', '2026-11-12', 140),
     jkp('Zvezdara-Beograd-zelena pijaca', '2026-07-02', 900), // stale, huge: must not be the highest price
     stips('Pirot-zelena pijaca', WEEK[46], 90),
-    stips('Niš-zelena pijaca', WEEK[43], 5), // stale, tiny: must not be the lowest
+    stips('Niš-zelena pijaca', WEEK[42], 5), // stale, tiny: must not be the lowest
   ]
   const fresh = (row) => isFreshRow(row, reference)
   const cities = computeCityComparison(rows, fresh)
@@ -202,5 +206,50 @@ test('generated manifest (when present): stale pages stay indexed and in the sit
   for (const [path, entry] of stale) {
     const other = entry.alt && manifest[Object.values(entry.alt)[0]]
     if (other) assert.equal(Boolean(other.st), true, `${path} and its pair are both stale`)
+  }
+})
+
+test('a whole list is stale only when not one product in it is fresh', () => {
+  const reference = { jkp: '2026-11-12', stipsWeek: '2026-11-09' }
+  const old = [stips('M', WEEK[42]), stips('M', '38. (14.09.2026-20.09.2026)')]
+  assert.deepEqual(listingStatus(old, reference), { noFresh: true, lastReport: '18.10.2026' })
+  assert.deepEqual(listingStatus([...old, stips('M', WEEK[46])], reference), { noFresh: false, lastReport: '' })
+  assert.deepEqual(listingStatus([], reference), { noFresh: false, lastReport: '' }, 'an empty list is empty, not stale')
+  assert.deepEqual(listingStatus(old, null), { noFresh: false, lastReport: '' }, 'no reference: nothing is stale')
+})
+
+test('description of a market or category with a whole stale list: no claim of current prices', () => {
+  const market = staleListingDescription({ lang: 'sr', kind: 'market', market: 'Zelena pijaca', city: 'Sombor', lastReport: '18.10.2026' })
+  assert.equal(market, 'Zelena pijaca, Sombor: Nema aktuelnih podataka. Poslednja prijava: 18.10.2026.')
+  const marketEn = staleListingDescription({ lang: 'en', kind: 'market', market: 'Green Market', city: 'Sombor', lastReport: '18.10.2026' })
+  assert.equal(marketEn, 'Green Market, Sombor: No current data. Last report: 18.10.2026.')
+  const category = staleListingDescription({ lang: 'sr', kind: 'category', market: 'Zelena pijaca', city: 'Sombor', category: 'Povrće', lastReport: '18.10.2026' })
+  assert.equal(category, 'Sombor • Zelena pijaca • Povrće. Nema aktuelnih podataka. Poslednja prijava: 18.10.2026.')
+  const categoryEn = staleListingDescription({ lang: 'en', kind: 'category', market: 'Green Market', city: 'Sombor', category: 'Vegetables', lastReport: '18.10.2026' })
+  assert.equal(categoryEn, 'Sombor • Green Market • Vegetables. No current data. Last report: 18.10.2026.')
+  // the city already in the market's name is not repeated
+  assert.equal(staleListingDescription({ lang: 'sr', kind: 'market', market: 'TC Novi Beograd', city: 'Beograd', lastReport: '01.01.2026' }), 'TC Novi Beograd: Nema aktuelnih podataka. Poslednja prijava: 01.01.2026.')
+  for (const text of [market, marketEn, category, categoryEn]) {
+    assert.ok(text.length <= 155)
+    assert.doesNotMatch(text, /aktuelne cene|aktuelna cena|current price|fresh/i)
+  }
+})
+
+test('generated manifest (when present): stale-list markets and categories stay indexed, canonical/hreflang untouched', async () => {
+  const manifestFile = new URL('../functions/lib/seo-manifest.mjs', import.meta.url)
+  const sitemapFile = new URL('../public/sitemap.xml', import.meta.url)
+  if (!existsSync(manifestFile) || !existsSync(sitemapFile)) return
+  const { SEO_MANIFEST: manifest } = await import(manifestFile.href)
+  const sitemap = readFileSync(sitemapFile, 'utf8')
+  const listings = Object.entries(manifest).filter(([, entry]) => (entry.type === 'market' || entry.type === 'category') && entry.ns)
+  assert.ok(listings.length > 0)
+  for (const [path, entry] of listings) {
+    assert.equal(entry.noindex, undefined, `${path} must not be noindex`)
+    assert.match(entry.lr, /^\d{2}\.\d{2}\.\d{4}$/)
+    if (!entry.canonicalPath || entry.canonicalPath === path) {
+      assert.equal(sitemap.includes(`<loc>https://cenesapijace.org${path}</loc>`), true, `${path} stays in the sitemap`)
+    }
+    const other = entry.alt && manifest[Object.values(entry.alt)[0]]
+    if (other) assert.equal(Boolean(other.ns), true, `${path} and its pair agree`)
   }
 })

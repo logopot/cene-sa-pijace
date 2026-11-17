@@ -21,7 +21,9 @@ import SEO from '../../components/SEO/SEO.jsx'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs.jsx'
 import GlobalFilterBar from '../../components/FilterBar/GlobalFilterBar.jsx'
 import { SITE_URL, getMarketOgImage } from '../../constants/seo.js'
-import { isKvantaskaMarket, kvantaskaMarketCopy, cityInMarketName, marketCopyWithoutCity } from '../../utils/seoCopy.js'
+import { isKvantaskaMarket, kvantaskaMarketCopy, cityInMarketName, marketCopyWithoutCity, staleListingDescription } from '../../utils/seoCopy.js'
+import { useFreshness } from '../../hooks/useFreshness.js'
+import { listingStatus } from '../../data/freshness.js'
 import NotFound from '../NotFound/NotFound.jsx'
 import {
   StatusSection,
@@ -68,6 +70,7 @@ function MarketDetails({ rows, loading, error }) {
   const grad = useMemo(() => resolveGradBySlug(rows, citySlug), [rows, citySlug])
   const pijaca = useMemo(() => resolvePijacaBySlug(rows, grad, marketSlug), [rows, grad, marketSlug])
   const { filteredRows, weekLabel, isFallbackWeek, source } = useMarketData(rows, grad, pijaca)
+  const { reference } = useFreshness()
 
   useEffect(() => {
     if (grad && pijaca) trackPageEvent('view_market', { market_name: pijaca, city: grad })
@@ -107,12 +110,17 @@ function MarketDetails({ rows, loading, error }) {
       ? marketCopyWithoutCity({ lang: i18n.language, market: pijacaLabel, generic: seoKey.endsWith('Generic') })
       : null
   const seoCopy = kvantasCopy ?? noCityCopy
+  // Whole list stale: the description makes no claim of current prices.
+  const listing = listingStatus(filteredRows, reference)
+  const staleDescription = listing.noFresh
+    ? staleListingDescription({ lang: i18n.language, kind: 'market', market: pijacaLabel, city: gradLabel, lastReport: listing.lastReport })
+    : null
 
   return (
     <>
       <SEO
         title={seoCopy?.title ?? t(`${seoKey}.title`, { market: pijacaLabel, city: gradLabel })}
-        description={seoCopy?.description ?? t(`${seoKey}.description`, { market: pijacaLabel, city: gradLabel })}
+        description={staleDescription ?? seoCopy?.description ?? t(`${seoKey}.description`, { market: pijacaLabel, city: gradLabel })}
         url={`${SITE_URL}${buildMarketRoute(grad, pijaca, i18n.language)}`}
         image={getMarketOgImage(grad, pijaca)}
       />

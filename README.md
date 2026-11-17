@@ -101,6 +101,22 @@ Google Sheets (filled by the STIPS and JKP scrapers) stays the single source of 
 
 **Refreshing data:** run the "Weekly Market Scrape to Sheets" workflow manually (Actions -> Run workflow) or wait for the Monday schedule; its last step calls the Cloudflare Pages deploy hook (secret `CLOUDFLARE_DEPLOY_HOOK`), which rebuilds the site with the new data. Locally: `npm run generate:data`.
 
+## 🕒 Svežina podataka
+
+A price that is old is never shown as a current one. One definition for the whole site, in `src/data/freshness.js` (used by `generate-data.mjs`, `generate-seo-map.mjs`, the edge function through the manifest it reads, and the React pages):
+
+| Source | A product is **fresh** when its newest record is... |
+|---|---|
+| JKP | at most `FRESH_DAYS_JKP = 21` days before the newest JKP date |
+| STIPS | at most `FRESH_WEEKS_STIPS = 3` weeks before the newest STIPS week (week numbers counted from Monday, so it works across a year end) |
+
+- The yardstick is the **newest date in the data per source** (the "reference", also written into `latest.json` as `"reference": {"jkp": "...", "stipsWeek": "..."}`), never the clock of the build or of the visitor. If the reference itself is more than 14 days older than the build, the build log warns (nothing changes because of it).
+- A product is judged after the "one source per market" rule (Kalenić and Skadarlija count by their JKP rows).
+- **Stale product:** its page says "Nema aktuelnih podataka. Poslednja cena: dd.mm.yyyy." above the price (the price and the chart stay); cards and lists show "Poslednja cena: dd.mm." instead of the price and put such products last; a stale market drops out of the lowest/highest price and the "cheapest" highlight of the market comparison and is listed under it as "last price"; computed ranges (city comparison, JSON-LD `lowPrice`/`highPrice`) use fresh rows only; the "biggest price drops" list can never contain one (checked in code).
+- **SEO of a stale product page:** still 200, indexed, in the sitemap, same title/canonical/hreflang; the description says "Nema aktuelnih podataka. Poslednja zabeležena cena: 160 RSD/kg (24.09.2026)." and the page carries no JSON-LD. Pages with no data at all keep `noindex`.
+- **A market or category whose whole list is stale** (not one fresh product): same title, status and sitemap entry, but the description says "Nema aktuelnih podataka. Poslednja prijava: dd.mm.yyyy." instead of promising current prices.
+- **Change the thresholds:** edit the two constants in `src/data/freshness.js` and rebuild.
+
 ## 🔀 Jedan izvor po tržištu (STIPS / JKP)
 
 Where two sources report on the same market, the site shows one of them only - the two can disagree widely on the same product (Kalenić potatoes: JKP 140, STIPS 200). Today that is exactly two markets, `Kalenić-Beograd-zelena pijaca` and `Skadarlija-Beograd-zelena pijaca`, and both prefer **JKP**. The rule is a single table in `src/data/sourcePreference.js`:

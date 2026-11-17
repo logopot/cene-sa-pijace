@@ -11,7 +11,7 @@
 import { SEO_MANIFEST } from './lib/seo-manifest.mjs'
 // Pure string builders shared with the build and the React pages, so the copy
 // served here and the copy the app sets after hydration are one rule.
-import { manifestEntryCopy, cityInMarketName, marketCopyWithoutCity, categoryCopyWithoutCity } from '../src/utils/seoCopy.js'
+import { manifestEntryCopy, cityInMarketName, marketCopyWithoutCity, categoryCopyWithoutCity, staleListingDescription } from '../src/utils/seoCopy.js'
 
 const SITE_URL = 'https://cenesapijace.org'
 
@@ -117,6 +117,24 @@ function cityCopy(city, lang) {
       }
 }
 
+// A market or category whose whole list is stale (the manifest marks it `ns`, with the
+// date of its newest report in `lr`): same title, but a description that makes no
+// claim of current prices. Anything else passes through.
+function staleListing(entry, kind, copy) {
+  if (!entry.ns) return copy
+  return {
+    ...copy,
+    description: staleListingDescription({
+      lang: entry.lang,
+      kind,
+      market: entry.market,
+      city: entry.city,
+      category: entry.category,
+      lastReport: entry.lr,
+    }),
+  }
+}
+
 function resolveMeta(pathname) {
   const url = `${SITE_URL}${pathname}`
   const entry = SEO_MANIFEST[pathname]
@@ -147,10 +165,14 @@ function resolveMeta(pathname) {
 
     case 'market':
       return {
-        ...(manifestEntryCopy(entry) ??
-          (cityInMarketName(entry.market, entry.city)
-            ? marketCopyWithoutCity({ lang: entry.lang, market: entry.market, generic: hasMarketWord(entry.market, entry.lang) })
-            : marketCopy(entry.market, entry.city, entry.lang))),
+        ...staleListing(
+          entry,
+          'market',
+          manifestEntryCopy(entry) ??
+            (cityInMarketName(entry.market, entry.city)
+              ? marketCopyWithoutCity({ lang: entry.lang, market: entry.market, generic: hasMarketWord(entry.market, entry.lang) })
+              : marketCopy(entry.market, entry.city, entry.lang)),
+        ),
         lang: entry.lang,
         image: `${SITE_URL}/og/markets/${entry.slug}.png`,
         url,
@@ -162,15 +184,19 @@ function resolveMeta(pathname) {
     // market page instead of asking search engines to index both.
     case 'category':
       return {
-        ...(manifestEntryCopy(entry) ??
-          (cityInMarketName(entry.market, entry.city)
-            ? categoryCopyWithoutCity({
-                lang: entry.lang,
-                category: entry.category,
-                market: entry.market,
-                generic: hasMarketWord(entry.market, entry.lang),
-              })
-            : categoryCopy(entry.category, entry.market, entry.city, entry.lang))),
+        ...staleListing(
+          entry,
+          'category',
+          manifestEntryCopy(entry) ??
+            (cityInMarketName(entry.market, entry.city)
+              ? categoryCopyWithoutCity({
+                  lang: entry.lang,
+                  category: entry.category,
+                  market: entry.market,
+                  generic: hasMarketWord(entry.market, entry.lang),
+                })
+              : categoryCopy(entry.category, entry.market, entry.city, entry.lang)),
+        ),
         lang: entry.lang,
         image: `${SITE_URL}/og/markets/${entry.slug}.png`,
         url: entry.canonicalPath ? `${SITE_URL}${entry.canonicalPath}` : url,
