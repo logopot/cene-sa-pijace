@@ -198,6 +198,10 @@
     "lastPriceOn": "Last price: {{date}}",
     "historyReferenceNote": "The green line shows the wholesale market price for comparison."
   },
+  "loadFailure": {
+    "message": "The page could not be loaded. Please refresh.",
+    "reload": "Refresh"
+  },
   "feedback": {
     "title": "Suggestions & comments",
     "seoDescription": "Send a suggestion or comment about the Cene sa pijace website.",

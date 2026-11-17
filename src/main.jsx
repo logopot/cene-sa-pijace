@@ -11,6 +11,9 @@ import PageSkeleton from './components/PageSkeleton/PageSkeleton.jsx'
 import { fetchLatestPrices } from './services/dataService.js'
 import { hasStoredSelection } from './utils/storedSelection.js'
 import { theme } from './styles/theme.js'
+import { installChunkErrorHandlers } from './utils/chunkReload.js'
+import { scheduleIdlePrefetch } from './utils/prefetch.js'
+import { PREFETCH_LOADERS } from './routes/lazyPages.js'
 
 const container = document.getElementById('root')
 
@@ -48,6 +51,7 @@ async function boot() {
       const [initialData] = await Promise.all([fetchLatestPrices(), whenI18nReady()])
       if (i18n.resolvedLanguage === 'sr') {
         hydrateRoot(container, renderApp(initialData))
+        scheduleIdlePrefetch(PREFETCH_LOADERS)
         return
       }
     } catch {
@@ -55,6 +59,10 @@ async function boot() {
     }
   }
   createRoot(container).render(renderApp())
+  scheduleIdlePrefetch(PREFETCH_LOADERS)
 }
 
+// Before anything can fail: a stale tab asking for a chunk that a deploy removed
+// reloads itself once instead of sitting on a spinner (see utils/chunkReload.js).
+installChunkErrorHandlers()
 boot()

@@ -198,6 +198,10 @@
     "lastPriceOn": "Poslednja cena: {{date}}",
     "historyReferenceNote": "Zelena linija je cena na veletržnici i služi za poređenje."
   },
+  "loadFailure": {
+    "message": "Stranica nije mogla da se učita. Osvežite stranicu.",
+    "reload": "Osveži"
+  },
   "feedback": {
     "title": "Predlozi i komentari",
     "seoDescription": "Pošaljite predlog ili komentar za sajt Cene sa pijace.",

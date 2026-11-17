@@ -150,6 +150,7 @@ All events go through `src/utils/analytics.js` (string parameters trimmed and lo
 | `filter_category` | user picks a category (`all` = every category) | `category` | ne |
 | `filter_market` | user picks a market (`all` = every market) | `market` | ne |
 | `language_switch` | language switched | `from`, `to` | ne |
+| `chunk_reload` | the page reloaded itself once because a lazy chunk of an older deploy could not be loaded (a stale tab after a deploy); no parameters | ne |
 | `feedback_open` | suggestions form opened | `from_page_type` (`home`, `city`, `market`, `category`, `product`, `other`; never the path) | ne |
 | `feedback_submit` | suggestions form sent successfully (nothing the visitor wrote is ever sent) | - | **da** |
 

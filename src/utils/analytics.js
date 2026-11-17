@@ -23,6 +23,8 @@
 //   click_source_link  source (stips|jkp), page_type, product_name  (click on a
 //                      link to the official source; sent with transport beacon)
 //   language_switch    from, to
+//   chunk_reload       (no parameters: the page reloaded itself once because a lazy
+//                      chunk from an older deploy could not be loaded)
 //   feedback_open      from_page_type  (kind of page the suggestions form was
 //                      opened from: home, city, market, category, product, other
 //                      - never the path; the form's text is never sent anywhere)

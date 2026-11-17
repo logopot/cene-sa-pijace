@@ -8,7 +8,8 @@ import DisclaimerPage from './components/DisclaimerPage/DisclaimerPage.jsx'
 import Feedback from './pages/Feedback/Feedback.jsx'
 import ScrollToTop from './components/ScrollToTop/ScrollToTop.jsx'
 import ScrollToTopButton from './components/ScrollToTopButton/ScrollToTopButton.jsx'
-import PageSkeleton from './components/PageSkeleton/PageSkeleton.jsx'
+import ChunkErrorBoundary, { SlowLoadFallback } from './components/ChunkErrorBoundary/ChunkErrorBoundary.jsx'
+import { loadAnalytics } from './routes/lazyPages.js'
 import CityDetails from './pages/CityDetails/CityDetails.jsx'
 import MarketDetails from './pages/MarketDetails/MarketDetails.jsx'
 import MarketCategoryDetails from './pages/MarketCategoryDetails/MarketCategoryDetails.jsx'
@@ -24,7 +25,7 @@ import { AppShell, Main } from './App.styled.js'
 
 // The product page is the only one that pulls in the charting library, so
 // it's split out of the entry bundle and fetched on demand.
-const Analytics = lazy(() => import('./pages/Analytics/Analytics.jsx'))
+const Analytics = lazy(loadAnalytics)
 
 // The whole page tree for already-loaded data. Kept free of data fetching so
 // the exact same component renders both in the browser (see App.jsx) and at
@@ -69,7 +70,11 @@ function AppContent({ rows, loading, error, seed }) {
         <ScrollToTop />
         <Header rows={rows} />
         <Main>
-          <Suspense fallback={<PageSkeleton />}>
+          {/* A chunk that cannot be loaded reloads the page once, then shows a message with
+              a Refresh button; a load that takes over 15 s shows the same message (never
+              a spinner without end). */}
+          <ChunkErrorBoundary resetKey={location.pathname}>
+          <Suspense fallback={<SlowLoadFallback />}>
           <Routes>
             <Route
               path="/"
@@ -112,6 +117,7 @@ function AppContent({ rows, loading, error, seed }) {
             <Route path="*" element={<NotFound />} />
           </Routes>
           </Suspense>
+          </ChunkErrorBoundary>
         </Main>
         <Footer />
         <ScrollToTopButton />
