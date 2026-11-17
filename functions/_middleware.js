@@ -246,11 +246,12 @@ async function loadSnapshot(context, pathname) {
   if (!entry || entry.type === 'disclaimer' || entry.type === 'feedback') return { helpers: '', root: '', jsonLd: '' }
   if (pathname !== '/') {
     const loaded = splitJsonLd(await fetchAsset(context, `/snap/${pathname.replace(/^\//, '')}.html`))
-    // A product page with no price anywhere has no snapshot (nothing to list), but
-    // it must not reach crawlers with an empty heading: it carries the product's
-    // name (the page stays noindex, see generate-seo-map.mjs).
-    if (!loaded.helpers && entry.type === 'product' && entry.name) {
-      return { helpers: emptyProductSnapshot(entry), root: '', jsonLd: '' }
+    // A product or category page with nothing priced has no snapshot (nothing to
+    // list), but it must not reach crawlers with an empty heading: it carries the
+    // product's name / the category and market (the page stays noindex, see
+    // generate-seo-map.mjs).
+    if (!loaded.helpers && entry.noindex && emptyPageHeading(entry)) {
+      return { helpers: emptyPageSnapshot(entry), root: '', jsonLd: '' }
     }
     return { ...loaded, root: '' }
   }
@@ -265,9 +266,17 @@ async function loadSnapshot(context, pathname) {
 const escapeHtml = (value) =>
   String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
 
-// Same shell as scripts/lib/snapshot.mjs's page(), with the product name only.
-function emptyProductSnapshot(entry) {
-  return `<header class="snap-head"><a href="/" class="snap-logo">Cene sa pijace</a></header><main class="snap-main" lang="${entry.lang}"><h1>${escapeHtml(entry.name)}</h1></main>`
+// The heading of a page that has no content to list - the same words the page's own
+// H1 uses (a product's name; "{category} - {market}" for a category).
+function emptyPageHeading(entry) {
+  if (entry.type === 'product') return entry.name
+  if (entry.type === 'category') return `${entry.category} - ${entry.market}`
+  return ''
+}
+
+// Same shell as scripts/lib/snapshot.mjs's page(), with the heading only.
+function emptyPageSnapshot(entry) {
+  return `<header class="snap-head"><a href="/" class="snap-logo">Cene sa pijace</a></header><main class="snap-main" lang="${entry.lang}"><h1>${escapeHtml(emptyPageHeading(entry))}</h1></main>`
 }
 
 class SetInnerHtml {

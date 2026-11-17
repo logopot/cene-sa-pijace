@@ -28,6 +28,7 @@ import { getAveragePrice } from '../src/utils/price.js'
 import { isKvantaskaMarket } from '../src/utils/seoCopy.js'
 import { computeCityComparison, buildProductJsonLd } from '../src/utils/productJsonLd.js'
 import { analyzeWeeklyDrops } from '../src/utils/weeklyDrops.js'
+import { applySourcePreference, describeSourcePreference } from '../src/data/sourcePreference.js'
 import { translateDataValue, translateCategory, getProductUrlSlug, SUPPORTED_LANGUAGES } from './lib/productLabels.mjs'
 import { fetchAllMarketRows, readLocalEnvFile, ROOT } from './lib/googleSheets.mjs'
 import {
@@ -273,7 +274,12 @@ function buildSnapshots(latestRows) {
 }
 
 async function main() {
-  const allRows = keepPricedRows(await fetchAllMarketRows())
+  // One source per market where two overlap (src/data/sourcePreference.js): applied
+  // here, before anything is written, so latest.json, the product histories and
+  // the snapshots never contain the other source's rows of those markets.
+  const preferred = applySourcePreference(keepPricedRows(await fetchAllMarketRows()))
+  for (const line of describeSourcePreference(preferred, 'generate-data')) console.log(line)
+  const allRows = preferred.rows
   if (allRows.length === 0) throw new Error('Sheet returned no priced rows - refusing to publish an empty dataset')
 
   rmSync(DATA_DIR, { recursive: true, force: true })

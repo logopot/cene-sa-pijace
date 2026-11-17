@@ -101,6 +101,23 @@ Google Sheets (filled by the STIPS and JKP scrapers) stays the single source of 
 
 **Refreshing data:** run the "Weekly Market Scrape to Sheets" workflow manually (Actions -> Run workflow) or wait for the Monday schedule; its last step calls the Cloudflare Pages deploy hook (secret `CLOUDFLARE_DEPLOY_HOOK`), which rebuilds the site with the new data. Locally: `npm run generate:data`.
 
+## 🔀 Jedan izvor po tržištu (STIPS / JKP)
+
+Where two sources report on the same market, the site shows one of them only - the two can disagree widely on the same product (Kalenić potatoes: JKP 140, STIPS 200). Today that is exactly two markets, `Kalenić-Beograd-zelena pijaca` and `Skadarlija-Beograd-zelena pijaca`, and both prefer **JKP**. The rule is a single table in `src/data/sourcePreference.js`:
+
+```js
+export const PREFERRED_SOURCE_BY_MARKET = {
+  'Kalenić-Beograd-zelena pijaca': 'jkp',
+  'Skadarlija-Beograd-zelena pijaca': 'jkp',
+}
+```
+
+- **Key** is the market's `Mesto` exactly as in the sheet; **value** is `'jkp'` (rows with a `Source`) or `'stips'` (rows without one).
+- **Where it is applied:** `scripts/generate-data.mjs` drops the other source's rows of those markets before it writes `latest.json`, the product histories (chart) and the snapshots, so nothing visible - pages, search, market comparison, chart, "biggest price drops", homepage snapshot, JSON-LD - sees them. `scripts/generate-seo-map.mjs` does the same for the prices behind titles, descriptions and noindex. The Google sheet and the scrapers are not touched; the other source's rows stay stored there.
+- **Products only the dropped source has** (e.g. "Paprika (Babura)" at Kalenić) lose their data but keep their route: it answers 200 with `noindex`, is left out of `sitemap.xml` (sr and en together) and its source HTML still has the product name as H1. A category left with nothing at such a market is treated the same way. No redirects. If the preferred source does report the product, the route stays normal.
+- **Add a market:** add a line, rebuild. **Change the winner:** change the value, rebuild. **Remove the rule:** delete the line (or empty the object), rebuild - both sources show again. The build log says what was dropped (`source preference: ...`) and warns about a market that has both sources but no line here, and about a rule that would leave a market empty (it is then not applied).
+- Pages made priceless by the rule do not count towards the build's 5% safety limit for "routes with no price" (that limit is there to catch a broken scrape).
+
 ## 📈 GA4 događaji
 
 All events go through `src/utils/analytics.js` (string parameters trimmed and lowercased, empty ones dropped, no personal data). The gtag snippet in `index.html` is configured with `send_page_view: false`: the single `page_view` of every page comes from `src/utils/pageView.js`.

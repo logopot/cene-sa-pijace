@@ -21,6 +21,7 @@ import { keepPricedRows, selectLatestRows } from './lib/dataset.mjs'
 import { latestRowsForMarket, rowsForMarket, listingFacts, productFacts, productVariant } from '../src/utils/seoFacts.js'
 import { manifestEntryCopy, isKvantaskaMarket } from '../src/utils/seoCopy.js'
 import { untranslatedProductNames } from '../src/utils/productNames.js'
+import { applySourcePreference, describeSourcePreference, PREFERRED_SOURCE_BY_MARKET } from '../src/data/sourcePreference.js'
 import { writeFileSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
 
@@ -125,16 +126,23 @@ function reportCopyUniqueness(entries) {
 function markPricelessRoutes(entries) {
   const priceless = Object.entries(entries).filter(([, entry]) => entry.type === 'product' && !entry.pr)
   const listed = Object.entries(entries).filter(([routePath, entry]) => isOwnCanonical(routePath, entry)).length
-  const share = priceless.length / listed
+  // Pages that are priceless ON PURPOSE - a product only the non-preferred source
+  // reports at a market with a source rule (src/data/sourcePreference.js) - are
+  // noindex too, but do not count towards the safety limit: it is there to catch a
+  // broken scrape, not a rule somebody wrote.
+  const intended = priceless.filter(([, entry]) => entry.pf).length
+  const share = (priceless.length - intended) / listed
   const examples = priceless.filter(([, entry]) => entry.lang === 'sr').slice(0, 10).map(([routePath]) => routePath)
   if (share > NOINDEX_MAX_SHARE) {
     console.error(
-      `[generate-seo-map] NOINDEX NOT APPLIED: ${priceless.length} of ${listed} routes (${(share * 100).toFixed(1)}%) have no price, over the ${NOINDEX_MAX_SHARE * 100}% limit. Examples:\n  ${examples.join('\n  ')}`,
+      `[generate-seo-map] NOINDEX NOT APPLIED: ${priceless.length - intended} of ${listed} routes (${(share * 100).toFixed(1)}%) have no price, over the ${NOINDEX_MAX_SHARE * 100}% limit. Examples:\n  ${examples.join('\n  ')}`,
     )
     return
   }
   for (const [, entry] of priceless) entry.noindex = 1
-  console.log(`[generate-seo-map] noindex (no price rows): ${priceless.length} of ${listed} routes (${(share * 100).toFixed(2)}%)`)
+  console.log(
+    `[generate-seo-map] noindex (no price rows): ${priceless.length} of ${listed} routes - ${priceless.length - intended} without data (${(share * 100).toFixed(2)}%, limit ${NOINDEX_MAX_SHARE * 100}%), ${intended} by the source rule`,
+  )
   for (const example of examples) console.log('[generate-seo-map]   noindex example:', example)
 }
 
@@ -142,7 +150,14 @@ function buildManifest(rows) {
   const entries = buildStaticEntries()
   // The same latest priced rows the page snapshots and the app's latest.json
   // are made of (see generate-data.mjs), indexed by market once.
-  const latestRows = selectLatestRows(keepPricedRows(rows))
+  // Routes exist for every product the sheet has ever listed, but the PRICES behind
+  // their titles, descriptions and noindex come only from the rows the site shows:
+  // for a market with two sources, the preferred one (src/data/sourcePreference.js).
+  // A product only the other source reports keeps its route and becomes a page
+  // without a price (200, noindex, out of the sitemap), see markPricelessRoutes.
+  const preferred = applySourcePreference(keepPricedRows(rows))
+  for (const line of describeSourcePreference(preferred, 'generate-seo-map')) console.log(line)
+  const latestRows = selectLatestRows(preferred.rows)
   const marketLatest = new Map()
   const marketAll = new Map()
   const allFor = (grad, pijaca) => {
@@ -186,7 +201,7 @@ function buildManifest(rows) {
 
     if (row.Kategorija && row.Proizvod) {
       const marketKey = `${grad}|${pijaca}`
-      marketCategories.set(`${marketKey}|${row.Kategorija}`, { grad, pijaca, kategorija: row.Kategorija })
+      marketCategories.set(`${marketKey}|${row.Kategorija}`, { grad, pijaca, kategorija: row.Kategorija, ruled: row.Mesto in PREFERRED_SOURCE_BY_MARKET })
       if (!categoriesByMarket.has(marketKey)) categoriesByMarket.set(marketKey, new Set())
       categoriesByMarket.get(marketKey).add(row.Kategorija)
 
@@ -195,6 +210,7 @@ function buildManifest(rows) {
         pijaca,
         kategorija: row.Kategorija,
         proizvod: row.Proizvod,
+        ruled: row.Mesto in PREFERRED_SOURCE_BY_MARKET,
       })
     }
   }
@@ -226,7 +242,7 @@ function buildManifest(rows) {
       }
     }
 
-    for (const { grad, pijaca, kategorija } of marketCategories.values()) {
+    for (const { grad, pijaca, kategorija, ruled } of marketCategories.values()) {
       const marketPath = buildMarketRoute(grad, pijaca, lang)
       const categoryUrlSlug = getCategoryUrlSlug(kategorija, lang)
       const categoryPath = buildMarketCategoryRoute(grad, pijaca, categoryUrlSlug, lang)
@@ -241,13 +257,18 @@ function buildManifest(rows) {
         slug: getCanonicalMarketSlug(grad, pijaca),
         canonicalPath: isOnlyCategory ? marketPath : categoryPath,
       }
+      // A category with nothing listed any more - all its rows were of the source a
+      // market's rule (src/data/sourcePreference.js) leaves out - is a page without
+      // prices, like a product page without one: served (200), noindex, out of the
+      // sitemap. Only for such markets: elsewhere a category keeps its old behaviour.
+      if (ruled && !latestFor(grad, pijaca).some((row) => row.Kategorija === kategorija)) entries[categoryPath].noindex = 1
       if (isKvantaskaMarket(lang, entries[categoryPath].market)) {
         const { source, date } = listingFacts(latestFor(grad, pijaca).filter((row) => row.Kategorija === kategorija))
         Object.assign(entries[categoryPath], { sr: source, dt: date })
       }
     }
 
-    for (const { grad, pijaca, kategorija, proizvod } of products.values()) {
+    for (const { grad, pijaca, kategorija, proizvod, ruled } of products.values()) {
       const categoryUrlSlug = getCategoryUrlSlug(kategorija, lang)
       const marketPath = buildMarketCategoryRoute(grad, pijaca, categoryUrlSlug, lang)
       const productPath = `${marketPath}/${getProductUrlSlug(proizvod, lang)}`
@@ -273,6 +294,7 @@ function buildManifest(rows) {
         mk: translateDataValue(lang, 'pijaca', pijaca),
         ct: translateDataValue(lang, 'grad', grad),
         cg: translateCategory(lang, kategorija),
+        ...(ruled && { pf: 1 }),
         ...(facts && {
           pr: [facts.min, facts.max],
           ...(facts.unitRaw && { un: translateDataValue(lang, 'jedMere', facts.unitRaw) }),
@@ -294,6 +316,7 @@ function buildManifest(rows) {
   }
   reportCopyUniqueness(entries)
   markPricelessRoutes(entries)
+  for (const entry of Object.values(entries)) delete entry.pf
 
   const { linked, dropped } = attachAlternates(entries, groups)
   console.log(`[generate-seo-map] hreflang: ${linked} routes linked sr<->en, ${dropped} left without alternates`)
